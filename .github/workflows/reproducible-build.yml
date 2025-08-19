@@ -183,7 +183,7 @@ jobs:
       
       - name: Create release (for tags)
         if: github.event_name == 'push' && github.ref_type == 'tag'
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             checksums-*.sha256
