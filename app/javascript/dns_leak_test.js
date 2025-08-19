@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Start progress bar animation
     let progress = 0;
-    const progressInterval = setInterval(() => {
+    let progressInterval = setInterval(() => {
       progress += Math.random() * 15;
       if (progress >= 90) {
         progress = 90;
@@ -46,8 +46,18 @@ document.addEventListener('DOMContentLoaded', function() {
         'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
       }
     })
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+      return response.json();
+    })
     .then(data => {
+      // Validate the response has required data
+      if (!data || !data.test_id || !data.domains || !Array.isArray(data.domains)) {
+        throw new Error('Invalid response from server');
+      }
+      
       currentTestId = data.test_id;
       
       // Trigger DNS queries by creating hidden images with the test domains
@@ -74,6 +84,8 @@ document.addEventListener('DOMContentLoaded', function() {
     })
     .catch(error => {
       console.error('DNS test error:', error);
+      clearInterval(progressInterval); // Stop the progress bar
+      progressBar.style.width = '0%';
       showDnsTestError('Failed to start DNS leak test. Please try again.');
     });
   }
@@ -86,7 +98,12 @@ document.addEventListener('DOMContentLoaded', function() {
         'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
       }
     })
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+      return response.json();
+    })
     .then(data => {
       // Complete progress bar
       progressBar.style.width = '100%';
@@ -97,6 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
     })
     .catch(error => {
       console.error('DNS results error:', error);
+      progressBar.style.width = '0%';
       showDnsTestError('Failed to get DNS test results. Please try again.');
     });
   }
