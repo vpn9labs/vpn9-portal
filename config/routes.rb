@@ -170,6 +170,7 @@ Rails.application.routes.draw do
       # Runtime attestation and verification
       get :attestation, to: "attestation#show"
       get "attestation/verify", to: "attestation#verify"
+      get "attestation/debug", to: "attestation#debug"
     end
   end
 

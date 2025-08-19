@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Pre-build hook to set build arguments for reproducible builds
+
+# Calculate build metadata
+export BUILD_VERSION=$(git describe --tags --always)
+export BUILD_COMMIT=$(git rev-parse HEAD)
+export BUILD_TIMESTAMP=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+export SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)
+
+echo "Build metadata:"
+echo "  VERSION: ${BUILD_VERSION}"
+echo "  COMMIT: ${BUILD_COMMIT}"
+echo "  TIMESTAMP: ${BUILD_TIMESTAMP}"

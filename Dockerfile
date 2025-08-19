@@ -102,6 +102,9 @@ RUN bundle exec bootsnap precompile app/ lib/
 # Debug: Check bun installation
 RUN which bun && bun --version
 
+# Build JavaScript and CSS assets
+RUN bun run build && bun run build:css
+
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY  
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
@@ -111,11 +114,13 @@ RUN if [ -d public/assets ]; then \
     fi
 
 # Clean up build artifacts to reduce image size
+# Keep app/assets/builds which contains compiled CSS and JS
 RUN rm -rf node_modules tmp/cache vendor/bundle/ruby/*/cache \
     test spec .rspec .rubocop.yml .eslintrc \
-    app/assets vendor/assets lib/assets \
+    app/assets/stylesheets app/assets/images app/assets/config \
+    vendor/assets lib/assets \
     tmp/* log/* storage/* \
-    package.json bun.lock postcss.config.js tailwind.config.js \
+    package.json bun.lock postcss.config.js \
     .bundle/config
 
 # Final stage
@@ -144,10 +149,15 @@ RUN touch -d "@${SOURCE_DATE_EPOCH}" /rails /rails/public /rails/public/assets 2
 
 USER 1000:1000
 
-# Add build metadata as labels
-ARG BUILD_VERSION
-ARG BUILD_COMMIT
-ARG BUILD_TIMESTAMP
+# Add build metadata as environment variables and labels
+ARG BUILD_VERSION=development
+ARG BUILD_COMMIT=unknown
+ARG BUILD_TIMESTAMP=unknown
+
+ENV BUILD_VERSION=${BUILD_VERSION} \
+    BUILD_COMMIT=${BUILD_COMMIT} \
+    BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
+
 LABEL org.opencontainers.image.version="${BUILD_VERSION}" \
       org.opencontainers.image.revision="${BUILD_COMMIT}" \
       org.opencontainers.image.created="${BUILD_TIMESTAMP}" \
