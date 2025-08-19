@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "json"
+
 module Api
   module V1
     class AttestationController < ActionController::Base
@@ -59,48 +61,27 @@ module Api
       # Debug endpoint to check Docker label reading
       def debug
         container_id = current_container_id
-        
-        debug_info = {
+
+        render json: {
           container: {
             id: container_id,
-            hostname: ENV["HOSTNAME"],
-            docker_socket_exists: File.exist?("/var/run/docker.sock"),
-            docker_socket_readable: File.exist?("/var/run/docker.sock") ? File.readable?("/var/run/docker.sock") : false
-          },
-          labels: {
-            version: read_docker_label("org.opencontainers.image.version"),
-            revision: read_docker_label("org.opencontainers.image.revision"),
-            created: read_docker_label("org.opencontainers.image.created")
+            hostname: ENV["HOSTNAME"]
           },
           environment: {
             build_version: ENV["BUILD_VERSION"],
             build_commit: ENV["BUILD_COMMIT"],
-            build_timestamp: ENV["BUILD_TIMESTAMP"]
-          },
-          docker_command_test: nil
+            build_timestamp: ENV["BUILD_TIMESTAMP"],
+            docker_image_digest: ENV["DOCKER_IMAGE_DIGEST"]
+          }
         }
-
-        # Try running docker command directly if socket exists
-        if File.exist?("/var/run/docker.sock") && container_id != "unknown"
-          begin
-            debug_info[:docker_command_test] = {
-              docker_version: `docker --version 2>&1`.strip,
-              inspect_output: `docker inspect #{container_id} --format='{{json .Config.Labels}}' 2>&1`.strip[0..500]
-            }
-          rescue => e
-            debug_info[:docker_command_test] = { error: e.message }
-          end
-        end
-
-        render json: debug_info
       end
 
       private
 
       def current_image_digest
-        # Read from Docker labels or environment
+        # Attestation requires explicit injection at deploy time
         return "sha256:test1234567890" if Rails.env.test?
-        ENV["DOCKER_IMAGE_DIGEST"] || read_docker_label("org.opencontainers.image.revision")
+        ENV["DOCKER_IMAGE_DIGEST"]
       end
 
       def current_container_id
@@ -148,36 +129,7 @@ module Api
         `git rev-parse HEAD`.strip rescue "unknown"
       end
 
-      def read_docker_label(label)
-        # Read Docker label from current container
-        return nil if Rails.env.test?
-
-        container_id = current_container_id
-        return nil if container_id == "unknown" || container_id == "test-container-id"
-
-        # Check if we have access to Docker socket
-        if File.exist?("/var/run/docker.sock")
-          # Try to read label using docker inspect
-          cmd = "docker inspect #{container_id} --format='{{index .Config.Labels \"#{label}\"}}' 2>/dev/null"
-          result = `#{cmd}`.strip
-          
-          # Log for debugging
-          Rails.logger.info "Reading Docker label '#{label}' from container #{container_id[0..12]}: #{result.inspect}"
-          
-          # Return result if it's valid
-          if result.present? && result != "<no value>" && result != "" && result != "nil"
-            result
-          else
-            nil
-          end
-        else
-          Rails.logger.warn "Docker socket not available at /var/run/docker.sock"
-          nil
-        end
-      rescue => e
-        Rails.logger.error "Error reading Docker label: #{e.message}"
-        nil
-      end
+      # Docker socket and registry lookups removed: labels cannot be read and digest must be injected.
 
       def perform_runtime_verification
         checks = {
