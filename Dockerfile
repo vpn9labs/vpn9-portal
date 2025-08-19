@@ -1,81 +1,161 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1.9.0@sha256:fe40cf4e92cd0c467be2cfc30657a680ae2398318afd50b0c80585784c604f28
 # check=error=true
 
-# This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
-# docker build -t vpn9 .
-# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name vpn9 vpn9
+# Reproducible Build Dockerfile for VPN9 Portal
+# This Dockerfile ensures deterministic, reproducible builds
+# Build timestamp and metadata are controlled for reproducibility
+#
+# This is the default Dockerfile used by:
+# - Kamal deployments (kamal deploy)
+# - Reproducible builds (scripts/reproducible-build.sh)
+# - GitHub Actions CI/CD
+#
+# For development, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
-# For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
-
-# Make sure RUBY_VERSION matches the Ruby version in .ruby-version
+# Fixed base image with SHA256 digest for reproducibility
 ARG RUBY_VERSION=3.4.5
-FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
+FROM docker.io/library/ruby:${RUBY_VERSION}-slim@sha256:0d2adfa1930d67ee79e5d16c3610f4fbed43c98e98dbda14c2811b8197211c74 AS base
+
+# Set reproducible build timestamp (default to a fixed past date)
+ARG SOURCE_DATE_EPOCH=1700000000
+ENV SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH}
 
 # Rails app lives here
 WORKDIR /rails
 
-# Install base packages
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+# Install base packages with pinned versions for reproducibility
+# Using Debian 13 (trixie) package versions
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+        curl=8.14.1-2 \
+        libjemalloc2=5.3.0-3 \
+        libvips42t64=8.16.1-1+b1 \
+        sqlite3=3.46.1-7 && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
-# Set production environment
+# Set production environment with reproducible settings
 ENV RAILS_ENV="production" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development"
+    BUNDLE_WITHOUT="development" \
+    BUNDLE_FROZEN="true" \
+    TZ="UTC" \
+    LANG="C.UTF-8" \
+    LC_ALL="C.UTF-8"
 
-# Throw-away build stage to reduce size of final image
+# Build stage
 FROM base AS build
 
-# Install packages needed to build gems
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config unzip && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+# Install build dependencies with pinned versions  
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+        build-essential=12.12 \
+        git=1:2.47.2-0.2 \
+        libyaml-dev=0.2.5-2 \
+        pkg-config=1.8.1-4 \
+        unzip=6.0-29 && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
+# Install Bun with specific version and checksum
 ENV BUN_INSTALL=/usr/local/bun
 ENV PATH=/usr/local/bun/bin:$PATH
 ARG BUN_VERSION=1.2.19
-RUN curl -fsSL https://bun.sh/install | bash -s -- "bun-v${BUN_VERSION}"
+ARG BUN_SHA256=c3d3c14e9a5ec83ff67d0acfe76e4315ad06da9f34f59fc7b13813782caf1f66
+RUN curl -fsSL -o bun.zip https://github.com/oven-sh/bun/releases/download/bun-v${BUN_VERSION}/bun-linux-x64.zip && \
+    echo "${BUN_SHA256}  bun.zip" | sha256sum -c - && \
+    unzip bun.zip -d /tmp && \
+    mkdir -p /usr/local/bun/bin && \
+    mv /tmp/bun-linux-x64/bun /usr/local/bun/bin/bun && \
+    rm -rf bun.zip /tmp/bun-linux-x64 && \
+    chmod +x /usr/local/bun/bin/bun && \
+    ln -s /usr/local/bun/bin/bun /usr/local/bun/bin/bunx
 
-# Install application gems
-COPY Gemfile Gemfile.lock ./
-RUN bundle install && \
+# Copy dependency files
+COPY --link Gemfile Gemfile.lock ./
+COPY --link package.json bun.lock ./
+
+# Install gems with frozen lockfile
+RUN bundle install --jobs=$(nproc) --retry=3 && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile --gemfile
 
-# Install node modules
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+# Install node modules with frozen lockfile
+RUN --mount=type=cache,target=/root/.bun/install/cache,sharing=locked \
+    bun install --frozen-lockfile
 
 # Copy application code
-COPY . .
+COPY --link . .
+
+# Remove non-deterministic files and large unnecessary files
+RUN rm -rf .git .github .gitignore .dockerignore \
+    log/* tmp/* storage/* \
+    node_modules/.cache \
+    public/packs-test
 
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
 
-# Precompiling assets for production without requiring secret RAILS_MASTER_KEY
+# Debug: Check bun installation
+RUN which bun && bun --version
+
+# Precompiling assets for production without requiring secret RAILS_MASTER_KEY  
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
+# Strip timestamps from compiled assets for reproducibility (only if directory exists)
+RUN if [ -d public/assets ]; then \
+      find public/assets -type f -exec touch -d "@${SOURCE_DATE_EPOCH}" {} \; ; \
+    fi
 
+# Clean up build artifacts to reduce image size
+RUN rm -rf node_modules tmp/cache vendor/bundle/ruby/*/cache \
+    test spec .rspec .rubocop.yml .eslintrc \
+    app/assets vendor/assets lib/assets \
+    tmp/* log/* storage/* \
+    package.json bun.lock postcss.config.js tailwind.config.js \
+    .bundle/config
 
-
-# Final stage for app image
+# Final stage
 FROM base
 
-# Copy built artifacts: gems, application
-COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
-COPY --from=build /rails /rails
+# Copy built artifacts including bun
+COPY --from=build --link "${BUNDLE_PATH}" "${BUNDLE_PATH}"
+COPY --from=build --link /usr/local/bun /usr/local/bun
+COPY --from=build --link /rails /rails
 
-# Run and own only the runtime files as a non-root user for security
+# Ensure bun is in PATH
+ENV BUN_INSTALL=/usr/local/bun
+ENV PATH=/usr/local/bun/bin:$PATH
+
+# Create necessary directories that were removed during cleanup
+RUN mkdir -p tmp/pids tmp/cache log storage && \
+    touch log/production.log
+
+# Create non-root user with fixed UID/GID
 RUN groupadd --system --gid 1000 rails && \
     useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
-    chown -R rails:rails db log storage tmp
+    chown -R 1000:1000 db log storage tmp
+
+# Set reproducible file timestamps (only for critical directories)
+RUN touch -d "@${SOURCE_DATE_EPOCH}" /rails /rails/public /rails/public/assets 2>/dev/null || true
+
 USER 1000:1000
 
-# Entrypoint prepares the database.
-ENTRYPOINT ["/rails/bin/docker-entrypoint"]
+# Add build metadata as labels
+ARG BUILD_VERSION
+ARG BUILD_COMMIT
+ARG BUILD_TIMESTAMP
+LABEL org.opencontainers.image.version="${BUILD_VERSION}" \
+      org.opencontainers.image.revision="${BUILD_COMMIT}" \
+      org.opencontainers.image.created="${BUILD_TIMESTAMP}" \
+      org.opencontainers.image.source="https://github.com/vpn9labs/vpn9-portal" \
+      org.opencontainers.image.vendor="VPN9" \
+      org.opencontainers.image.title="VPN9 Portal" \
+      org.opencontainers.image.description="Reproducible build of VPN9 Portal"
 
-# Start server via Thruster by default, this can be overwritten at runtime
+ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 EXPOSE 80
 CMD ["./bin/thrust", "./bin/rails", "server"]

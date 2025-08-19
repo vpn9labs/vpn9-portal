@@ -48,4 +48,28 @@
 
 # Ignore Docker-related files
 /.dockerignore
+Dockerfile*
+
+# Ignore test files and documentation
+/test
+/spec
+/.rspec
+/docs
+README.md
+*.md
+
+# Ignore development configuration
+/.rubocop.yml
+/.eslintrc*
+/.prettierrc*
+
+# Ignore builds directory
+/builds
+
+# Ignore coverage reports
+/coverage
+
+# Ignore vendor directory if using local gems
+/vendor/bundle
+/vendor/cache
 /Dockerfile*

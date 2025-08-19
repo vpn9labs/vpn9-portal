@@ -24,7 +24,7 @@ module Api
           },
           verification: {
             docker_image: "vpn9/vpn9-portal:#{build_version}",
-            dockerfile_url: "https://github.com/vpn9labs/vpn9-portal/blob/#{build_commit}/Dockerfile.reproducible",
+            dockerfile_url: "https://github.com/vpn9labs/vpn9-portal/blob/#{build_commit}/Dockerfile",
             source_url: "https://github.com/vpn9labs/vpn9-portal/tree/#{build_commit}",
             build_log_url: "https://github.com/vpn9labs/vpn9-portal/actions/runs/#{ENV['GITHUB_RUN_ID']}",
             attestation_url: "https://github.com/vpn9labs/vpn9-portal/releases/download/#{build_version}/attestation-#{build_version}.json",
