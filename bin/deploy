@@ -15,16 +15,19 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
   echo ""
 fi
 
-# Show build metadata that will be used (calculated in .kamal/secrets)
-BUILD_VERSION=$(git describe --tags --always 2>/dev/null || echo "v0.0.1-$(git rev-parse --short HEAD)")
-BUILD_COMMIT=$(git rev-parse HEAD)
+# Calculate and export build metadata
+export BUILD_VERSION=$(git describe --tags --always 2>/dev/null || echo "v0.0.1-$(git rev-parse --short HEAD)")
+export BUILD_COMMIT=$(git rev-parse HEAD)
+export BUILD_TIMESTAMP=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+export SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)
 
 echo "Build Metadata:"
 echo "  VERSION: ${BUILD_VERSION}"
 echo "  COMMIT: ${BUILD_COMMIT:0:8}"
+echo "  TIMESTAMP: ${BUILD_TIMESTAMP}"
 echo ""
 
-# Deploy with Kamal
+# Deploy with Kamal (will use exported env vars for empty args)
 echo "Deploying with Kamal..."
 OP_ACCOUNT=zajpt kamal deploy
 

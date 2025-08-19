@@ -150,9 +150,9 @@ RUN touch -d "@${SOURCE_DATE_EPOCH}" /rails /rails/public /rails/public/assets 2
 USER 1000:1000
 
 # Add build metadata as environment variables and labels
-ARG BUILD_VERSION=development
-ARG BUILD_COMMIT=unknown
-ARG BUILD_TIMESTAMP=unknown
+ARG BUILD_VERSION
+ARG BUILD_COMMIT
+ARG BUILD_TIMESTAMP
 
 ENV BUILD_VERSION=${BUILD_VERSION} \
     BUILD_COMMIT=${BUILD_COMMIT} \
