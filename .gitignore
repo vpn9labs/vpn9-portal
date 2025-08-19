@@ -45,4 +45,10 @@
 
 /node_modules
 
-/builds
+# Reproducible build artifacts (DO NOT COMMIT - too large!)
+/builds/
+builds/*.tar
+builds/*.tar.gz
+builds/*.tar.xz
+builds/verification/
+builds/attestations/*.json
