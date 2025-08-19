@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # VPN9 Portal Deployment Script
-# This script commits any working changes and deploys with build metadata
+# Build metadata is calculated in .kamal/secrets
 
 echo "=== VPN9 Portal Deployment ==="
 echo ""
@@ -15,35 +15,18 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
   echo ""
 fi
 
-# Calculate build metadata from the latest commit
+# Show build metadata that will be used (calculated in .kamal/secrets)
 BUILD_VERSION=$(git describe --tags --always 2>/dev/null || echo "v0.0.1-$(git rev-parse --short HEAD)")
 BUILD_COMMIT=$(git rev-parse HEAD)
-BUILD_TIMESTAMP=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
-SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)
 
 echo "Build Metadata:"
 echo "  VERSION: ${BUILD_VERSION}"
 echo "  COMMIT: ${BUILD_COMMIT:0:8}"
-echo "  TIMESTAMP: ${BUILD_TIMESTAMP}"
 echo ""
 
-# Create a temporary deploy config with actual build args
-# Using sed to preserve structure and comments
-echo "Creating temporary deploy config with build metadata..."
-cp config/deploy.yml config/deploy.tmp.yml
-
-# Replace the build arg values in the temporary config
-sed -i "s/BUILD_VERSION: \"latest\"/BUILD_VERSION: \"${BUILD_VERSION}\"/" config/deploy.tmp.yml
-sed -i "s/BUILD_COMMIT: \"HEAD\"/BUILD_COMMIT: \"${BUILD_COMMIT}\"/" config/deploy.tmp.yml
-sed -i "s/BUILD_TIMESTAMP: \".*\"/BUILD_TIMESTAMP: \"${BUILD_TIMESTAMP}\"/" config/deploy.tmp.yml
-sed -i "s/SOURCE_DATE_EPOCH: \".*\"/SOURCE_DATE_EPOCH: \"${SOURCE_DATE_EPOCH}\"/" config/deploy.tmp.yml
-
-# Deploy with Kamal using the temporary config
+# Deploy with Kamal
 echo "Deploying with Kamal..."
-OP_ACCOUNT=zajpt kamal deploy -c config/deploy.tmp.yml
-
-# Clean up temporary config
-rm -f config/deploy.tmp.yml
+OP_ACCOUNT=zajpt kamal deploy
 
 echo ""
 echo "=== Deployment Complete ==="
