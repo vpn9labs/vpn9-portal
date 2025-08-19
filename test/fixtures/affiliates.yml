@@ -1,0 +1,71 @@
+# Affiliates test fixtures
+
+active_affiliate:
+  name: Active Affiliate
+  email: active@example.com
+  password_digest: <%= BCrypt::Password.create("password123") %>
+  code: ACTIVE123
+  status: active
+  commission_rate: 20.0
+  company_name: Active Company
+  website: https://active.example.com
+  phone: +1234567890
+  address: 123 Active St
+  city: Active City
+  state: AC
+  country: USA
+  postal_code: "12345"
+  tax_id: TAX-123456
+  promotional_methods: Blog, Social Media
+  expected_referrals: 50
+  payout_currency: btc
+  payout_address: bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh
+  minimum_payout_amount: 100
+  created_at: <%= 30.days.ago %>
+  updated_at: <%= 1.day.ago %>
+
+pending_affiliate:
+  name: Pending Affiliate
+  email: pending@example.com
+  password_digest: <%= BCrypt::Password.create("password123") %>
+  code: PENDING456
+  status: pending
+  commission_rate: 15.0
+  company_name: Pending Company
+  website: https://pending.example.com
+  phone: +9876543210
+  payout_currency: eth
+  payout_address: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb6"
+  minimum_payout_amount: 50
+  created_at: <%= 7.days.ago %>
+  updated_at: <%= 1.day.ago %>
+
+suspended_affiliate:
+  name: Suspended Affiliate
+  email: suspended@example.com
+  password_digest: <%= BCrypt::Password.create("password123") %>
+  code: SUSPENDED789
+  status: suspended
+  commission_rate: 10.0
+  payout_currency: btc
+  payout_address: bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq
+  minimum_payout_amount: 200
+  created_at: <%= 60.days.ago %>
+  updated_at: <%= 15.days.ago %>
+
+high_volume:
+  name: High Volume Tester
+  email: highvolume@example.com
+  password_digest: <%= BCrypt::Password.create("password123") %>
+  code: HIGHVOL123
+  status: active
+  commission_rate: 25.0
+  company_name: Big Marketing Corp
+  website: https://bigmarketing.com
+  promotional_methods: Email campaigns, PPC ads, SEO
+  expected_referrals: 500
+  payout_currency: btc
+  payout_address: bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh
+  minimum_payout_amount: 500
+  created_at: <%= 90.days.ago %>
+  updated_at: <%= 1.hour.ago %>

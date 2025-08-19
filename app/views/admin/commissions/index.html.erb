@@ -1,0 +1,184 @@
+<div class="px-4 sm:px-6 lg:px-8">
+  <div class="sm:flex sm:items-center">
+    <div class="sm:flex-auto">
+      <h1 class="text-2xl font-semibold text-gray-900">Commissions</h1>
+      <p class="mt-2 text-sm text-gray-700">Review and approve affiliate commissions</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="mt-6 bg-gray-50 p-4 rounded-lg">
+    <%= form_with(url: admin_commissions_path, method: :get, local: true, class: "space-y-4 sm:space-y-0 sm:flex sm:items-end sm:space-x-4") do |f| %>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Status</label>
+        <%= select_tag :status, 
+            options_for_select([
+              ["All", ""],
+              ["Pending", "pending"],
+              ["Approved", "approved"],
+              ["Paid", "paid"],
+              ["Cancelled", "cancelled"]
+            ], params[:status]),
+            class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Start Date</label>
+        <%= date_field_tag :start_date, params[:start_date], 
+            class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700">End Date</label>
+        <%= date_field_tag :end_date, params[:end_date],
+            class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+      </div>
+      
+      <%= submit_tag "Filter", class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700" %>
+    <% end %>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="bg-white px-4 py-5 shadow rounded-lg">
+      <dt class="text-sm font-medium text-gray-500">Pending</dt>
+      <dd class="mt-1 text-3xl font-semibold text-yellow-600">
+        $<%= number_with_delimiter(@totals[:pending].to_i) %>
+      </dd>
+    </div>
+    
+    <div class="bg-white px-4 py-5 shadow rounded-lg">
+      <dt class="text-sm font-medium text-gray-500">Approved</dt>
+      <dd class="mt-1 text-3xl font-semibold text-blue-600">
+        $<%= number_with_delimiter(@totals[:approved].to_i) %>
+      </dd>
+    </div>
+    
+    <div class="bg-white px-4 py-5 shadow rounded-lg">
+      <dt class="text-sm font-medium text-gray-500">Paid</dt>
+      <dd class="mt-1 text-3xl font-semibold text-green-600">
+        $<%= number_with_delimiter(@totals[:paid].to_i) %>
+      </dd>
+    </div>
+    
+    <div class="bg-white px-4 py-5 shadow rounded-lg">
+      <dt class="text-sm font-medium text-gray-500">Cancelled</dt>
+      <dd class="mt-1 text-3xl font-semibold text-red-600">
+        $<%= number_with_delimiter(@totals[:cancelled].to_i) %>
+      </dd>
+    </div>
+  </div>
+
+  <!-- Commissions Table -->
+  <%= form_with(url: bulk_approve_admin_commissions_path, method: :post, local: true) do |form| %>
+    <div class="mt-8 flow-root">
+      <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+          <div class="overflow-hidden shadow border border-gray-200 sm:rounded-lg">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="relative px-7 sm:w-12 sm:px-6">
+                    <input type="checkbox" 
+                           id="select-all"
+                           class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                  </th>
+                  <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">Date</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Affiliate</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Amount</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Rate</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Payment</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
+                  <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                    <span class="sr-only">Actions</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200 bg-white">
+                <% @commissions.each do |commission| %>
+                  <tr>
+                    <td class="relative px-7 sm:w-12 sm:px-6">
+                      <% if commission.pending? || commission.approved? %>
+                        <%= check_box_tag "commission_ids[]", commission.id, false,
+                            class: "absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" %>
+                      <% end %>
+                    </td>
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900">
+                      <%= commission.created_at.strftime("%Y-%m-%d") %>
+                    </td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm">
+                      <div>
+                        <div class="font-medium text-gray-900">
+                          <%= commission.affiliate.name || "Unnamed" %>
+                        </div>
+                        <div class="text-gray-500">
+                          <%= commission.affiliate.code %>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
+                      $<%= commission.amount %>
+                    </td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
+                      <%= commission.commission_rate %>%
+                    </td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
+                      #<%= commission.payment_id %>
+                    </td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm">
+                      <% case commission.status %>
+                      <% when "pending" %>
+                        <span class="inline-flex rounded-full bg-yellow-100 px-2 text-xs font-semibold leading-5 text-yellow-800">Pending</span>
+                      <% when "approved" %>
+                        <span class="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">Approved</span>
+                      <% when "paid" %>
+                        <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Paid</span>
+                      <% when "cancelled" %>
+                        <span class="inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold leading-5 text-red-800">Cancelled</span>
+                      <% end %>
+                    </td>
+                    <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                      <%= link_to "View", admin_commission_path(commission), class: "text-indigo-600 hover:text-indigo-900 mr-2" %>
+                      <% if commission.pending? %>
+                        <%= link_to "Approve", approve_admin_commission_path(commission), 
+                            method: :post,
+                            class: "text-green-600 hover:text-green-900 mr-2" %>
+                        <%= link_to "Cancel", cancel_admin_commission_path(commission),
+                            method: :post,
+                            data: { confirm: "Are you sure?" },
+                            class: "text-red-600 hover:text-red-900" %>
+                      <% end %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bulk Actions -->
+    <div class="mt-4 flex items-center space-x-3">
+      <%= submit_tag "Bulk Approve Selected", 
+          formaction: bulk_approve_admin_commissions_path,
+          class: "inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700" %>
+      <%= submit_tag "Bulk Cancel Selected",
+          formaction: bulk_cancel_admin_commissions_path,
+          class: "inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700" %>
+    </div>
+  <% end %>
+
+  <% if @commissions.respond_to?(:current_page) %>
+    <div class="mt-6">
+      <%= paginate @commissions %>
+    </div>
+  <% end %>
+</div>
+
+<script>
+  document.getElementById('select-all')?.addEventListener('change', function(e) {
+    const checkboxes = document.querySelectorAll('input[name="commission_ids[]"]');
+    checkboxes.forEach(checkbox => checkbox.checked = e.target.checked);
+  });
+</script>

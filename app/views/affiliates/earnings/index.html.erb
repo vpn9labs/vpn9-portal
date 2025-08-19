@@ -1,0 +1,160 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="sm:flex sm:items-center">
+    <div class="sm:flex-auto">
+      <h1 class="text-2xl font-semibold text-gray-900">Earnings</h1>
+      <p class="mt-2 text-sm text-gray-700">Track your commissions and request payouts</p>
+    </div>
+    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+      <% if @current_affiliate.eligible_for_payout?(@current_affiliate.minimum_payout_amount || 100) %>
+        <%= button_to "Request Payout", request_payout_affiliates_earnings_path, 
+            method: :post,
+            class: "block rounded-md bg-green-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-green-500" %>
+      <% else %>
+        <button disabled class="block rounded-md bg-gray-300 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm cursor-not-allowed">
+          Request Payout (Min: $<%= @current_affiliate.minimum_payout_amount || 100 %>)
+        </button>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Earnings Summary -->
+  <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-6">
+    <div class="bg-white px-4 py-5 shadow rounded-lg">
+      <dt class="text-sm font-medium text-gray-500">Pending</dt>
+      <dd class="mt-1 text-2xl font-semibold text-yellow-600">
+        $<%= number_with_delimiter(@earnings_summary[:pending]) %>
+      </dd>
+    </div>
+    
+    <div class="bg-white px-4 py-5 shadow rounded-lg">
+      <dt class="text-sm font-medium text-gray-500">Approved</dt>
+      <dd class="mt-1 text-2xl font-semibold text-green-600">
+        $<%= number_with_delimiter(@earnings_summary[:approved]) %>
+      </dd>
+    </div>
+    
+    <div class="bg-white px-4 py-5 shadow rounded-lg">
+      <dt class="text-sm font-medium text-gray-500">Paid</dt>
+      <dd class="mt-1 text-2xl font-semibold text-blue-600">
+        $<%= number_with_delimiter(@earnings_summary[:paid]) %>
+      </dd>
+    </div>
+    
+    <div class="bg-white px-4 py-5 shadow rounded-lg">
+      <dt class="text-sm font-medium text-gray-500">Cancelled</dt>
+      <dd class="mt-1 text-2xl font-semibold text-red-600">
+        $<%= number_with_delimiter(@earnings_summary[:cancelled]) %>
+      </dd>
+    </div>
+    
+    <div class="bg-white px-4 py-5 shadow rounded-lg">
+      <dt class="text-sm font-medium text-gray-500">Available Balance</dt>
+      <dd class="mt-1 text-2xl font-semibold text-gray-900">
+        $<%= number_with_delimiter(@earnings_summary[:available_balance]) %>
+      </dd>
+    </div>
+    
+    <div class="bg-white px-4 py-5 shadow rounded-lg">
+      <dt class="text-sm font-medium text-gray-500">Lifetime Earnings</dt>
+      <dd class="mt-1 text-2xl font-semibold text-gray-900">
+        $<%= number_with_delimiter(@earnings_summary[:lifetime_earnings]) %>
+      </dd>
+    </div>
+  </div>
+
+  <!-- Monthly Earnings Chart Placeholder -->
+  <div class="mt-8 bg-white shadow rounded-lg p-6">
+    <h2 class="text-lg font-medium text-gray-900 mb-4">Monthly Earnings</h2>
+    <div class="text-gray-500">
+      <!-- Chart would go here - placeholder for now -->
+      <div class="h-64 bg-gray-100 rounded flex items-center justify-center">
+        <p>Monthly earnings chart</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Commissions List -->
+  <div class="mt-8">
+    <h2 class="text-lg font-medium text-gray-900 mb-4">Commission History</h2>
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+      <% if @commissions.any? %>
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Date
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Payment ID
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                User
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Amount
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Rate
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @commissions.each do |commission| %>
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= commission.created_at.strftime("%B %d, %Y") %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <%= commission.payment.transaction_id %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <%= commission.referral.user.email_address || "User ##{commission.referral.user.id}" %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  $<%= "%.2f" % commission.amount %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <%= commission.commission_rate %>%
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <% case commission.status %>
+                  <% when "pending" %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                      Pending
+                    </span>
+                  <% when "approved" %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                      Approved
+                    </span>
+                  <% when "paid" %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                      Paid
+                    </span>
+                  <% when "cancelled" %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                      Cancelled
+                    </span>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <div class="px-6 py-4 text-sm text-gray-500 text-center">
+          No commissions found.
+        </div>
+      <% end %>
+    </div>
+    
+    <!-- Pagination -->
+    <% if @commissions.respond_to?(:current_page) %>
+      <div class="mt-4">
+        <%= paginate @commissions %>
+      </div>
+    <% end %>
+  </div>
+</div>

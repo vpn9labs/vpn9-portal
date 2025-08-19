@@ -1,0 +1,75 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="bg-white shadow sm:rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <h3 class="text-lg leading-6 font-medium text-gray-900">
+        Delete Your Account
+      </h3>
+      
+      <div class="mt-5">
+        <div class="rounded-md bg-red-50 p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">
+                Warning: This action cannot be undone
+              </h3>
+              <div class="mt-2 text-sm text-red-700">
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>Your account will be permanently deleted</li>
+                  <li>You will lose access to all services immediately</li>
+                  <li>Your email address will be removed from our system</li>
+                  <li>Payment history will be preserved for legal compliance but anonymized</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <%= form_with url: account_deletion_path, method: :post, local: true, class: "mt-5" do |f| %>
+        <div class="space-y-4">
+          <div>
+            <label for="reason" class="block text-sm font-medium text-gray-700">
+              Reason for leaving (optional)
+            </label>
+            <div class="mt-1">
+              <%= text_area_tag :reason, nil, 
+                  rows: 3,
+                  class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md",
+                  placeholder: "Help us improve by sharing why you're leaving..." %>
+            </div>
+          </div>
+          
+          <div>
+            <label for="passphrase" class="block text-sm font-medium text-gray-700">
+              Enter your passphrase to confirm deletion
+            </label>
+            <div class="mt-1">
+              <%= password_field_tag :passphrase, nil,
+                  required: true,
+                  autocomplete: "off",
+                  class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md",
+                  placeholder: "Enter your passphrase" %>
+            </div>
+            <p class="mt-2 text-sm text-gray-500">
+              This is required to verify your identity
+            </p>
+          </div>
+        </div>
+        
+        <div class="mt-5 flex justify-between">
+          <%= link_to "Cancel", root_path, 
+              class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+          
+          <%= f.submit "Delete My Account", 
+              class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500",
+              data: { confirm: "Are you absolutely sure? This action cannot be undone." } %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

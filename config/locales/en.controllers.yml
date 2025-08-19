@@ -1,0 +1,8 @@
+en:
+  signups:
+    success: "Welcome! You have signed up successfully."
+    success_with_passphrase: "Welcome! Your account has been created. Please save your passphrase - you'll need it to access your account."
+    try_again_later: "Try again later."
+  sessions:
+    invalid_passphrase: "Invalid passphrase. Please check your passphrase and try again."
+    rate_limit_exceeded: "Try again later."

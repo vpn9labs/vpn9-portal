@@ -1,0 +1,201 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="md:flex md:items-center md:justify-between mb-8">
+    <div class="flex-1 min-w-0">
+      <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+        Edit Profile
+      </h2>
+    </div>
+  </div>
+
+  <%= form_with model: @affiliate, url: affiliates_profile_path, local: true do |f| %>
+    <% if @affiliate.errors.any? %>
+      <div class="rounded-md bg-red-50 p-4 mb-6">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">
+              There were <%= pluralize(@affiliate.errors.count, "error") %> with your submission
+            </h3>
+            <div class="mt-2 text-sm text-red-700">
+              <ul class="list-disc pl-5 space-y-1">
+                <% @affiliate.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="space-y-8">
+      <!-- Personal Information -->
+      <div class="bg-white shadow sm:rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+            Personal Information
+          </h3>
+          <div class="grid grid-cols-6 gap-6">
+            <div class="col-span-6 sm:col-span-3">
+              <%= f.label :name, class: "block text-sm font-medium text-gray-700" %>
+              <%= f.text_field :name, class: "mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm" %>
+            </div>
+
+            <div class="col-span-6 sm:col-span-3">
+              <%= f.label :email, class: "block text-sm font-medium text-gray-700" %>
+              <%= f.email_field :email, class: "mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm" %>
+            </div>
+
+            <div class="col-span-6 sm:col-span-3">
+              <%= f.label :phone, class: "block text-sm font-medium text-gray-700" %>
+              <%= f.text_field :phone, class: "mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm" %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Business Information -->
+      <div class="bg-white shadow sm:rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+            Business Information
+          </h3>
+          <div class="grid grid-cols-6 gap-6">
+            <div class="col-span-6 sm:col-span-3">
+              <%= f.label :company_name, class: "block text-sm font-medium text-gray-700" %>
+              <%= f.text_field :company_name, class: "mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm" %>
+            </div>
+
+            <div class="col-span-6 sm:col-span-3">
+              <%= f.label :website, class: "block text-sm font-medium text-gray-700" %>
+              <%= f.text_field :website, placeholder: "https://", class: "mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm" %>
+            </div>
+
+            <div class="col-span-6">
+              <%= f.label :address, class: "block text-sm font-medium text-gray-700" %>
+              <%= f.text_field :address, class: "mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm" %>
+            </div>
+
+            <div class="col-span-6 sm:col-span-2">
+              <%= f.label :city, class: "block text-sm font-medium text-gray-700" %>
+              <%= f.text_field :city, class: "mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm" %>
+            </div>
+
+            <div class="col-span-6 sm:col-span-2">
+              <%= f.label :state, "State / Province", class: "block text-sm font-medium text-gray-700" %>
+              <%= f.text_field :state, class: "mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm" %>
+            </div>
+
+            <div class="col-span-6 sm:col-span-2">
+              <%= f.label :postal_code, "ZIP / Postal code", class: "block text-sm font-medium text-gray-700" %>
+              <%= f.text_field :postal_code, class: "mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm" %>
+            </div>
+
+            <div class="col-span-6 sm:col-span-3">
+              <%= f.label :country, class: "block text-sm font-medium text-gray-700" %>
+              <%= f.text_field :country, class: "mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm" %>
+            </div>
+
+            <div class="col-span-6 sm:col-span-3">
+              <%= f.label :tax_id, "Tax ID", class: "block text-sm font-medium text-gray-700" %>
+              <%= f.text_field :tax_id, class: "mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm" %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Marketing Information -->
+      <div class="bg-white shadow sm:rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+            Marketing Information
+          </h3>
+          <div class="grid grid-cols-6 gap-6">
+            <div class="col-span-6">
+              <%= f.label :promotional_methods, class: "block text-sm font-medium text-gray-700" %>
+              <%= f.text_area :promotional_methods, rows: 3, class: "mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm" %>
+              <p class="mt-2 text-sm text-gray-500">
+                Describe how you plan to promote our services (e.g., blog, social media, email marketing)
+              </p>
+            </div>
+
+            <div class="col-span-6 sm:col-span-3">
+              <%= f.label :expected_referrals, "Expected referrals per month", class: "block text-sm font-medium text-gray-700" %>
+              <%= f.number_field :expected_referrals, class: "mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm" %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit buttons -->
+      <div class="flex justify-end space-x-3">
+        <%= link_to "Cancel", affiliates_profile_path, class: "bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+        <%= f.submit "Save Changes", class: "bg-indigo-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Password Change Section -->
+  <div class="bg-white shadow sm:rounded-lg mt-8">
+    <div class="px-4 py-5 sm:p-6">
+      <h3 class="text-lg leading-6 font-medium text-gray-900">
+        Change Password
+      </h3>
+      <div class="mt-2 max-w-xl text-sm text-gray-500">
+        <p>Update your password to keep your account secure.</p>
+      </div>
+      <%= form_with model: @affiliate, url: update_password_affiliates_profile_path, method: :patch, local: true do |f| %>
+        <div class="mt-5 space-y-4">
+          <div>
+            <%= label_tag :current_password, "Current Password", class: "block text-sm font-medium text-gray-700" %>
+            <%= password_field_tag :current_password, nil, class: "mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm", required: true %>
+          </div>
+          <div>
+            <%= f.label :password, "New Password", class: "block text-sm font-medium text-gray-700" %>
+            <%= f.password_field :password, class: "mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm", required: true %>
+          </div>
+          <div>
+            <%= f.label :password_confirmation, "Confirm New Password", class: "block text-sm font-medium text-gray-700" %>
+            <%= f.password_field :password_confirmation, class: "mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm", required: true %>
+          </div>
+          <div>
+            <%= f.submit "Update Password", class: "bg-indigo-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Payment Settings (Read-only) -->
+  <div class="bg-yellow-50 border border-yellow-200 shadow sm:rounded-lg mt-8">
+    <div class="px-4 py-5 sm:p-6">
+      <h3 class="text-lg leading-6 font-medium text-gray-900">
+        Payment Settings
+      </h3>
+      <div class="mt-2 text-sm text-gray-600">
+        <p class="mb-4">Payment settings cannot be changed directly. Please contact support to update:</p>
+        <dl class="space-y-2">
+          <div class="flex">
+            <dt class="font-medium text-gray-700 w-40">Payout Currency:</dt>
+            <dd><%= @affiliate.payout_currency.upcase %></dd>
+          </div>
+          <div class="flex">
+            <dt class="font-medium text-gray-700 w-40">Payout Address:</dt>
+            <dd class="font-mono text-xs"><%= @affiliate.payout_address %></dd>
+          </div>
+          <div class="flex">
+            <dt class="font-medium text-gray-700 w-40">Minimum Payout:</dt>
+            <dd>$<%= @affiliate.minimum_payout_amount %></dd>
+          </div>
+        </dl>
+        <p class="mt-4 text-sm">
+          To update payment settings, please email <a href="mailto:support@vpn9.com" class="text-indigo-600 hover:text-indigo-500">support@vpn9.com</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

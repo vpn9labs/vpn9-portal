@@ -1,0 +1,92 @@
+<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto">
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+      <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+        <div>
+          <h3 class="text-lg leading-6 font-medium text-gray-900">
+            Your Devices
+          </h3>
+          <p class="mt-1 max-w-2xl text-sm text-gray-500">
+            Manage your connected VPN devices (<%= Current.user.devices.count %> of <%= Current.user.device_limit %> devices used)
+          </p>
+        </div>
+        <% if Current.user.can_add_device? %>
+          <%= link_to "Setup New Device", new_device_setup_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+        <% else %>
+          <button disabled class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-400 bg-gray-100 cursor-not-allowed">
+            Device Limit Reached
+          </button>
+        <% end %>
+      </div>
+      
+      <% if @devices.any? %>
+        <div class="border-t border-gray-200">
+          <ul role="list" class="divide-y divide-gray-200">
+            <% @devices.each do |device| %>
+              <li class="px-4 py-4 sm:px-6">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                      <svg class="h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                      </svg>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">
+                        <%= device.name %>
+                      </div>
+                      <div class="text-sm text-gray-500">
+                        Added <%= device.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+                      </div>
+                      <div class="mt-1">
+                        <details class="text-xs">
+                          <summary class="cursor-pointer text-indigo-600 hover:text-indigo-500">
+                            Show network details
+                          </summary>
+                          <div class="mt-2 p-2 bg-gray-50 rounded text-xs space-y-1">
+                            <div>
+                              <span class="font-medium">IPv4:</span>
+                              <span class="font-mono"><%= device.wireguard_ip %></span>
+                            </div>
+                            <div>
+                              <span class="font-medium">IPv6:</span>
+                              <span class="font-mono break-all"><%= device.wireguard_ipv6 %></span>
+                            </div>
+                            <div class="pt-2 border-t border-gray-200 mt-2">
+                              <span class="font-medium">Public Key:</span>
+                              <div class="font-mono break-all text-gray-600"><%= device.public_key %></div>
+                            </div>
+                          </div>
+                        </details>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <%= button_to "Remove", device_path(device), method: :delete, 
+                        data: { turbo_confirm: "Remove device '#{device.name}'?" },
+                        class: "inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      <% else %>
+        <div class="px-4 py-12 sm:px-6 text-center">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">No devices</h3>
+          <p class="mt-1 text-sm text-gray-500">Get started by adding a new device.</p>
+          <div class="mt-6">
+            <%= link_to "Setup New Device", new_device_setup_path, class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    
+    <div class="mt-8 text-center">
+      <%= link_to "← Back to Dashboard", root_path, class: "text-sm text-gray-600 hover:text-gray-900" %>
+    </div>
+  </div>
+</div>

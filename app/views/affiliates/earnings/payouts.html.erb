@@ -1,0 +1,146 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="sm:flex sm:items-center">
+    <div class="sm:flex-auto">
+      <h1 class="text-2xl font-semibold text-gray-900">Payout History</h1>
+      <p class="mt-2 text-sm text-gray-700">View your past and pending payout requests</p>
+    </div>
+    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+      <%= link_to "Back to Earnings", affiliates_earnings_path, 
+          class: "block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500" %>
+    </div>
+  </div>
+
+  <% if @payouts.any? %>
+    <div class="mt-8 overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+      <table class="min-w-full divide-y divide-gray-300">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Date</th>
+            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Amount</th>
+            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Method</th>
+            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
+            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Transaction ID</th>
+            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Completed</th>
+            <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+              <span class="sr-only">Actions</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          <% @payouts.each do |payout| %>
+            <tr>
+              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
+                <%= payout.created_at.strftime("%b %d, %Y") %>
+              </td>
+              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
+                <span class="font-medium">$<%= '%.2f' % payout.amount %></span>
+              </td>
+              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                <%= payout.payout_method.upcase %>
+              </td>
+              <td class="whitespace-nowrap px-3 py-4 text-sm">
+                <% case payout.status %>
+                <% when 'pending' %>
+                  <span class="inline-flex rounded-full bg-yellow-100 px-2 text-xs font-semibold leading-5 text-yellow-800">
+                    Pending
+                  </span>
+                <% when 'approved' %>
+                  <span class="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">
+                    Approved
+                  </span>
+                <% when 'processing' %>
+                  <span class="inline-flex rounded-full bg-indigo-100 px-2 text-xs font-semibold leading-5 text-indigo-800">
+                    Processing
+                  </span>
+                <% when 'completed' %>
+                  <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">
+                    Completed
+                  </span>
+                <% when 'failed' %>
+                  <span class="inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold leading-5 text-red-800">
+                    Failed
+                  </span>
+                <% when 'cancelled' %>
+                  <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">
+                    Cancelled
+                  </span>
+                <% end %>
+              </td>
+              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                <% if payout.transaction_id.present? %>
+                  <code class="text-xs"><%= payout.transaction_id %></code>
+                <% else %>
+                  <span class="text-gray-400">—</span>
+                <% end %>
+              </td>
+              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                <% if payout.completed_at.present? %>
+                  <%= payout.completed_at.strftime("%b %d, %Y") %>
+                <% else %>
+                  <span class="text-gray-400">—</span>
+                <% end %>
+              </td>
+              <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                <% if payout.can_cancel? %>
+                  <%= button_to "Cancel", 
+                      cancel_payout_affiliates_earnings_path(payout),
+                      method: :post,
+                      data: { confirm: "Are you sure you want to cancel this payout request?" },
+                      class: "text-red-600 hover:text-red-900" %>
+                <% elsif payout.failed? %>
+                  <span class="text-xs text-gray-500" title="<%= payout.failure_reason %>">
+                    View reason
+                  </span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <% if @payouts.respond_to?(:total_pages) %>
+      <div class="mt-4">
+        <%= paginate @payouts %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <div class="text-center">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">No payout history</h3>
+          <p class="mt-1 text-sm text-gray-500">
+            You haven't requested any payouts yet.
+          </p>
+          <div class="mt-6">
+            <%= link_to "View Earnings", affiliates_earnings_path, 
+                class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @current_affiliate.last_payout&.failure_reason.present? && @current_affiliate.last_payout.failed? %>
+    <div class="mt-6 rounded-md bg-red-50 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">
+            Last payout failed
+          </h3>
+          <div class="mt-2 text-sm text-red-700">
+            <p><%= @current_affiliate.last_payout.failure_reason %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

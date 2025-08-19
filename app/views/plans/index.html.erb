@@ -1,0 +1,66 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="text-center">
+    <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+      VPN Subscription Plans
+    </h2>
+    <p class="mt-4 text-xl text-gray-600">
+      Choose a plan that works for you. Pay with cryptocurrency for maximum privacy.
+    </p>
+  </div>
+
+  <div class="mt-12 space-y-4 sm:mt-16 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-6 lg:max-w-4xl lg:mx-auto xl:max-w-none xl:mx-0 xl:grid-cols-3">
+    <% @plans.each do |plan| %>
+      <div class="border border-gray-200 rounded-lg shadow-sm divide-y divide-gray-200">
+        <div class="p-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">
+            <%= plan.name %>
+          </h3>
+          <p class="mt-4 text-sm text-gray-500">
+            <%= plan.description %>
+          </p>
+          <p class="mt-8">
+            <span class="text-4xl font-extrabold text-gray-900">
+              <%= plan.currency == 'USD' ? '$' : plan.currency %><%= plan.price.to_i %>
+            </span>
+            <span class="text-base font-medium text-gray-500">
+              / <%= plan.duration_days %> days
+            </span>
+          </p>
+
+          <div class="mt-6 pb-4 border-b border-gray-200">
+            <p class="text-sm text-gray-600">
+              <span class="font-medium">Device Limit:</span> 
+              <span class="font-semibold text-gray-900"><%= plan.display_device_limit %></span>
+              <%= " devices" unless plan.device_limit == 100 %>
+            </p>
+          </div>
+
+          <% if plan.features.present? %>
+            <ul class="mt-6 space-y-4">
+              <% plan.features.each do |feature| %>
+                <li class="flex space-x-3">
+                  <svg class="flex-shrink-0 h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="text-sm text-gray-500"><%= feature %></span>
+                </li>
+              <% end %>
+            </ul>
+          <% end %>
+
+          <%= link_to "Select Plan", plan_path(plan), 
+              class: "mt-8 block w-full bg-indigo-600 border border-indigo-600 rounded-md py-2 text-sm font-semibold text-white text-center hover:bg-indigo-700" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mt-12 text-center">
+    <p class="text-base text-gray-500">
+      All plans include unlimited bandwidth and access to all VPN servers worldwide.
+    </p>
+    <p class="mt-2 text-sm text-gray-400">
+      Payments are processed using cryptocurrency for your privacy.
+    </p>
+  </div>
+</div>

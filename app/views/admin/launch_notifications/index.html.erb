@@ -1,0 +1,105 @@
+<div class="px-4 sm:px-6 lg:px-8">
+  <div class="sm:flex sm:items-center">
+    <div class="sm:flex-auto">
+      <h1 class="text-2xl font-semibold text-gray-900">Launch Notifications</h1>
+      <p class="mt-2 text-sm text-gray-700">
+        A list of all users who signed up for launch notifications. Total signups: <span class="font-semibold"><%= @total_count %></span>
+      </p>
+    </div>
+    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+      <%= link_to "View Stats", stats_admin_launch_notifications_path, class: "inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto" %>
+      <%= link_to "Export CSV", export_admin_launch_notifications_path(format: :csv), class: "ml-3 inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto" %>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="mt-6 bg-white shadow rounded-lg p-4">
+    <%= form_with url: admin_launch_notifications_path, method: :get, local: true, class: "space-y-4 sm:flex sm:space-y-0 sm:space-x-4" do |f| %>
+      <div class="flex-1">
+        <%= f.text_field :search, value: params[:search], placeholder: "Search by email...", class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+      </div>
+      <div>
+        <%= f.date_field :date_from, value: params[:date_from], class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", placeholder: "From date" %>
+      </div>
+      <div>
+        <%= f.date_field :date_to, value: params[:date_to], class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", placeholder: "To date" %>
+      </div>
+      <div>
+        <%= f.submit "Filter", class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+        <%= link_to "Clear", admin_launch_notifications_path, class: "ml-2 inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Table -->
+  <div class="mt-8 flex flex-col">
+    <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+      <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+        <div class="overflow-hidden shadow border border-gray-200 md:rounded-lg">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Email</th>
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">IP Address</th>
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Source</th>
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Campaign</th>
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Signed Up</th>
+                <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                  <span class="sr-only">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-white">
+              <% @launch_notifications.each do |notification| %>
+                <% metadata = notification.metadata || {} %>
+                <tr>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
+                    <%= notification.email %>
+                  </td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <%= metadata['ip_address'] || 'N/A' %>
+                  </td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <% if metadata['utm_source'].present? %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <%= metadata['utm_source'] %>
+                      </span>
+                    <% else %>
+                      <span class="text-gray-400">Direct</span>
+                    <% end %>
+                  </td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <%= metadata['utm_campaign'] || '-' %>
+                  </td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <time datetime="<%= notification.created_at.iso8601 %>" title="<%= notification.created_at.strftime('%B %d, %Y at %I:%M %p') %>">
+                      <%= time_ago_in_words(notification.created_at) %> ago
+                    </time>
+                  </td>
+                  <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                    <%= link_to "View", admin_launch_notification_path(notification), class: "text-indigo-600 hover:text-indigo-900 mr-3" %>
+                    <%= link_to "Delete", admin_launch_notification_path(notification), method: :delete, data: { confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-900" %>
+                  </td>
+                </tr>
+              <% end %>
+              <% if @launch_notifications.empty? %>
+                <tr>
+                  <td colspan="6" class="px-3 py-8 text-center text-sm text-gray-500">
+                    No launch notification signups found.
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <% if @launch_notifications.respond_to?(:total_pages) && @launch_notifications.total_pages > 1 %>
+    <div class="mt-6">
+      <%= paginate @launch_notifications %>
+    </div>
+  <% end %>
+</div>

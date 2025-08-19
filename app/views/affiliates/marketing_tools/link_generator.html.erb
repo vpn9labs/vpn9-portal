@@ -1,0 +1,51 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <h2 class="text-2xl font-bold text-gray-900 mb-6">Link Generator</h2>
+
+  <div class="bg-white rounded-lg shadow p-6 mb-6">
+    <p class="text-gray-600 mb-6">Enter any URL to automatically add your referral code</p>
+    
+    <%= form_with url: link_generator_affiliates_marketing_tools_path, method: :get, local: true, class: "space-y-4" do |f| %>
+      <div>
+        <%= label_tag :url, "URL", class: "block text-sm font-medium text-gray-700" %>
+        <%= text_field_tag :url, params[:url] || root_url, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+        <p class="mt-1 text-xs text-gray-500">Enter the URL you want to add your referral code to</p>
+      </div>
+      
+      <%= submit_tag "Generate Link", class: "px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700" %>
+    <% end %>
+  </div>
+
+  <% if @generated_link %>
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+      <h3 class="text-lg font-semibold mb-4">Generated Link</h3>
+      <div class="flex items-center justify-between p-4 bg-gray-50 rounded">
+        <div class="flex-1 mr-4">
+          <p class="text-sm break-all" id="generatedLink"><%= @generated_link %></p>
+        </div>
+        <button onclick="copyToClipboard('<%= @generated_link %>')" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+          Copy
+        </button>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="bg-white rounded-lg shadow p-6">
+    <h3 class="text-lg font-semibold mb-4">How It Works</h3>
+    <ol class="list-decimal list-inside space-y-2 text-gray-600">
+      <li>Enter any URL from your website or landing page</li>
+      <li>Click "Generate Link" to add your referral code</li>
+      <li>Copy the generated link and share it with your audience</li>
+      <li>Track clicks and conversions in your dashboard</li>
+    </ol>
+  </div>
+</div>
+
+<script>
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(function() {
+    alert('Copied!');
+  }, function(err) {
+    console.error('Could not copy text: ', err);
+  });
+}
+</script>

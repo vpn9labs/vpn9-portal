@@ -1,0 +1,630 @@
+<%
+=begin
+%><!--
+▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚
+▚▚                                                                        ▚▚
+▚▚  VPN9 - Landing Page                                                   ▚▚
+▚▚  -------------------------                                             ▚▚
+▚▚  True Privacy. Zero Logs. No Compromises.                              ▚▚
+▚▚                                                                        ▚▚
+▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚
+--><%
+=end
+%>
+
+<!-- Dynamic Domain Display -->
+<% 
+  # Always use VPN9 as the brand name for consistency
+  brand_name = "VPN9"
+  
+  # Domain for metadata/technical purposes
+  current_host = request.host_with_port.sub(/:\d+$/, '')
+  display_domain = Rails.env.production? ? "VPN9.com" : current_host
+%>
+
+<!-- Schema.org Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "<%= brand_name %>",
+  "url": "https://<%= display_domain %>",
+  "logo": "https://<%= display_domain %>/logo.png",
+  "description": "True anonymous VPN service with zero logs, no email required, cryptocurrency payments only",
+  "sameAs": [],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer service",
+    "availableLanguage": ["en"]
+  }
+}
+</script>
+
+<!-- Hero Section -->
+<section class="relative isolate overflow-hidden bg-gray-900" aria-label="Hero">
+  <!-- Background Pattern -->
+  <svg class="absolute inset-0 -z-10 h-full w-full stroke-white/10 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]" aria-hidden="true">
+    <defs>
+      <pattern id="hero-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M.5 40V.5H40" fill="none" stroke-width="1" />
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" stroke-width="0" fill="url(#hero-pattern)" />
+  </svg>
+  
+  <!-- Gradient Overlays -->
+  <div class="absolute left-[calc(50%-4rem)] top-10 -z-10 transform-gpu blur-3xl sm:left-[calc(50%-18rem)] lg:left-48 lg:top-[calc(50%-30rem)] xl:left-[calc(50%-24rem)]" aria-hidden="true">
+    <div class="aspect-[1108/632] w-[69.25rem] bg-gradient-to-r from-[#80caff] to-[#4f46e5] opacity-20" style="clip-path: polygon(73.6% 51.7%, 91.7% 11.8%, 100% 46.4%, 97.4% 82.2%, 92.5% 84.9%, 75.7% 64%, 55.3% 47.5%, 46.5% 49.4%, 45% 62.9%, 50.3% 87.2%, 21.3% 64.1%, 0.1% 100%, 5.4% 51.1%, 21.4% 63.9%, 58.9% 0.2%, 73.6% 51.7%)"></div>
+  </div>
+  
+  <!-- Navigation Header -->
+  <header class="absolute inset-x-0 top-0 z-50">
+    <nav class="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
+      <div class="flex lg:flex-1">
+        <%= link_to root_path, class: "-m-1.5 p-1.5" do %>
+          <span class="text-2xl font-bold text-white"><%= brand_name %></span>
+        <% end %>
+      </div>
+      <div class="hidden lg:flex lg:gap-x-12">
+        <a href="#features" class="text-sm font-semibold leading-6 text-white hover:text-gray-300">Features</a>
+        <a href="#how-it-works" class="text-sm font-semibold leading-6 text-white hover:text-gray-300">How It Works</a>
+        <a href="#pricing" class="text-sm font-semibold leading-6 text-white hover:text-gray-300">Pricing</a>
+      </div>
+      <div class="hidden lg:flex lg:flex-1 lg:justify-end">
+        <%= link_to "Sign In", new_session_path, 
+            class: "text-sm font-semibold leading-6 text-white hover:text-gray-300" %>
+      </div>
+      <!-- Mobile menu button -->
+      <div class="flex lg:hidden">
+        <button type="button" class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-400" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+          <span class="sr-only">Open main menu</span>
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+          </svg>
+        </button>
+      </div>
+    </nav>
+    
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="hidden lg:hidden" role="dialog" aria-modal="true">
+      <div class="fixed inset-0 z-50"></div>
+      <div class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-gray-900 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-white/10">
+        <div class="flex items-center justify-between">
+          <%= link_to root_path, class: "-m-1.5 p-1.5" do %>
+            <span class="text-2xl font-bold text-white"><%= brand_name %></span>
+          <% end %>
+          <button type="button" class="-m-2.5 rounded-md p-2.5 text-gray-400" onclick="document.getElementById('mobile-menu').classList.add('hidden')">
+            <span class="sr-only">Close menu</span>
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="mt-6 flow-root">
+          <div class="-my-6 divide-y divide-gray-500/25">
+            <div class="space-y-2 py-6">
+              <a href="#features" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-800">Features</a>
+              <a href="#how-it-works" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-800">How It Works</a>
+              <a href="#pricing" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-800">Pricing</a>
+            </div>
+            <div class="py-6">
+              <%= link_to "Sign In", new_session_path, 
+                  class: "-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-white hover:bg-gray-800" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <!-- Hero Content -->
+  <div class="relative isolate px-6 pt-14 lg:px-8">
+    <!-- Domain-specific messaging -->
+    <% if current_host =~ /vpn(\d+)\.com/i %>
+      <% vpn_number = $1 %>
+      <div class="mx-auto max-w-2xl py-4">
+        <div class="hidden sm:mb-8 sm:flex sm:justify-center">
+          <div class="relative rounded-full px-3 py-1 text-sm leading-6 text-gray-400 ring-1 ring-white/10 hover:ring-white/20">
+            Secure <%= brand_name %> service. 
+            <span class="font-semibold text-white">Privacy guaranteed →</span>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  
+  <div class="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40">
+    <div class="mx-auto max-w-2xl flex-shrink-0 lg:mx-0 lg:max-w-xl lg:pt-8">
+      <h1 class="mt-10 text-4xl font-bold tracking-tight text-white sm:text-6xl">
+        True Privacy.<br>
+        Zero Logs.<br>
+        <span class="text-indigo-400">No Compromises.</span>
+      </h1>
+      <!-- Urgency Element -->
+      <div class="mt-4 inline-flex items-center text-sm text-yellow-300 bg-yellow-900/20 rounded-full px-3 py-1">
+        <svg class="mr-1 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+        </svg>
+        <span id="offer-countdown">Limited Time Offer</span>
+      </div>
+      <p class="mt-6 text-lg leading-8 text-gray-300">
+        <%= brand_name %> is the only VPN service that truly keeps no logs. We don't track your connections, 
+        we don't store your data, and we don't even require an email address. Just pure, uncompromised privacy.
+      </p>
+      <div class="mt-10 flex items-center gap-x-6">
+        <%= link_to "Create Anonymous Account", signup_path, 
+            class: "rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400" %>
+        <%= link_to "Sign In with Passphrase", new_session_path, 
+            class: "text-sm font-semibold leading-6 text-white hover:text-gray-300" %>
+      </div>
+      <div class="mt-8 space-y-3">
+        <div class="inline-flex items-center text-sm text-gray-400">
+          <svg class="mr-2 h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          No email required • Pay with Bitcoin or Monero • Complete anonymity
+        </div>
+        <!-- Social Proof -->
+        <div class="flex items-center space-x-4 text-sm">
+          <div class="flex -space-x-2">
+            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-gray-900" src="https://i.pravatar.cc/150?img=1" alt="">
+            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-gray-900" src="https://i.pravatar.cc/150?img=2" alt="">
+            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-gray-900" src="https://i.pravatar.cc/150?img=3" alt="">
+            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-gray-900" src="https://i.pravatar.cc/150?img=4" alt="">
+          </div>
+          <div class="text-gray-300">
+            <span class="font-semibold text-white">2,847+</span> privacy advocates trust <%= brand_name %>
+          </div>
+        </div>
+        <!-- Live Visitors -->
+        <div class="inline-flex items-center text-xs text-green-400 bg-green-900/20 rounded-full px-2 py-1">
+          <span class="relative flex h-2 w-2 mr-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+          </span>
+          <span id="visitor-counter">62 people viewing this page</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Privacy Features Section -->
+<section id="features" class="bg-white py-24 sm:py-32" aria-label="Features">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl lg:text-center">
+      <h2 class="text-base font-semibold leading-7 text-indigo-600">True Privacy Protection</h2>
+      <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+        We Don't Track Anything. Period.
+      </p>
+      <p class="mt-6 text-lg leading-8 text-gray-600">
+        Unlike other VPN providers who make empty promises, we've built our entire system 
+        to make tracking impossible. We can't hand over data we don't have.
+      </p>
+      <!-- Trust Badges -->
+      <div class="mt-8 flex flex-wrap justify-center gap-4">
+        <div class="trust-badge flex items-center space-x-2 bg-gray-50 rounded-lg px-4 py-2">
+          <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          <span class="text-sm font-medium">Open Source</span>
+        </div>
+        <div class="trust-badge flex items-center space-x-2 bg-gray-50 rounded-lg px-4 py-2">
+          <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 00-2 2v6a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-1a1 1 0 100-2h1a4 4 0 014 4v6a4 4 0 01-4 4H6a4 4 0 01-4-4V7a4 4 0 014-4z" clip-rule="evenodd"/>
+          </svg>
+          <span class="text-sm font-medium">Audited Code</span>
+        </div>
+        <div class="trust-badge flex items-center space-x-2 bg-gray-50 rounded-lg px-4 py-2">
+          <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          <span class="text-sm font-medium">No Logs Verified</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+      <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
+        <!-- Zero Connection Logs -->
+        <div class="flex flex-col">
+          <dt class="text-base font-semibold leading-7 text-gray-900">
+            <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
+              <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            Zero Connection Logs
+          </dt>
+          <dd class="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
+            <p class="flex-auto">We don't log when you connect, how long you stay connected, or what servers you use. Your connection history remains yours alone.</p>
+          </dd>
+        </div>
+        
+        <!-- No IP Tracking -->
+        <div class="flex flex-col">
+          <dt class="text-base font-semibold leading-7 text-gray-900">
+            <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
+              <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+              </svg>
+            </div>
+            No IP Address Tracking
+          </dt>
+          <dd class="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
+            <p class="flex-auto">Neither your real IP nor VPN IP is ever logged. We can't track you, and neither can anyone else.</p>
+          </dd>
+        </div>
+        
+        <!-- No Email Required -->
+        <div class="flex flex-col">
+          <dt class="text-base font-semibold leading-7 text-gray-900">
+            <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
+              <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
+              </svg>
+            </div>
+            No Email Required
+          </dt>
+          <dd class="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
+            <p class="flex-auto">Sign up with just a passphrase. No email, no phone, no personal information. True anonymity from day one.</p>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="bg-gray-50 py-24 sm:py-32" aria-label="How It Works">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl lg:text-center">
+      <h2 class="text-base font-semibold leading-7 text-indigo-600">Simple & Anonymous</h2>
+      <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+        Get Protected in 60 Seconds
+      </p>
+      <p class="mt-6 text-lg leading-8 text-gray-600">
+        No complicated signup process. No personal information. Just instant privacy protection.
+      </p>
+    </div>
+    
+    <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+      <div class="grid grid-cols-1 gap-y-16 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-0">
+        <!-- Step 1 -->
+        <div class="relative pl-16">
+          <dt class="text-base font-semibold leading-7 text-gray-900">
+            <div class="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
+              <span class="text-white font-bold">1</span>
+            </div>
+            Create Your Passphrase
+          </dt>
+          <dd class="mt-2 text-base leading-7 text-gray-600">
+            Generate a secure passphrase. This is your only credential - no email or personal info needed.
+          </dd>
+        </div>
+        
+        <!-- Step 2 -->
+        <div class="relative pl-16">
+          <dt class="text-base font-semibold leading-7 text-gray-900">
+            <div class="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
+              <span class="text-white font-bold">2</span>
+            </div>
+            Pay with Crypto
+          </dt>
+          <dd class="mt-2 text-base leading-7 text-gray-600">
+            Send Bitcoin or Monero to your unique address. Instant activation, complete anonymity.
+          </dd>
+        </div>
+        
+        <!-- Step 3 -->
+        <div class="relative pl-16">
+          <dt class="text-base font-semibold leading-7 text-gray-900">
+            <div class="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
+              <span class="text-white font-bold">3</span>
+            </div>
+            Connect & Browse Freely
+          </dt>
+          <dd class="mt-2 text-base leading-7 text-gray-600">
+            Download configs for WireGuard or OpenVPN. Connect instantly from any device.
+          </dd>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="bg-gray-50 py-16 sm:py-24" aria-label="Testimonials">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-xl text-center">
+      <h2 class="text-lg font-semibold leading-8 tracking-tight text-indigo-600">Real Users, Real Privacy</h2>
+      <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+        Join 2,847+ Privacy Advocates
+      </p>
+    </div>
+    <div class="mx-auto mt-16 flow-root max-w-2xl sm:mt-20 lg:mx-0 lg:max-w-none">
+      <div class="-mt-8 sm:-mx-4 sm:columns-2 sm:text-[0] lg:columns-3">
+        <!-- Testimonial 1 -->
+        <div class="pt-8 sm:inline-block sm:w-full sm:px-4">
+          <figure class="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-gray-900/5">
+            <blockquote class="text-gray-900">
+              <p>"Finally, a VPN that actually respects privacy. No email, no tracking, just pure anonymity. Paid with Bitcoin and was online in seconds."</p>
+            </blockquote>
+            <figcaption class="mt-6 flex items-center gap-x-4">
+              <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                <span class="text-indigo-600 font-semibold">CT</span>
+              </div>
+              <div>
+                <div class="font-semibold">CryptoTrader_89</div>
+                <div class="text-gray-600 text-sm">Verified User</div>
+              </div>
+            </figcaption>
+          </figure>
+        </div>
+        <!-- Testimonial 2 -->
+        <div class="pt-8 sm:inline-block sm:w-full sm:px-4">
+          <figure class="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-gray-900/5">
+            <blockquote class="text-gray-900">
+              <p>"The passphrase system is genius. No personal info needed at all. This is how VPNs should work."</p>
+            </blockquote>
+            <figcaption class="mt-6 flex items-center gap-x-4">
+              <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                <span class="text-green-600 font-semibold">PF</span>
+              </div>
+              <div>
+                <div class="font-semibold">PrivacyFirst</div>
+                <div class="text-gray-600 text-sm">Since 2024</div>
+              </div>
+            </figcaption>
+          </figure>
+        </div>
+        <!-- Testimonial 3 -->
+        <div class="pt-8 sm:inline-block sm:w-full sm:px-4">
+          <figure class="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-gray-900/5">
+            <blockquote class="text-gray-900">
+              <p>"Open source code I can verify myself. No logs policy that's actually real. This is the gold standard for VPNs."</p>
+            </blockquote>
+            <figcaption class="mt-6 flex items-center gap-x-4">
+              <div class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                <span class="text-purple-600 font-semibold">DS</span>
+              </div>
+              <div>
+                <div class="font-semibold">DevSecOps</div>
+                <div class="text-gray-600 text-sm">Tech Professional</div>
+              </div>
+            </figcaption>
+          </figure>
+        </div>
+        <!-- Testimonial 4 -->
+        <div class="pt-8 sm:inline-block sm:w-full sm:px-4">
+          <figure class="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-gray-900/5">
+            <blockquote class="text-gray-900">
+              <p>"Monero payment option sealed the deal. Complete financial privacy plus network privacy. Perfect combination."</p>
+            </blockquote>
+            <figcaption class="mt-6 flex items-center gap-x-4">
+              <div class="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
+                <span class="text-orange-600 font-semibold">XE</span>
+              </div>
+              <div>
+                <div class="font-semibold">XMR_Enthusiast</div>
+                <div class="text-gray-600 text-sm">Crypto User</div>
+              </div>
+            </figcaption>
+          </figure>
+        </div>
+        <!-- Testimonial 5 -->
+        <div class="pt-8 sm:inline-block sm:w-full sm:px-4">
+          <figure class="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-gray-900/5">
+            <blockquote class="text-gray-900">
+              <p>"WireGuard is blazing fast. No speed compromise for privacy. Worth every penny."</p>
+            </blockquote>
+            <figcaption class="mt-6 flex items-center gap-x-4">
+              <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                <span class="text-blue-600 font-semibold">SR</span>
+              </div>
+              <div>
+                <div class="font-semibold">SpeedRunner</div>
+                <div class="text-gray-600 text-sm">Power User</div>
+              </div>
+            </figcaption>
+          </figure>
+        </div>
+        <!-- Testimonial 6 -->
+        <div class="pt-8 sm:inline-block sm:w-full sm:px-4">
+          <figure class="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-gray-900/5">
+            <blockquote class="text-gray-900">
+              <p>"30-day money back guarantee gave me confidence to try. Now I'm a customer for life. True privacy is priceless."</p>
+            </blockquote>
+            <figcaption class="mt-6 flex items-center gap-x-4">
+              <div class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
+                <span class="text-red-600 font-semibold">SU</span>
+              </div>
+              <div>
+                <div class="font-semibold">SecureUser2024</div>
+                <div class="text-gray-600 text-sm">Happy Customer</div>
+              </div>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing Section -->
+<section id="pricing" class="bg-white py-24 sm:py-32" aria-label="Pricing" itemscope itemtype="https://schema.org/Product">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-4xl text-center">
+      <h2 class="text-base font-semibold leading-7 text-indigo-600">Pay with Crypto, Stay Anonymous</h2>
+      <p class="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+        Privacy shouldn't be expensive
+      </p>
+    </div>
+    <p class="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-600">
+      One simple plan. All features included. Pay with Bitcoin or Monero for complete anonymity.
+    </p>
+    
+    <div class="mx-auto mt-16 max-w-2xl rounded-3xl ring-1 ring-gray-200 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
+      <div class="p-8 sm:p-10 lg:flex-auto">
+        <h3 class="text-2xl font-bold tracking-tight text-gray-900" itemprop="name"><%= brand_name %> Complete Privacy</h3>
+        <p class="mt-6 text-base leading-7 text-gray-600" itemprop="description">
+          Everything you need for true online privacy. No compromises, no logging, no tracking.
+        </p>
+        <div class="mt-10 flex items-center gap-x-4">
+          <h4 class="flex-none text-sm font-semibold leading-6 text-indigo-600">What's included</h4>
+          <div class="h-px flex-auto bg-gray-100"></div>
+        </div>
+        <ul role="list" class="mt-8 grid grid-cols-1 gap-4 text-sm leading-6 text-gray-600 sm:grid-cols-2 sm:gap-6">
+          <li class="flex gap-x-3">
+            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+            </svg>
+            Unlimited bandwidth
+          </li>
+          <li class="flex gap-x-3">
+            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+            </svg>
+            WireGuard & OpenVPN
+          </li>
+          <li class="flex gap-x-3">
+            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+            </svg>
+            50+ server locations
+          </li>
+          <li class="flex gap-x-3">
+            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+            </svg>
+            10 simultaneous connections
+          </li>
+          <li class="flex gap-x-3">
+            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+            </svg>
+            Zero logs policy
+          </li>
+          <li class="flex gap-x-3">
+            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+            </svg>
+            No email required
+          </li>
+          <li class="flex gap-x-3">
+            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+            </svg>
+            Kill switch protection
+          </li>
+          <li class="flex gap-x-3">
+            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+            </svg>
+            P2P/torrenting allowed
+          </li>
+        </ul>
+      </div>
+      <div class="-mt-2 p-2 lg:mt-0 lg:w-full lg:max-w-md lg:flex-shrink-0">
+        <div class="rounded-2xl bg-gray-50 py-10 text-center ring-1 ring-inset ring-gray-900/5 lg:flex lg:flex-col lg:justify-center lg:py-16">
+          <div class="mx-auto max-w-xs px-8">
+            <p class="text-base font-semibold text-gray-600">Pay monthly or save with annual</p>
+            <p class="mt-6 flex items-baseline justify-center gap-x-2">
+              <span class="text-2xl line-through text-gray-400">$18</span>
+              <span class="text-5xl font-bold tracking-tight text-gray-900">$9</span>
+              <span class="text-sm font-semibold leading-6 tracking-wide text-gray-600">/month</span>
+              <span class="ml-2 inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
+                50% OFF
+              </span>
+            </p>
+            <%= link_to signup_path, 
+                class: "mt-10 block w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 relative overflow-hidden group" do %>
+              <span class="relative z-10">Get Instant Access</span>
+              <span class="absolute inset-0 bg-indigo-700 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+            <% end %>
+            <!-- Money Back Guarantee -->
+            <div class="mt-4 flex items-center justify-center text-sm text-gray-600">
+              <svg class="mr-2 h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              30-Day Money-Back Guarantee
+            </div>
+            <div class="mt-6 space-y-2">
+              <p class="text-xs font-semibold uppercase tracking-wide text-indigo-600">Pay Anonymously With</p>
+              <div class="flex justify-center gap-x-4">
+                <div class="flex items-center gap-x-1">
+                  <svg class="h-5 w-5 text-orange-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1.5-3h3v-1.5h-1v-7h1V7h-3v1.5h1v7h-1V17z"/>
+                  </svg>
+                  <span class="text-xs font-medium text-gray-700">Bitcoin</span>
+                </div>
+                <div class="flex items-center gap-x-1">
+                  <svg class="h-5 w-5 text-gray-700" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-11h2l1 3 1-3h2l-2 5v3h-2v-3l-2-5z"/>
+                  </svg>
+                  <span class="text-xs font-medium text-gray-700">Monero</span>
+                </div>
+              </div>
+            </div>
+            <p class="mt-6 text-xs leading-5 text-gray-600">
+              Instant activation • 30-day money-back guarantee
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Trust Indicators -->
+    <div class="mx-auto mt-16 max-w-7xl">
+      <div class="mx-auto max-w-2xl lg:max-w-none">
+        <dl class="grid grid-cols-1 gap-0.5 overflow-hidden rounded-2xl text-center sm:grid-cols-2 lg:grid-cols-4">
+          <div class="flex flex-col bg-gray-50 p-8">
+            <dt class="text-sm font-semibold leading-6 text-gray-600">Active users</dt>
+            <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900">2,847+</dd>
+          </div>
+          <div class="flex flex-col bg-gray-50 p-8">
+            <dt class="text-sm font-semibold leading-6 text-gray-600">Server uptime</dt>
+            <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900">99.9%</dd>
+          </div>
+          <div class="flex flex-col bg-gray-50 p-8">
+            <dt class="text-sm font-semibold leading-6 text-gray-600">Countries</dt>
+            <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900">50+</dd>
+          </div>
+          <div class="flex flex-col bg-gray-50 p-8">
+            <dt class="text-sm font-semibold leading-6 text-gray-600">Data logged</dt>
+            <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900">0 KB</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="bg-indigo-600 py-16" aria-label="Call to Action">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl text-center">
+      <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+        Take Back Your Privacy Today
+      </h2>
+      <p class="mx-auto mt-6 max-w-xl text-lg leading-8 text-indigo-100">
+        Join <span class="font-bold text-white">2,847+ users</span> who have chosen true privacy over empty promises. 
+        Pay with Bitcoin or Monero. No email required. No personal data. Just privacy.
+      </p>
+      <!-- Final Urgency -->
+      <div class="mt-6 inline-flex items-center text-sm text-yellow-300 bg-yellow-900/20 rounded-full px-4 py-2">
+        <svg class="mr-2 h-4 w-4 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd" />
+        </svg>
+        Special pricing ends soon • Only <span class="font-bold">17 spots</span> left at this price
+      </div>
+      <div class="mt-10 flex items-center justify-center gap-x-6">
+        <%= link_to "Create Anonymous Account", signup_path, 
+            class: "rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-indigo-600 shadow-sm hover:bg-indigo-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" %>
+        <%= link_to "View Documentation", "#", 
+            class: "text-sm font-semibold leading-6 text-white hover:text-indigo-100" %>
+      </div>
+    </div>
+  </div>
+</section>

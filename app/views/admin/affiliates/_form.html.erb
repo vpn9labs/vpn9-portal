@@ -1,0 +1,114 @@
+<%= form_with(model: [:admin, affiliate], local: true) do |form| %>
+  <% if affiliate.errors.any? %>
+    <div class="rounded-md bg-red-50 p-4 mb-6">
+      <div class="flex">
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">
+            There were <%= pluralize(affiliate.errors.count, "error") %> with your submission
+          </h3>
+          <div class="mt-2 text-sm text-red-700">
+            <ul role="list" class="list-disc pl-5 space-y-1">
+              <% affiliate.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="space-y-6">
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      <div>
+        <%= form.label :name, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+      </div>
+
+      <div>
+        <%= form.label :email, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.email_field :email, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+      </div>
+
+      <div>
+        <%= form.label :code, "Affiliate Code", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :code, 
+            placeholder: "Leave blank to auto-generate",
+            class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm uppercase" %>
+        <p class="mt-1 text-xs text-gray-500">Will be automatically uppercased</p>
+      </div>
+
+      <div>
+        <%= form.label :status, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.select :status, 
+            options_for_select([
+              ["Pending", "pending"],
+              ["Active", "active"],
+              ["Suspended", "suspended"]
+            ], affiliate.status),
+            {},
+            class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+      </div>
+
+      <div>
+        <%= form.label :commission_rate, "Commission Rate (%)", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.number_field :commission_rate, 
+            step: 0.1,
+            min: 0,
+            max: 100,
+            class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+      </div>
+
+      <div>
+        <%= form.label :cookie_duration_days, "Cookie Duration (days)", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.number_field :cookie_duration_days,
+            min: 1,
+            max: 365,
+            class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+      </div>
+
+      <div>
+        <%= form.label :payout_currency, "Payout Currency", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.select :payout_currency,
+            options_for_select([
+              ["Bitcoin (BTC)", "btc"],
+              ["Ethereum (ETH)", "eth"],
+              ["Bank Transfer", "bank"],
+              ["Manual", "manual"]
+            ], affiliate.payout_currency),
+            { include_blank: "Select currency" },
+            class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+      </div>
+
+      <div>
+        <%= form.label :minimum_payout_amount, "Minimum Payout ($)", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.number_field :minimum_payout_amount,
+            step: 1,
+            min: 0,
+            class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+      </div>
+    </div>
+
+    <div>
+      <%= form.label :payout_address, "Payout Address", class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_field :payout_address,
+          placeholder: "Wallet address or bank details",
+          class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm font-mono" %>
+      <p class="mt-1 text-xs text-gray-500">Bitcoin/Ethereum wallet address or bank account details</p>
+    </div>
+
+    <div>
+      <%= form.label :notes, "Internal Notes", class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_area :notes,
+          rows: 3,
+          class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+      <p class="mt-1 text-xs text-gray-500">Private notes about this affiliate (not visible to affiliate)</p>
+    </div>
+  </div>
+
+  <div class="mt-6 flex items-center justify-end space-x-3">
+    <%= link_to "Cancel", admin_affiliates_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+    <%= form.submit affiliate.new_record? ? "Create Affiliate" : "Update Affiliate", 
+        class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+  </div>
+<% end %>

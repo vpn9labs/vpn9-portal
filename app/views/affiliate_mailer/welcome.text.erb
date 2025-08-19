@@ -1,0 +1,27 @@
+Welcome to the VPN9 Affiliate Program!
+
+Hi <%= @affiliate.name || @affiliate.email %>,
+
+Thank you for joining the VPN9 Affiliate Program! We're excited to have you as a partner.
+
+Your Account Details:
+- Affiliate Code: <%= @affiliate.code %>
+- Commission Rate: <%= @affiliate.commission_rate %>%
+- Account Status: <%= @affiliate.status.capitalize %>
+
+<% if @affiliate.pending? %>
+Your account is currently pending approval. We'll review your application within 24-48 hours and notify you once it's approved.
+<% else %>
+Your account is active and ready to use! You can start promoting VPN9 immediately.
+<% end %>
+
+Getting Started:
+1. Log in to your dashboard at <%= login_affiliates_url %>
+2. Get your unique referral links
+3. Start promoting VPN9 to your audience
+4. Track your performance and earnings in real-time
+
+If you have any questions, feel free to reach out to our affiliate support team.
+
+Best regards,
+The VPN9 Team

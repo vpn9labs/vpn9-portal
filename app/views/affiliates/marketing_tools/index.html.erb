@@ -1,0 +1,87 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <h2 class="text-2xl font-bold text-gray-900 mb-6">Marketing Tools</h2>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2">
+      <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h3 class="text-lg font-semibold mb-4">Your Referral Links</h3>
+        <div class="space-y-4">
+          <% @referral_links.each do |name, url| %>
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-700"><%= name.to_s.humanize %></p>
+                <p class="text-xs text-gray-500 break-all mt-1"><%= url %></p>
+              </div>
+              <button onclick="copyToClipboard('<%= url %>')" class="ml-4 px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                Copy
+              </button>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h3 class="text-lg font-semibold mb-4">Marketing Banners</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <% @banners.each do |banner| %>
+            <div class="border rounded p-3">
+              <img src="/images/<%= banner[:image] %>" alt="<%= banner[:name] %>" class="w-full h-auto mb-2">
+              <p class="text-sm font-medium"><%= banner[:name] %></p>
+              <p class="text-xs text-gray-500"><%= banner[:size] %></p>
+            </div>
+          <% end %>
+        </div>
+        <div class="mt-4">
+          <%= link_to "View All Banners", banners_affiliates_marketing_tools_path, class: "text-indigo-600 hover:text-indigo-800" %>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold mb-4">Email Templates</h3>
+        <div class="space-y-4">
+          <% @email_templates.each do |template| %>
+            <div class="border rounded p-4">
+              <h4 class="font-medium text-gray-900"><%= template[:name] %></h4>
+              <p class="text-sm text-gray-600 mt-1">Subject: <%= template[:subject] %></p>
+              <p class="text-xs text-gray-500 mt-2"><%= template[:preview] %></p>
+            </div>
+          <% end %>
+        </div>
+        <div class="mt-4">
+          <%= link_to "View All Templates", email_templates_affiliates_marketing_tools_path, class: "text-indigo-600 hover:text-indigo-800" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+        <div class="space-y-3">
+          <%= link_to "Link Generator", link_generator_affiliates_marketing_tools_path, class: "block w-full px-4 py-2 bg-indigo-600 text-white text-center rounded hover:bg-indigo-700" %>
+          <%= link_to "Download Banners", banners_affiliates_marketing_tools_path, class: "block w-full px-4 py-2 bg-gray-600 text-white text-center rounded hover:bg-gray-700" %>
+          <%= link_to "Email Templates", email_templates_affiliates_marketing_tools_path, class: "block w-full px-4 py-2 bg-gray-600 text-white text-center rounded hover:bg-gray-700" %>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold mb-4">Tips</h3>
+        <ul class="text-sm text-gray-600 space-y-2">
+          <li>• Use referral links in all your content</li>
+          <li>• Test different banner sizes for better conversion</li>
+          <li>• Personalize email templates for your audience</li>
+          <li>• Track your performance in the dashboard</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(function() {
+    alert('Copied!');
+  }, function(err) {
+    console.error('Could not copy text: ', err);
+  });
+}
+</script>

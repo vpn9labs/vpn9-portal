@@ -1,0 +1,38 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+monthly:
+  name: Monthly Plan
+  description: Monthly VPN subscription
+  price: 9.99
+  currency: USD
+  duration_days: 30
+  active: true
+  features:
+    unlimited_bandwidth: true
+    all_locations: true
+    max_devices: 5
+
+yearly:
+  name: Yearly Plan
+  description: Yearly VPN subscription with discount
+  price: 99.99
+  currency: USD
+  duration_days: 365
+  active: true
+  features:
+    unlimited_bandwidth: true
+    all_locations: true
+    max_devices: 10
+    priority_support: true
+
+trial:
+  name: Trial Plan
+  description: 7-day free trial
+  price: 0.00
+  currency: USD
+  duration_days: 7
+  active: true
+  features:
+    unlimited_bandwidth: false
+    all_locations: false
+    max_devices: 1

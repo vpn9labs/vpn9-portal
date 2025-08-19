@@ -1,0 +1,331 @@
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex justify-between items-center">
+    <h1 class="text-3xl font-bold text-gray-900">Affiliate Analytics</h1>
+    <div class="flex space-x-4">
+      <%= form_with url: admin_analytics_path, method: :get, local: true, class: "flex items-center space-x-2" do |f| %>
+        <%= f.date_field :start_date, value: @date_range.first.to_date, class: "rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+        <span class="text-gray-500">to</span>
+        <%= f.date_field :end_date, value: @date_range.last.to_date, class: "rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+        <%= f.submit "Update", class: "inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500" %>
+      <% end %>
+      <%= link_to "Export CSV", admin_analytics_path(format: :csv, start_date: @date_range.first, end_date: @date_range.last), class: "inline-flex items-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500" %>
+    </div>
+  </div>
+
+  <!-- Overview Stats -->
+  <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+      <dt class="truncate text-sm font-medium text-gray-500">Total Clicks</dt>
+      <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+        <%= number_with_delimiter(@overall_metrics[:total_clicks]) %>
+      </dd>
+    </div>
+
+    <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+      <dt class="truncate text-sm font-medium text-gray-500">Total Referrals</dt>
+      <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+        <%= number_with_delimiter(@overall_metrics[:total_referrals]) %>
+      </dd>
+      <% if @overall_metrics[:total_clicks] > 0 %>
+        <p class="text-sm text-gray-500">
+          <%= number_to_percentage((@overall_metrics[:total_referrals].to_f / @overall_metrics[:total_clicks] * 100), precision: 2) %> conversion
+        </p>
+      <% end %>
+    </div>
+
+    <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+      <dt class="truncate text-sm font-medium text-gray-500">Conversions</dt>
+      <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+        <%= number_with_delimiter(@overall_metrics[:converted_referrals]) %>
+      </dd>
+      <% if @overall_metrics[:total_referrals] > 0 %>
+        <p class="text-sm text-gray-500">
+          <%= number_to_percentage((@overall_metrics[:converted_referrals].to_f / @overall_metrics[:total_referrals] * 100), precision: 2) %> of referrals
+        </p>
+      <% end %>
+    </div>
+
+    <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+      <dt class="truncate text-sm font-medium text-gray-500">Revenue</dt>
+      <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+        <%= number_to_currency(@overall_metrics[:total_revenue]) %>
+      </dd>
+      <p class="text-sm text-gray-500">
+        <%= number_to_currency(@overall_metrics[:total_commissions]) %> in commissions
+      </p>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
+    <!-- Daily Performance Chart -->
+    <div class="overflow-hidden rounded-lg bg-white shadow">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg font-medium leading-6 text-gray-900">Daily Performance</h3>
+        <div class="mt-5">
+          <canvas id="dailyPerformanceChart" width="400" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conversion Funnel -->
+    <div class="overflow-hidden rounded-lg bg-white shadow">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg font-medium leading-6 text-gray-900">Conversion Funnel</h3>
+        <div class="mt-5 space-y-4">
+          <div>
+            <div class="flex justify-between text-sm">
+              <span>Clicks</span>
+              <span class="font-medium"><%= number_with_delimiter(@funnel_stats[:clicks]) %></span>
+            </div>
+            <div class="mt-1 w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-blue-600 h-2 rounded-full" style="width: 100%"></div>
+            </div>
+          </div>
+          
+          <div>
+            <div class="flex justify-between text-sm">
+              <span>Unique Visitors</span>
+              <span class="font-medium"><%= number_with_delimiter(@funnel_stats[:unique_visitors]) %></span>
+            </div>
+            <div class="mt-1 w-full bg-gray-200 rounded-full h-2">
+              <% unique_percent = @funnel_stats[:clicks] > 0 ? (@funnel_stats[:unique_visitors].to_f / @funnel_stats[:clicks] * 100) : 0 %>
+              <div class="bg-blue-600 h-2 rounded-full" style="width: <%= unique_percent %>%"></div>
+            </div>
+          </div>
+          
+          <div>
+            <div class="flex justify-between text-sm">
+              <span>Signups</span>
+              <span class="font-medium"><%= number_with_delimiter(@funnel_stats[:signups]) %></span>
+            </div>
+            <div class="mt-1 w-full bg-gray-200 rounded-full h-2">
+              <% signup_percent = @funnel_stats[:clicks] > 0 ? (@funnel_stats[:signups].to_f / @funnel_stats[:clicks] * 100) : 0 %>
+              <div class="bg-blue-600 h-2 rounded-full" style="width: <%= signup_percent %>%"></div>
+            </div>
+          </div>
+          
+          <div>
+            <div class="flex justify-between text-sm">
+              <span>Conversions</span>
+              <span class="font-medium"><%= number_with_delimiter(@funnel_stats[:conversions]) %></span>
+            </div>
+            <div class="mt-1 w-full bg-gray-200 rounded-full h-2">
+              <% conv_percent = @funnel_stats[:clicks] > 0 ? (@funnel_stats[:conversions].to_f / @funnel_stats[:clicks] * 100) : 0 %>
+              <div class="bg-green-600 h-2 rounded-full" style="width: <%= conv_percent %>%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Affiliates Table -->
+  <div class="overflow-hidden rounded-lg bg-white shadow">
+    <div class="px-4 py-5 sm:p-6">
+      <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Top Performing Affiliates</h3>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Affiliate</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Earnings</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Clicks</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Conversions</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Conv Rate</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @top_affiliates.each do |affiliate| %>
+              <% 
+                clicks = affiliate.affiliate_clicks.where(created_at: @date_range).count
+                conversions = affiliate.referrals.converted.where(created_at: @date_range).count
+                conv_rate = clicks > 0 ? (conversions.to_f / clicks * 100) : 0
+              %>
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900"><%= affiliate.name %></div>
+                  <div class="text-sm text-gray-500"><%= affiliate.email %></div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                    <%= affiliate.code %>
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= number_to_currency(affiliate.total_earnings) %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= number_with_delimiter(clicks) %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= number_with_delimiter(conversions) %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= number_to_percentage(conv_rate, precision: 2) %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <%= link_to "View", admin_affiliate_path(affiliate), class: "text-indigo-600 hover:text-indigo-900" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Traffic Sources -->
+  <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
+    <!-- Top Traffic Sources -->
+    <div class="overflow-hidden rounded-lg bg-white shadow">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Top Traffic Sources</h3>
+        <div class="space-y-3">
+          <% @top_sources.each do |source, count| %>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600 truncate max-w-xs" title="<%= source %>">
+                <%= source.truncate(50) %>
+              </span>
+              <span class="text-sm font-medium text-gray-900">
+                <%= number_with_delimiter(count) %>
+              </span>
+            </div>
+          <% end %>
+          <% if @top_sources.empty? %>
+            <p class="text-sm text-gray-500">No traffic sources recorded</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Landing Pages -->
+    <div class="overflow-hidden rounded-lg bg-white shadow">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Top Landing Pages</h3>
+        <div class="space-y-3">
+          <% @traffic_sources.each do |page, count| %>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600 truncate max-w-xs" title="<%= page %>">
+                <%= page.truncate(50) %>
+              </span>
+              <span class="text-sm font-medium text-gray-900">
+                <%= number_with_delimiter(count) %>
+              </span>
+            </div>
+          <% end %>
+          <% if @traffic_sources.empty? %>
+            <p class="text-sm text-gray-500">No landing pages recorded</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Conversions -->
+  <div class="overflow-hidden rounded-lg bg-white shadow">
+    <div class="px-4 py-5 sm:p-6">
+      <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Recent Conversions</h3>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Affiliate</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Landing Page</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days to Convert</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @recent_conversions.each do |referral| %>
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= referral.converted_at&.strftime("%b %d, %Y %H:%M") || "-" %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= link_to referral.affiliate.name, admin_affiliate_path(referral.affiliate), class: "text-indigo-600 hover:text-indigo-900" %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= referral.user.email_address %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <%= referral.landing_page || "-" %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= referral.days_since_click %>
+                </td>
+              </tr>
+            <% end %>
+            <% if @recent_conversions.empty? %>
+              <tr>
+                <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                  No conversions in this period
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Daily Performance Chart
+  const ctx = document.getElementById('dailyPerformanceChart').getContext('2d');
+  const dailyData = <%= @daily_performance.to_json.html_safe %>;
+  
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: dailyData.map(d => d.date),
+      datasets: [{
+        label: 'Clicks',
+        data: dailyData.map(d => d.clicks),
+        borderColor: 'rgb(59, 130, 246)',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        yAxisID: 'y',
+      }, {
+        label: 'Referrals',
+        data: dailyData.map(d => d.referrals),
+        borderColor: 'rgb(34, 197, 94)',
+        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+        yAxisID: 'y',
+      }, {
+        label: 'Revenue',
+        data: dailyData.map(d => d.revenue),
+        borderColor: 'rgb(168, 85, 247)',
+        backgroundColor: 'rgba(168, 85, 247, 0.1)',
+        yAxisID: 'y1',
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      scales: {
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          grid: {
+            drawOnChartArea: false,
+          },
+        },
+      }
+    }
+  });
+</script>

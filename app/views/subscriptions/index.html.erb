@@ -1,0 +1,144 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="mb-8">
+    <h2 class="text-2xl font-bold text-gray-900">My Subscription</h2>
+  </div>
+
+  <% if @current_subscription %>
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
+      <div class="px-4 py-5 sm:px-6">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+          Active Subscription
+        </h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">
+          Your current VPN subscription details
+        </p>
+      </div>
+      <div class="border-t border-gray-200">
+        <dl>
+          <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Plan</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <%= @current_subscription.plan.name %>
+            </dd>
+          </div>
+          <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Status</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                <%= @current_subscription.status.humanize %>
+              </span>
+            </dd>
+          </div>
+          <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Started</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <%= @current_subscription.started_at.strftime("%B %d, %Y") %>
+            </dd>
+          </div>
+          <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Expires</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <%= @current_subscription.expires_at.strftime("%B %d, %Y") %>
+              <span class="text-gray-500">(<%= @current_subscription.days_remaining %> days remaining)</span>
+            </dd>
+          </div>
+        </dl>
+      </div>
+      <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <%= link_to "Extend Subscription", plans_path, 
+            class: "w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm" %>
+        <% if @current_subscription.active? %>
+          <%= button_to "Cancel Subscription", cancel_subscription_path(@current_subscription),
+              method: :post,
+              data: { confirm: "Are you sure you want to cancel your subscription?" },
+              class: "mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" %>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-yellow-700">
+            You don't have an active subscription. 
+            <%= link_to "View available plans", plans_path, class: "font-medium underline text-yellow-700 hover:text-yellow-600" %>
+          </p>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @recent_payments.any? %>
+    <div class="mb-8">
+      <h3 class="text-lg font-medium text-gray-900 mb-4">Recent Payments</h3>
+      <div class="bg-white shadow overflow-hidden sm:rounded-md">
+        <ul class="divide-y divide-gray-200">
+          <% @recent_payments.each do |payment| %>
+            <li>
+              <%= link_to payment_path(payment), class: "block hover:bg-gray-50 px-4 py-4 sm:px-6" do %>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                      <span class="<%= payment_status_class(payment.status) %>">
+                        <%= payment.status.humanize %>
+                      </span>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">
+                        <%= payment.plan.name %> - <%= payment.amount %> <%= payment.currency %>
+                      </div>
+                      <div class="text-sm text-gray-500">
+                        <%= payment.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ml-2 flex-shrink-0">
+                    <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @past_subscriptions.any? %>
+    <div>
+      <h3 class="text-lg font-medium text-gray-900 mb-4">Past Subscriptions</h3>
+      <div class="bg-white shadow overflow-hidden sm:rounded-md">
+        <ul class="divide-y divide-gray-200">
+          <% @past_subscriptions.each do |subscription| %>
+            <li>
+              <%= link_to subscription_path(subscription), class: "block hover:bg-gray-50 px-4 py-4 sm:px-6" do %>
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-medium text-gray-900">
+                      <%= subscription.plan.name %>
+                    </p>
+                    <p class="text-sm text-gray-500">
+                      <%= subscription.started_at.strftime("%B %d, %Y") %> - <%= subscription.expires_at.strftime("%B %d, %Y") %>
+                    </p>
+                  </div>
+                  <div class="ml-2 flex-shrink-0">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                      <%= subscription.status.humanize %>
+                    </span>
+                  </div>
+                </div>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+</div>

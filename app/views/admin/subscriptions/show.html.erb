@@ -1,0 +1,105 @@
+<div class="mb-8">
+  <h1 class="text-2xl font-semibold text-gray-900">Subscription Details</h1>
+</div>
+
+<div class="bg-white shadow overflow-hidden rounded-lg mb-8">
+  <div class="px-4 py-5 sm:px-6">
+    <h3 class="text-lg leading-6 font-medium text-gray-900">Subscription Information</h3>
+  </div>
+  <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
+    <dl class="sm:divide-y sm:divide-gray-200">
+      <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dt class="text-sm font-medium text-gray-500">ID</dt>
+        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">#<%= @subscription.id %></dd>
+      </div>
+      <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dt class="text-sm font-medium text-gray-500">User</dt>
+        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+          <%= link_to @subscription.user.email_address || "User ##{@subscription.user.id}", admin_user_path(@subscription.user), class: "text-indigo-600 hover:text-indigo-900" %>
+        </dd>
+      </div>
+      <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dt class="text-sm font-medium text-gray-500">Plan</dt>
+        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @subscription.plan.name %></dd>
+      </div>
+      <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dt class="text-sm font-medium text-gray-500">Status</dt>
+        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+          <span class="inline-flex px-2 text-xs font-semibold leading-5 rounded-full
+            <%= @subscription.active? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+            <%= @subscription.status.humanize %>
+          </span>
+        </dd>
+      </div>
+      <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dt class="text-sm font-medium text-gray-500">Started</dt>
+        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @subscription.started_at.strftime("%B %d, %Y at %I:%M %p") %></dd>
+      </div>
+      <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dt class="text-sm font-medium text-gray-500">Expires</dt>
+        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+          <%= @subscription.expires_at.strftime("%B %d, %Y at %I:%M %p") %>
+          <% if @subscription.active? %>
+            <span class="text-gray-500">(<%= @subscription.days_remaining %> days remaining)</span>
+          <% end %>
+        </dd>
+      </div>
+      <% if @subscription.cancelled_at.present? %>
+        <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Cancelled</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @subscription.cancelled_at.strftime("%B %d, %Y at %I:%M %p") %></dd>
+        </div>
+      <% end %>
+    </dl>
+  </div>
+</div>
+
+<div class="mb-8">
+  <h2 class="text-xl font-semibold text-gray-900 mb-4">Related Payments</h2>
+  <div class="bg-white shadow overflow-hidden rounded-lg">
+    <% if @payments.any? %>
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paid At</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @payments.each do |payment| %>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                <%= payment.id.first(8) %>...
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <%= number_to_currency(payment.amount) %> <%= payment.currency %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex px-2 text-xs font-semibold leading-5 rounded-full
+                  <%= payment.successful? ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
+                  <%= payment.status.humanize %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= payment.created_at.strftime("%B %d, %Y") %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= payment.paid_at ? payment.paid_at.strftime("%B %d, %Y") : "-" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <div class="px-6 py-4 text-sm text-gray-500">No payments found for this subscription.</div>
+    <% end %>
+  </div>
+</div>
+
+<div class="mt-6">
+  <%= link_to "← Back to Subscriptions", admin_subscriptions_path, class: "text-indigo-600 hover:text-indigo-900" %>
+  <%= link_to "Edit Subscription", edit_admin_subscription_path(@subscription), class: "ml-4 text-indigo-600 hover:text-indigo-900" %>
+</div>

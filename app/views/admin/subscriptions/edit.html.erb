@@ -1,0 +1,50 @@
+<div class="mb-8">
+  <h1 class="text-2xl font-semibold text-gray-900">Edit Subscription</h1>
+</div>
+
+<div class="bg-white shadow overflow-hidden rounded-lg">
+  <div class="px-4 py-5 sm:p-6">
+    <%= form_with model: @subscription, url: admin_subscription_path(@subscription), local: true do |form| %>
+      <% if @subscription.errors.any? %>
+        <div class="mb-4 rounded-md bg-red-50 p-4">
+          <div class="flex">
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">
+                There were <%= pluralize(@subscription.errors.count, "error") %> with your submission
+              </h3>
+              <div class="mt-2 text-sm text-red-700">
+                <ul class="list-disc pl-5 space-y-1">
+                  <% @subscription.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="mb-4">
+        <h3 class="text-lg font-medium text-gray-900">User: <%= @subscription.user.email_address || "User ##{@subscription.user.id}" %></h3>
+        <p class="text-sm text-gray-500">Plan: <%= @subscription.plan.name %></p>
+      </div>
+
+      <div class="grid grid-cols-6 gap-6">
+        <div class="col-span-6 sm:col-span-3">
+          <%= form.label :status, class: "block text-sm font-medium text-gray-700" %>
+          <%= form.select :status, options_for_select(Subscription.statuses.map {|key, value| [key.humanize, key]}, @subscription.status), {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+        </div>
+
+        <div class="col-span-6 sm:col-span-3">
+          <%= form.label :expires_at, class: "block text-sm font-medium text-gray-700" %>
+          <%= form.datetime_field :expires_at, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-center justify-between">
+        <%= link_to "Cancel", admin_subscription_path(@subscription), class: "text-sm text-gray-600 hover:text-gray-900" %>
+        <%= form.submit "Update Subscription", class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+      </div>
+    <% end %>
+  </div>
+</div>

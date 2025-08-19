@@ -1,0 +1,31 @@
+class RootController < ApplicationController
+  allow_unauthenticated_access
+
+  def index
+    if params[:dismiss]
+      session.delete(:show_credentials)
+    end
+
+    # If user is signed in, show dashboard view
+    # Otherwise, show appropriate landing page based on parameters
+    if authenticated?
+      render :dashboard
+    else
+      # Check for special landing page versions
+      if params[:live].present? || params[:full].present?
+        # Show the full/live landing page when explicitly requested
+        @cro_version = false
+        @teaser_version = false
+        render :landing, layout: "public"
+      elsif params[:cro].present?
+        # Show CRO optimized version
+        @cro_version = true
+        render :landing_cro, layout: "public"
+      else
+        # Default to teaser/coming soon page
+        @teaser_version = true
+        render :landing_teaser, layout: "public"
+      end
+    end
+  end
+end

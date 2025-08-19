@@ -1,0 +1,63 @@
+<div class="bg-gray-50 py-12 sm:px-6 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-lg">
+    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+      <div class="text-center">
+        <svg class="mx-auto h-12 w-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        
+        <h2 class="mt-4 text-2xl font-bold text-gray-900">
+          Welcome to Our Affiliate Program!
+        </h2>
+        
+        <p class="mt-2 text-gray-600">
+          Thank you for joining, <%= @affiliate.name %>!
+        </p>
+      </div>
+
+      <div class="mt-8 bg-gray-50 rounded-lg p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Your Account Details:</h3>
+        
+        <dl class="space-y-3">
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Your Unique Affiliate Code:</dt>
+            <dd class="mt-1 text-lg font-mono font-bold text-indigo-600"><%= @affiliate.code %></dd>
+          </div>
+          
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Commission Rate:</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @affiliate.commission_rate %>%</dd>
+          </div>
+          
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Account Status:</dt>
+            <dd class="mt-1">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                <%= @affiliate.status.capitalize %>
+              </span>
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="mt-6 bg-blue-50 rounded-lg p-4">
+        <h4 class="text-sm font-medium text-blue-900">What happens next?</h4>
+        <ul class="mt-2 text-sm text-blue-700 space-y-1">
+          <li>• We'll review your application within 24-48 hours</li>
+          <li>• You'll receive an email once your account is approved</li>
+          <li>• Meanwhile, you can access your dashboard to get familiar with the tools</li>
+        </ul>
+      </div>
+
+      <div class="mt-8 space-y-3">
+        <%= link_to affiliates_dashboard_path, class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+          Go to Your Dashboard
+        <% end %>
+        
+        <%= link_to root_path, class: "w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+          Return to Homepage
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

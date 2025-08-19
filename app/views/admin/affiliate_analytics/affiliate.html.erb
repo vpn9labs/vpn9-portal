@@ -1,0 +1,298 @@
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex justify-between items-center">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">
+        <%= @affiliate.name %> Analytics
+      </h1>
+      <p class="mt-1 text-sm text-gray-500">
+        Affiliate Code: <span class="font-mono font-medium"><%= @affiliate.code %></span>
+      </p>
+    </div>
+    <div class="flex space-x-4">
+      <%= form_with url: admin_affiliate_analytics_path(@affiliate), method: :get, local: true, class: "flex items-center space-x-2" do |f| %>
+        <%= f.date_field :start_date, value: @date_range.first.to_date, class: "rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+        <span class="text-gray-500">to</span>
+        <%= f.date_field :end_date, value: @date_range.last.to_date, class: "rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+        <%= f.submit "Update", class: "inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500" %>
+      <% end %>
+      <%= link_to "View Profile", admin_affiliate_path(@affiliate), class: "inline-flex items-center rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500" %>
+    </div>
+  </div>
+
+  <!-- Performance Stats -->
+  <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+      <dt class="truncate text-sm font-medium text-gray-500">Total Clicks</dt>
+      <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+        <%= number_with_delimiter(@stats[:clicks]) %>
+      </dd>
+      <p class="text-sm text-gray-500">
+        <%= number_with_delimiter(@stats[:unique_visitors]) %> unique
+      </p>
+    </div>
+
+    <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+      <dt class="truncate text-sm font-medium text-gray-500">Signups</dt>
+      <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+        <%= number_with_delimiter(@stats[:signups]) %>
+      </dd>
+      <% if @stats[:clicks] > 0 %>
+        <p class="text-sm text-gray-500">
+          <%= number_to_percentage(@stats[:signup_rate], precision: 2) %> rate
+        </p>
+      <% end %>
+    </div>
+
+    <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+      <dt class="truncate text-sm font-medium text-gray-500">Conversions</dt>
+      <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+        <%= number_with_delimiter(@stats[:conversions]) %>
+      </dd>
+      <% if @stats[:clicks] > 0 %>
+        <p class="text-sm text-gray-500">
+          <%= number_to_percentage(@stats[:conversion_rate], precision: 2) %> rate
+        </p>
+      <% end %>
+    </div>
+
+    <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+      <dt class="truncate text-sm font-medium text-gray-500">Total Earnings</dt>
+      <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+        <%= number_to_currency(@stats[:earnings]) %>
+      </dd>
+      <p class="text-sm text-gray-500">
+        <%= number_to_currency(@stats[:avg_commission]) %> avg
+      </p>
+    </div>
+  </div>
+
+  <!-- Fraud Analysis Alert -->
+  <% if @fraud_analysis[:flagged] %>
+    <div class="rounded-md bg-red-50 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">
+            Fraud Detection Alert
+          </h3>
+          <div class="mt-2 text-sm text-red-700">
+            <p>Risk Score: <%= @fraud_analysis[:risk_score] %>/100</p>
+            <ul class="list-disc list-inside mt-1">
+              <% @fraud_analysis[:reasons].each do |reason| %>
+                <li><%= reason %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Performance Chart -->
+  <div class="overflow-hidden rounded-lg bg-white shadow">
+    <div class="px-4 py-5 sm:p-6">
+      <h3 class="text-lg font-medium leading-6 text-gray-900">Daily Performance</h3>
+      <div class="mt-5">
+        <canvas id="performanceChart" width="400" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tables Row -->
+  <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
+    <!-- Top Landing Pages -->
+    <div class="overflow-hidden rounded-lg bg-white shadow">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Top Landing Pages</h3>
+        <div class="space-y-3">
+          <% @top_pages.each do |page, count| %>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600 truncate max-w-xs" title="<%= page %>">
+                <%= page || "(Direct)" %>
+              </span>
+              <div class="flex items-center space-x-2">
+                <span class="text-sm font-medium text-gray-900">
+                  <%= number_with_delimiter(count) %> clicks
+                </span>
+                <% 
+                  conversions = @affiliate.referrals.converted
+                    .joins("JOIN affiliate_clicks ON affiliate_clicks.ip_hash = referrals.ip_hash")
+                    .where(affiliate_clicks: { landing_page: page })
+                    .where(created_at: @date_range).count
+                  conv_rate = count > 0 ? (conversions.to_f / count * 100) : 0
+                %>
+                <span class="text-xs text-gray-500">
+                  <%= number_to_percentage(conv_rate, precision: 1) %> conv
+                </span>
+              </div>
+            </div>
+          <% end %>
+          <% if @top_pages.empty? %>
+            <p class="text-sm text-gray-500">No landing page data available</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Referrals -->
+    <div class="overflow-hidden rounded-lg bg-white shadow">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Recent Referrals</h3>
+        <div class="space-y-3">
+          <% @recent_referrals.each do |referral| %>
+            <div class="border-l-4 <%= referral.converted? ? 'border-green-400' : 'border-gray-300' %> pl-3">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-sm font-medium text-gray-900">
+                    <%= referral.user.email_address %>
+                  </p>
+                  <p class="text-xs text-gray-500">
+                    <%= referral.created_at.strftime("%b %d, %Y %H:%M") %>
+                  </p>
+                </div>
+                <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium <%= referral.converted? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+                  <%= referral.status.capitalize %>
+                </span>
+              </div>
+            </div>
+          <% end %>
+          <% if @recent_referrals.empty? %>
+            <p class="text-sm text-gray-500">No referrals in this period</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Commission Details -->
+  <div class="overflow-hidden rounded-lg bg-white shadow">
+    <div class="px-4 py-5 sm:p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-medium leading-6 text-gray-900">Commission History</h3>
+        <div class="text-sm text-gray-500">
+          Total: <%= number_to_currency(@stats[:earnings]) %>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commission</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @recent_commissions.each do |commission| %>
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= commission.created_at.strftime("%b %d, %Y") %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= commission.referral.user.email_address %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= number_to_currency(commission.payment.amount) %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <%= number_to_currency(commission.amount) %>
+                  <span class="text-xs text-gray-500">(<%= commission.commission_rate %>%)</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium
+                    <%= case commission.status
+                       when 'pending' then 'bg-yellow-100 text-yellow-800'
+                       when 'approved' then 'bg-blue-100 text-blue-800'
+                       when 'paid' then 'bg-green-100 text-green-800'
+                       when 'cancelled' then 'bg-red-100 text-red-800'
+                       else 'bg-gray-100 text-gray-800'
+                       end %>">
+                    <%= commission.status.capitalize %>
+                  </span>
+                </td>
+              </tr>
+            <% end %>
+            <% if @recent_commissions.empty? %>
+              <tr>
+                <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                  No commissions in this period
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Performance Chart
+  const ctx = document.getElementById('performanceChart').getContext('2d');
+  const dailyData = <%= @daily_performance.to_json.html_safe %>;
+  
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: dailyData.map(d => d.date),
+      datasets: [{
+        label: 'Clicks',
+        data: dailyData.map(d => d.clicks),
+        borderColor: 'rgb(59, 130, 246)',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        yAxisID: 'y',
+      }, {
+        label: 'Signups',
+        data: dailyData.map(d => d.signups),
+        borderColor: 'rgb(34, 197, 94)',
+        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+        yAxisID: 'y',
+      }, {
+        label: 'Commissions',
+        data: dailyData.map(d => d.commissions),
+        borderColor: 'rgb(168, 85, 247)',
+        backgroundColor: 'rgba(168, 85, 247, 0.1)',
+        yAxisID: 'y1',
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      scales: {
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          title: {
+            display: true,
+            text: 'Count'
+          }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          title: {
+            display: true,
+            text: 'Commission ($)'
+          },
+          grid: {
+            drawOnChartArea: false,
+          },
+        },
+      }
+    }
+  });
+</script>

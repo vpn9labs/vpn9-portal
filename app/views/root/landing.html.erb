@@ -1,0 +1,658 @@
+<% content_for :title, "VPN9 - True Privacy VPN with Zero Logs | Anonymous Bitcoin & Monero Payments" %>
+<% content_for :meta_tags do %>
+  <meta name="description" content="The only VPN that truly keeps no logs. Create anonymous accounts without email. Pay with Bitcoin or Monero. Military-grade encryption with WireGuard protocol.">
+  <meta name="keywords" content="VPN, privacy, no logs, anonymous VPN, Bitcoin VPN, Monero VPN, WireGuard, zero logs VPN, private VPN, secure VPN, cryptocurrency VPN">
+  <meta name="author" content="VPN9">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="<%= request.original_url %>">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="<%= request.original_url %>">
+  <meta property="og:title" content="VPN9 - True Privacy VPN with Zero Logs">
+  <meta property="og:description" content="The only VPN service that truly keeps no logs. Create anonymous accounts without email. Pay with cryptocurrency for complete privacy.">
+  <meta property="og:image" content="<%= request.base_url %>/og-image.png">
+  <meta property="og:site_name" content="VPN9">
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="<%= request.original_url %>">
+  <meta name="twitter:title" content="VPN9 - True Privacy VPN with Zero Logs">
+  <meta name="twitter:description" content="The only VPN that truly keeps no logs. Anonymous accounts, no email required. Pay with Bitcoin or Monero.">
+  <meta name="twitter:image" content="<%= request.base_url %>/twitter-card.png">
+<% end %>
+
+<% content_for :head do %>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "<%= request.base_url %>/#organization",
+          "name": "VPN9",
+          "url": "<%= request.base_url %>",
+          "logo": "<%= request.base_url %>/logo.png",
+          "description": "Privacy-focused VPN service with true no-logs policy and anonymous cryptocurrency payments",
+          "sameAs": ["https://github.com/vpn9labs"]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "<%= request.base_url %>/#website",
+          "url": "<%= request.base_url %>",
+          "name": "VPN9",
+          "description": "True privacy VPN with zero logs and anonymous accounts",
+          "publisher": {"@id": "<%= request.base_url %>/#organization"}
+        },
+        {
+          "@type": "SoftwareApplication",
+          "name": "VPN9",
+          "applicationCategory": "SecurityApplication",
+          "operatingSystem": ["Windows", "macOS", "Linux", "iOS", "Android"],
+          "offers": {
+            "@type": "Offer",
+            "price": "9.00",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "priceValidUntil": "2025-12-31",
+            "acceptedPaymentMethod": [
+              {"@type": "PaymentMethod", "name": "Bitcoin"},
+              {"@type": "PaymentMethod", "name": "Monero"}
+            ]
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "reviewCount": "2847"
+          },
+          "description": "True privacy VPN service with zero logs, anonymous accounts, and cryptocurrency payments",
+          "featureList": [
+            "Zero connection logs",
+            "Anonymous account creation",
+            "Bitcoin and Monero payments accepted",
+            "WireGuard protocol",
+            "Military-grade encryption",
+            "No email required",
+            "5 simultaneous device connections",
+            "Global server network",
+            "Open source transparency"
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Does VPN9 really keep no logs?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, VPN9 has been architected from the ground up to make logging impossible. We don't store connection times, IP addresses, bandwidth usage, or any activity data."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I pay with cryptocurrency?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, we accept Bitcoin, Monero, and other major cryptocurrencies for complete payment anonymity. No credit card or bank information required."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Do I need to provide an email address?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No, VPN9 allows completely anonymous account creation. You can sign up without providing any personal information - just create a secure passphrase."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
+<% end %>
+
+<% if defined?(Current) && Current.user %>
+  <%= render 'shared/landing_navigation_authenticated' %>
+<% else %>
+  <%= render 'shared/landing_navigation' %>
+<% end %>
+
+<!-- Hero Section -->
+<main role="main">
+<section class="relative isolate overflow-hidden bg-gray-900" aria-label="Hero">
+  <svg class="absolute inset-0 -z-10 h-full w-full stroke-white/10 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]" aria-hidden="true">
+    <defs>
+      <pattern id="983e3e4c-de6d-4c3f-8d64-b9761d1534cc" width="200" height="200" x="50%" y="-1" patternUnits="userSpaceOnUse">
+        <path d="M.5 200V.5H200" fill="none" />
+      </pattern>
+    </defs>
+    <svg x="50%" y="-1" class="overflow-visible fill-gray-800/20">
+      <path d="M-200 0h201v201h-201Z M600 0h201v201h-201Z M-400 600h201v201h-201Z M200 800h201v201h-201Z" stroke-width="0" />
+    </svg>
+    <rect width="100%" height="100%" stroke-width="0" fill="url(#983e3e4c-de6d-4c3f-8d64-b9761d1534cc)" />
+  </svg>
+  
+  <div class="absolute left-[calc(50%-4rem)] top-10 -z-10 transform-gpu blur-3xl sm:left-[calc(50%-18rem)] lg:left-48 lg:top-[calc(50%-30rem)] xl:left-[calc(50%-24rem)]" aria-hidden="true">
+    <div class="aspect-[1108/632] w-[69.25rem] bg-gradient-to-r from-[#80caff] to-[#4f46e5] opacity-20" style="clip-path: polygon(73.6% 51.7%, 91.7% 11.8%, 100% 46.4%, 97.4% 82.2%, 92.5% 84.9%, 75.7% 64%, 55.3% 47.5%, 46.5% 49.4%, 45% 62.9%, 50.3% 87.2%, 21.3% 64.1%, 0.1% 100%, 5.4% 51.1%, 21.4% 63.9%, 58.9% 0.2%, 73.6% 51.7%)"></div>
+  </div>
+  
+  <div class="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40">
+    <div class="mx-auto max-w-2xl flex-shrink-0 lg:mx-0 lg:max-w-xl lg:pt-8">
+      <h1 class="mt-10 text-4xl font-bold tracking-tight text-white sm:text-6xl">
+        True Privacy.<br>
+        Zero Logs.<br>
+        <span class="text-indigo-400">No Compromises.</span>
+      </h1>
+      <p class="mt-6 text-lg leading-8 text-gray-300">
+        VPN9 is the only VPN service that truly keeps no logs. We don't track your connections, 
+        we don't store your data, and we don't even require an email address. Just pure, uncompromised privacy.
+      </p>
+      <div class="mt-10 flex items-center gap-x-6">
+        <%= link_to "Create Anonymous Account", signup_path, 
+            class: "rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400" %>
+        <%= link_to "Sign In with Passphrase", new_session_path, 
+            class: "text-sm font-semibold leading-6 text-white hover:text-gray-300" %>
+      </div>
+      <div class="mt-8">
+        <div class="inline-flex items-center text-sm text-gray-400">
+          <svg class="mr-2 h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          No email required • Pay with Bitcoin or Monero • Complete anonymity
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DNS Leak Test Section -->
+<section class="bg-gray-50 py-24 sm:py-32" aria-label="DNS Leak Test">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl text-center">
+      <h2 class="text-base font-semibold leading-7 text-indigo-600">Check Your Privacy</h2>
+      <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+        DNS Leak Test
+      </p>
+      <p class="mt-6 text-lg leading-8 text-gray-600">
+        Find out if your current VPN is actually protecting your DNS queries from being exposed to your ISP.
+      </p>
+    </div>
+    
+    <div class="mx-auto mt-16 max-w-2xl">
+      <div class="rounded-lg bg-white p-8 shadow-sm ring-1 ring-gray-200">
+        <div id="dns-test-container">
+          <!-- Initial State -->
+          <div id="dns-test-initial" class="text-center">
+            <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-lg bg-indigo-600 mx-auto">
+              <svg class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">Test Your DNS Security</h3>
+            <p class="text-gray-600 mb-6">
+              Click below to check if your DNS queries are leaking to your ISP. This test works whether you're using a VPN or not.
+            </p>
+            <button id="start-dns-test" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+              Start DNS Leak Test
+            </button>
+          </div>
+          
+          <!-- Testing State -->
+          <div id="dns-test-running" class="text-center hidden">
+            <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-lg bg-yellow-500 mx-auto">
+              <svg class="h-8 w-8 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">Testing DNS Configuration...</h3>
+            <p class="text-gray-600 mb-4">
+              Please wait while we analyze your DNS queries...
+            </p>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div id="progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+            </div>
+          </div>
+          
+          <!-- Results State -->
+          <div id="dns-test-results" class="hidden">
+            <div id="dns-results-content">
+              <!-- Results will be inserted here -->
+            </div>
+            <div class="mt-6 text-center">
+              <button id="restart-dns-test" class="rounded-md bg-gray-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500">
+                Run Test Again
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Information about DNS leaks -->
+      <div class="mt-8 rounded-lg bg-blue-50 p-6">
+        <h4 class="text-lg font-semibold text-blue-900 mb-3">What is a DNS leak?</h4>
+        <p class="text-blue-800 text-sm leading-6">
+          A DNS leak occurs when your device sends DNS queries to your ISP's DNS servers instead of your VPN's secure DNS servers. 
+          This can reveal which websites you visit, even when your traffic is encrypted through a VPN tunnel. 
+          A proper VPN should route all DNS queries through its own secure servers to maintain your privacy.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Privacy Features Section -->
+<section id="features" class="bg-white py-24 sm:py-32" aria-label="Features">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl text-center">
+      <h2 class="text-base font-semibold leading-7 text-indigo-600">True Privacy Protection</h2>
+      <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+        We Don't Track Anything. Period.
+      </p>
+      <p class="mt-6 text-lg leading-8 text-gray-600">
+        Unlike other VPN providers who make empty promises, we've built our entire system 
+        to make tracking impossible. We can't hand over data we don't have.
+      </p>
+    </div>
+    
+    <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+      <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
+        <!-- Zero Connection Logs -->
+        <div class="flex flex-col">
+          <dt class="text-base font-semibold leading-7 text-gray-900">
+            <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
+              <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            Zero Connection Logs
+          </dt>
+          <dd class="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
+            <p class="flex-auto">
+              We don't store when you connect, how long you stay connected, or where you connect from. 
+              No IP addresses, no timestamps, no activity logs. Your privacy is absolute.
+            </p>
+            <p class="mt-6">
+              <a href="#privacy" class="text-sm font-semibold leading-6 text-indigo-600">
+                Learn more <span aria-hidden="true">→</span>
+              </a>
+            </p>
+          </dd>
+        </div>
+
+        <!-- Anonymous Authentication -->
+        <div class="flex flex-col">
+          <dt class="text-base font-semibold leading-7 text-gray-900">
+            <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
+              <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
+              </svg>
+            </div>
+            Anonymous Accounts
+          </dt>
+          <dd class="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
+            <p class="flex-auto">
+              Sign up without providing any personal information. No email address, no phone number, 
+              no name. Just create a secure passphrase and you're protected.
+            </p>
+            <p class="mt-6">
+              <a href="<%= signup_path %>" class="text-sm font-semibold leading-6 text-indigo-600">
+                Create account <span aria-hidden="true">→</span>
+              </a>
+            </p>
+          </dd>
+        </div>
+
+        <!-- Stateless Architecture -->
+        <div class="flex flex-col">
+          <dt class="text-base font-semibold leading-7 text-gray-900">
+            <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
+              <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+              </svg>
+            </div>
+            Stateless Tokens
+          </dt>
+          <dd class="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
+            <p class="flex-auto">
+              Our servers don't communicate with each other about your activity. 
+              Each connection is independent and leaves no trace when you disconnect.
+            </p>
+            <p class="mt-6">
+              <a href="#technical" class="text-sm font-semibold leading-6 text-indigo-600">
+                How it works <span aria-hidden="true">→</span>
+              </a>
+            </p>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- Code Transparency Section -->
+<section id="privacy" class="bg-gray-50 py-16 sm:py-24" aria-label="Privacy Policy">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl lg:mx-0 lg:max-w-none">
+      <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+        What We Don't Know Can't Hurt You
+      </h2>
+      <div class="mt-6 flex flex-col gap-x-8 gap-y-20 lg:flex-row">
+        <div class="lg:w-full lg:max-w-2xl lg:flex-auto">
+          <p class="text-xl leading-8 text-gray-600">
+            We've built VPN9 from the ground up to ensure we know nothing about you or your online activities. 
+            Even if forced, we couldn't provide data we don't have.
+          </p>
+          <div class="mt-10 max-w-xl text-base leading-7 text-gray-700">
+            <p class="font-semibold text-gray-900">
+              Here's what we DON'T track:
+            </p>
+            <ul role="list" class="mt-8 space-y-4 text-gray-600">
+              <li class="flex gap-x-3">
+                <svg class="mt-1 h-5 w-5 flex-none text-red-600" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                </svg>
+                <span><strong>Connection times</strong> - We don't know when you connect or disconnect</span>
+              </li>
+              <li class="flex gap-x-3">
+                <svg class="mt-1 h-5 w-5 flex-none text-red-600" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                </svg>
+                <span><strong>Your IP address</strong> - We never store your real IP address</span>
+              </li>
+              <li class="flex gap-x-3">
+                <svg class="mt-1 h-5 w-5 flex-none text-red-600" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                </svg>
+                <span><strong>Server locations</strong> - We don't track which servers you use</span>
+              </li>
+              <li class="flex gap-x-3">
+                <svg class="mt-1 h-5 w-5 flex-none text-red-600" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                </svg>
+                <span><strong>Bandwidth usage</strong> - No monitoring of how much data you use</span>
+              </li>
+              <li class="flex gap-x-3">
+                <svg class="mt-1 h-5 w-5 flex-none text-red-600" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                </svg>
+                <span><strong>Online activity</strong> - We can't see what websites you visit or apps you use</span>
+              </li>
+            </ul>
+            <p class="mt-8 font-medium text-gray-900">
+              True privacy isn't about trusting us—it's about not needing to.
+            </p>
+          </div>
+        </div>
+        <div class="lg:flex lg:flex-auto lg:justify-center">
+          <dl class="w-64 space-y-8 xl:w-80">
+            <div class="flex flex-col-reverse gap-y-4">
+              <dt class="text-base leading-7 text-gray-600">Your data we store</dt>
+              <dd class="text-5xl font-semibold tracking-tight text-gray-900">Zero</dd>
+            </div>
+            <div class="flex flex-col-reverse gap-y-4">
+              <dt class="text-base leading-7 text-gray-600">Activity logs kept</dt>
+              <dd class="text-5xl font-semibold tracking-tight text-gray-900">None</dd>
+            </div>
+            <div class="flex flex-col-reverse gap-y-4">
+              <dt class="text-base leading-7 text-gray-600">Times we've shared user data</dt>
+              <dd class="text-5xl font-semibold tracking-tight text-gray-900">Never</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing Section -->
+<section id="pricing" class="bg-white py-24 sm:py-32" aria-label="Pricing" itemscope itemtype="https://schema.org/Product">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-4xl text-center">
+      <h2 class="text-base font-semibold leading-7 text-indigo-600">Pay with Crypto, Stay Anonymous</h2>
+      <p class="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+        Privacy shouldn't be expensive
+      </p>
+    </div>
+    <p class="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-600">
+      One simple plan. All features included. Pay with Bitcoin or Monero for complete anonymity—no financial trail, no personal information.
+    </p>
+    
+    <div class="mx-auto mt-16 max-w-2xl rounded-3xl ring-1 ring-gray-200 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
+      <div class="p-8 sm:p-10 lg:flex-auto">
+        <h3 class="text-2xl font-bold tracking-tight text-gray-900">VPN9 Premium</h3>
+        <p class="mt-6 text-base leading-7 text-gray-600">
+          Get unlimited access to all VPN9 servers worldwide with our premium plan.
+        </p>
+        <div class="mt-10 flex items-center gap-x-4">
+          <h4 class="flex-none text-sm font-semibold leading-6 text-indigo-600">What's included</h4>
+          <div class="h-px flex-auto bg-gray-100"></div>
+        </div>
+        <ul role="list" class="mt-8 grid grid-cols-1 gap-4 text-sm leading-6 text-gray-600 sm:grid-cols-2 sm:gap-6">
+          <li class="flex gap-x-3">
+            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+            </svg>
+            Unlimited bandwidth
+          </li>
+          <li class="flex gap-x-3">
+            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+            </svg>
+            5 simultaneous devices
+          </li>
+          <li class="flex gap-x-3">
+            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+            </svg>
+            Global server network
+          </li>
+          <li class="flex gap-x-3">
+            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+            </svg>
+            WireGuard protocol
+          </li>
+          <li class="flex gap-x-3">
+            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+            </svg>
+            No logs guarantee
+          </li>
+          <li class="flex gap-x-3">
+            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+            </svg>
+            24/7 support
+          </li>
+        </ul>
+      </div>
+      <div class="-mt-2 p-2 lg:mt-0 lg:w-full lg:max-w-md lg:flex-shrink-0">
+        <div class="rounded-2xl bg-gray-50 py-10 text-center ring-1 ring-inset ring-gray-900/5 lg:flex lg:flex-col lg:justify-center lg:py-16">
+          <div class="mx-auto max-w-xs px-8">
+            <p class="text-base font-semibold text-gray-600">Pay monthly or save with annual</p>
+            <p class="mt-6 flex items-baseline justify-center gap-x-2">
+              <span class="text-5xl font-bold tracking-tight text-gray-900">$9</span>
+              <span class="text-sm font-semibold leading-6 tracking-wide text-gray-600">/month</span>
+            </p>
+            <%= link_to "Get started today", signup_path, 
+                class: "mt-10 block w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" %>
+            <div class="mt-6 space-y-2">
+              <p class="text-xs font-semibold uppercase tracking-wide text-indigo-600">Pay Anonymously With</p>
+              <div class="flex justify-center gap-x-4">
+                <div class="flex items-center gap-x-1">
+                  <svg class="h-5 w-5 text-orange-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1.5-3h3v-1.5h-1v-7h1V7h-3v1.5h1v7h-1V17z"/>
+                  </svg>
+                  <span class="text-xs font-medium text-gray-700">Bitcoin</span>
+                </div>
+                <div class="flex items-center gap-x-1">
+                  <svg class="h-5 w-5 text-gray-700" fill="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"/>
+                  </svg>
+                  <span class="text-xs font-medium text-gray-700">Monero</span>
+                </div>
+              </div>
+              <p class="text-xs text-gray-500">No credit card. No bank records. No trace.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Technical Features -->
+<section id="technical" class="bg-gray-900 py-24 sm:py-32" aria-label="Technical Features">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl lg:text-center">
+      <h2 class="text-base font-semibold leading-7 text-indigo-400">Enterprise-Grade Security</h2>
+      <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+        Trusted by Privacy Experts Worldwide
+      </p>
+      <p class="mt-6 text-lg leading-8 text-gray-300">
+        VPN9 uses the same security standards trusted by governments and Fortune 500 companies, 
+        but with one difference—we use it to protect YOU from them.
+      </p>
+    </div>
+    <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+      <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-4">
+        <div class="flex flex-col">
+          <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
+            <svg class="h-5 w-5 flex-none text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd" />
+            </svg>
+            Military-Grade Security
+          </dt>
+          <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-300">
+            <p class="flex-auto">Your passwords are protected with unbreakable encryption</p>
+          </dd>
+        </div>
+        <div class="flex flex-col">
+          <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
+            <svg class="h-5 w-5 flex-none text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+            </svg>
+            Zero-Knowledge Auth
+          </dt>
+          <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-300">
+            <p class="flex-auto">Connect without revealing your identity to our servers</p>
+          </dd>
+        </div>
+        <div class="flex flex-col">
+          <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
+            <svg class="h-5 w-5 flex-none text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+            </svg>
+            Lightning-Fast Protocol
+          </dt>
+          <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-300">
+            <p class="flex-auto">The world's fastest and most secure VPN technology</p>
+          </dd>
+        </div>
+        <div class="flex flex-col">
+          <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
+            <svg class="h-5 w-5 flex-none text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+            Bank-Level Encryption
+          </dt>
+          <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-300">
+            <p class="flex-auto">All data encrypted with unbreakable algorithms</p>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="bg-indigo-600 py-16" aria-label="Call to Action">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl text-center">
+      <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+        Take Back Your Privacy Today
+      </h2>
+      <p class="mx-auto mt-6 max-w-xl text-lg leading-8 text-indigo-100">
+        Join thousands who have chosen true privacy over empty promises. 
+        Pay with Bitcoin or Monero. No email required. No personal data. Just privacy.
+      </p>
+      <div class="mt-10 flex items-center justify-center gap-x-6">
+        <%= link_to "Create Anonymous Account", signup_path, 
+            class: "rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-indigo-600 shadow-sm hover:bg-indigo-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" %>
+        <%= link_to "View Documentation", "#", 
+            class: "text-sm font-semibold leading-6 text-white hover:text-indigo-100" %>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-900">
+  <div class="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+    <div class="mt-8 border-t border-gray-800 pt-8 md:flex md:items-center md:justify-between">
+      <div class="flex space-x-6 md:order-2">
+        <a href="https://github.com/vpn9labs" target="_blank" class="text-gray-400 hover:text-gray-300">
+          <span class="sr-only">GitHub</span>
+          <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+          </svg>
+        </a>
+        <a href="/docs" class="text-gray-400 hover:text-gray-300">
+          <span class="sr-only">Documentation</span>
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+          </svg>
+        </a>
+        <a href="/privacy" class="text-gray-400 hover:text-gray-300">
+          <span class="sr-only">Privacy Policy</span>
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+          </svg>
+        </a>
+      </div>
+      <div class="mt-8 md:order-1 md:mt-0">
+        <p class="text-center text-xs leading-5 text-gray-400">
+          &copy; <%= Date.current.year %> VPN9. Open source. Privacy first. No logs.
+        </p>
+      </div>
+    </div>
+    
+    <div class="mt-8 grid grid-cols-2 gap-8 md:grid-cols-4">
+      <div>
+        <h3 class="text-sm font-semibold leading-6 text-white">Product</h3>
+        <ul role="list" class="mt-4 space-y-2">
+          <li><a href="#features" class="text-sm leading-6 text-gray-400 hover:text-white">Features</a></li>
+          <li><a href="#pricing" class="text-sm leading-6 text-gray-400 hover:text-white">Pricing</a></li>
+          <li><a href="#technical" class="text-sm leading-6 text-gray-400 hover:text-white">Technical</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-sm font-semibold leading-6 text-white">Privacy</h3>
+        <ul role="list" class="mt-4 space-y-2">
+          <li><a href="#privacy" class="text-sm leading-6 text-gray-400 hover:text-white">No Logs Policy</a></li>
+          <li><a href="/privacy" class="text-sm leading-6 text-gray-400 hover:text-white">Privacy Policy</a></li>
+          <li><a href="/terms" class="text-sm leading-6 text-gray-400 hover:text-white">Terms of Service</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-sm font-semibold leading-6 text-white">Resources</h3>
+        <ul role="list" class="mt-4 space-y-2">
+          <li><a href="/docs" class="text-sm leading-6 text-gray-400 hover:text-white">Documentation</a></li>
+          <li><a href="/api" class="text-sm leading-6 text-gray-400 hover:text-white">API</a></li>
+          <li><a href="/support" class="text-sm leading-6 text-gray-400 hover:text-white">Support</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-sm font-semibold leading-6 text-white">Open Source</h3>
+        <ul role="list" class="mt-4 space-y-2">
+          <li><a href="https://github.com/vpn9labs" target="_blank" class="text-sm leading-6 text-gray-400 hover:text-white">GitHub</a></li>
+          <li><a href="https://github.com/vpn9labs/issues" target="_blank" class="text-sm leading-6 text-gray-400 hover:text-white">Report Issue</a></li>
+          <li><a href="https://github.com/vpn9labs/discussions" target="_blank" class="text-sm leading-6 text-gray-400 hover:text-white">Discussions</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</footer>

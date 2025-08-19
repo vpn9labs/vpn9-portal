@@ -1,0 +1,92 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <div class="px-4 py-5 sm:px-6">
+      <h3 class="text-lg leading-6 font-medium text-gray-900">
+        Subscription Details
+      </h3>
+      <p class="mt-1 max-w-2xl text-sm text-gray-500">
+        <%= @subscription.plan.name %> - <%= @subscription.plan.duration_days %> days
+      </p>
+    </div>
+    <div class="border-t border-gray-200">
+      <dl>
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Status</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= @subscription.active? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+              <%= @subscription.status.humanize %>
+            </span>
+          </dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Started</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @subscription.started_at.strftime("%B %d, %Y") %>
+          </dd>
+        </div>
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Expires</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @subscription.expires_at.strftime("%B %d, %Y") %>
+            <% if @subscription.active? %>
+              <span class="text-gray-500">(<%= @subscription.days_remaining %> days remaining)</span>
+            <% end %>
+          </dd>
+        </div>
+        <% if @subscription.cancelled_at %>
+          <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Cancelled</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <%= @subscription.cancelled_at.strftime("%B %d, %Y") %>
+            </dd>
+          </div>
+        <% end %>
+      </dl>
+    </div>
+  </div>
+
+  <% if @payments.any? %>
+    <div class="mt-8">
+      <h3 class="text-lg font-medium text-gray-900 mb-4">Payment History</h3>
+      <div class="bg-white shadow overflow-hidden sm:rounded-md">
+        <ul class="divide-y divide-gray-200">
+          <% @payments.each do |payment| %>
+            <li>
+              <%= link_to payment_path(payment), class: "block hover:bg-gray-50 px-4 py-4 sm:px-6" do %>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                      <span class="<%= payment_status_class(payment.status) %>">
+                        <%= payment.status.humanize %>
+                      </span>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">
+                        <%= payment.amount %> <%= payment.currency %>
+                        <% if payment.crypto_currency.present? %>
+                          via <%= payment.crypto_currency.upcase %>
+                        <% end %>
+                      </div>
+                      <div class="text-sm text-gray-500">
+                        <%= payment.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ml-2 flex-shrink-0">
+                    <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="mt-6">
+    <%= link_to "Back to Subscriptions", subscriptions_path, class: "text-indigo-600 hover:text-indigo-500" %>
+  </div>
+</div>

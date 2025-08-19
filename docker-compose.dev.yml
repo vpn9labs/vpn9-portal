@@ -1,0 +1,140 @@
+services:
+
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes: 
+      - redis_data:/data
+
+
+  db:
+    image: postgres
+    restart: always
+    # set shared memory limit when using docker compose
+    shm_size: 128mb
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: vpn9
+      POSTGRES_DB: vpn9
+      POSTGRES_PASSWORD: vpn9
+
+  # Bitcart Services
+  bitcart-postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: bitcart
+      POSTGRES_PASSWORD: bitcart
+      POSTGRES_DB: bitcart
+    volumes:
+      - bitcart_postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5434:5432
+
+  bitcart-redis:
+    image: redis:alpine
+    restart: always
+    volumes:
+      - bitcart_redis_data:/data
+
+  bitcart:
+    image: bitcart/bitcart:latest
+    restart: always
+    environment:
+      DB_HOST: bitcart-postgres
+      DB_PORT: 5432
+      DB_USER: bitcart
+      DB_PASSWORD: bitcart
+      DB_DATABASE: bitcart
+      REDIS_HOST: bitcart-redis
+      REDIS_PORT: 6379
+      BITCART_ADMIN_EMAIL: admin@vpn9.com
+      BITCART_ADMIN_PASSWORD: admin123
+      BITCART_ADMIN_API_KEY: test-api-key
+      BITCART_CRYPTOS: btc,ltc
+      BITCART_DEBUG: "true"
+      BITCART_BACKEND_CORS_ORIGINS: '["http://localhost:3000", "http://localhost:8091"]'
+      BTC_HOST: bitcart-btc
+      BTC_PORT: 5000
+      LTC_HOST: bitcart-ltc
+      LTC_PORT: 5000
+    depends_on:
+      - bitcart-postgres
+      - bitcart-redis
+      - bitcart-btc
+      - bitcart-ltc
+    ports:
+      - 8091:8000
+    volumes:
+      - bitcart_data:/app/data
+
+  bitcart-worker:
+    image: bitcart/bitcart:latest
+    restart: always
+    command: python -m dramatiq worker -p 1 -t 1
+    environment:
+      DB_HOST: bitcart-postgres
+      DB_PORT: 5432
+      DB_USER: bitcart
+      DB_PASSWORD: bitcart
+      DB_DATABASE: bitcart
+      REDIS_HOST: bitcart-redis
+      REDIS_PORT: 6379
+      BITCART_CRYPTOS: btc,ltc
+      BTC_HOST: bitcart-btc
+      BTC_PORT: 5000
+      LTC_HOST: bitcart-ltc
+      LTC_PORT: 5000
+    depends_on:
+      - bitcart
+      - bitcart-postgres
+      - bitcart-redis
+    volumes:
+      - bitcart_data:/app/data
+
+  bitcart-btc:
+    image: bitcart/bitcart-btc:latest
+    restart: unless-stopped
+    environment:
+      BTC_NETWORK: testnet
+      BTC_DEBUG: "true"
+      BTC_DATA_DIR: /data
+      BTC_HOST: 0.0.0.0
+    volumes:
+      - bitcart_btc_data:/data
+    ports:
+      - 5050:5000
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    networks:
+      - default
+
+  bitcart-ltc:
+    image: bitcart/bitcart-ltc:latest
+    restart: unless-stopped
+    environment:
+      LTC_NETWORK: testnet
+      LTC_DEBUG: "true"
+      LTC_DATA_DIR: /data
+      LTC_HOST: 0.0.0.0
+    volumes:
+      - bitcart_ltc_data:/data
+    ports:
+      - 5051:5000
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    networks:
+      - default
+
+volumes:
+  redis_data:
+  bitcart_postgres_data:
+  bitcart_redis_data:
+  bitcart_data:
+  bitcart_btc_data:
+  bitcart_ltc_data:

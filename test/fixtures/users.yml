@@ -1,0 +1,29 @@
+admin:
+  email_address: admin@example.com
+  passphrase_hash: <%= Digest::SHA256.hexdigest("admin-admin-admin-admin-admin-admin-admin")[0..15] + Argon2::Password.create("admin-admin-admin-admin-admin-admin-admin").to_s %>
+  recovery_code: "admin-recovery-code"
+  status: 0
+
+john:
+  email_address: john@example.com
+  passphrase_hash: <%= Digest::SHA256.hexdigest("john-john-john-john-john-john-john")[0..15] + Argon2::Password.create("john-john-john-john-john-john-john").to_s %>
+  recovery_code: "john-recovery-code"
+  status: 0
+
+jane:
+  email_address: jane@example.com
+  passphrase_hash: <%= Digest::SHA256.hexdigest("jane-jane-jane-jane-jane-jane-jane")[0..15] + Argon2::Password.create("jane-jane-jane-jane-jane-jane-jane").to_s %>
+  recovery_code: "jane-recovery-code"
+  status: 0
+
+one:
+  email_address: one@example.com
+  passphrase_hash: <%= Digest::SHA256.hexdigest("test-test-test-test-test-test-test")[0..15] + Argon2::Password.create("test-test-test-test-test-test-test").to_s %>
+  recovery_code: "test-recovery-code-one"
+  status: 0
+
+two:
+  email_address: two@example.com
+  passphrase_hash: <%= Digest::SHA256.hexdigest("word-word-word-word-word-word-word")[0..15] + Argon2::Password.create("word-word-word-word-word-word-word").to_s %>
+  recovery_code: "test-recovery-code-two" 
+  status: 0

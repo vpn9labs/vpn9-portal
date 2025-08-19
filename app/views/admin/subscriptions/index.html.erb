@@ -1,0 +1,53 @@
+<div class="mb-8 flex items-center justify-between">
+  <h1 class="text-2xl font-semibold text-gray-900">Subscriptions</h1>
+</div>
+
+<div class="overflow-hidden shadow border border-gray-200 sm:rounded-lg">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
+      <tr>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Started</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expires</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      <% @subscriptions.each do |subscription| %>
+        <tr>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+            #<%= subscription.id %>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            <%= link_to subscription.user.email_address || "User ##{subscription.user.id}", admin_user_path(subscription.user), class: "text-indigo-600 hover:text-indigo-900" %>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            <%= subscription.plan.name %>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="inline-flex px-2 text-xs font-semibold leading-5 rounded-full
+              <%= subscription.active? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+              <%= subscription.status.humanize %>
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <%= subscription.started_at.strftime("%B %d, %Y") %>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <%= subscription.expires_at.strftime("%B %d, %Y") %>
+            <% if subscription.active? && subscription.days_remaining < 7 %>
+              <span class="text-red-600 text-xs">(expires in <%= subscription.days_remaining %> days)</span>
+            <% end %>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+            <%= link_to "View", admin_subscription_path(subscription), class: "text-indigo-600 hover:text-indigo-900" %>
+            <%= link_to "Edit", edit_admin_subscription_path(subscription), class: "ml-4 text-indigo-600 hover:text-indigo-900" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

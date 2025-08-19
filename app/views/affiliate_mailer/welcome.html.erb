@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h2>Welcome to the VPN9 Affiliate Program!</h2>
+    
+    <p>Hi <%= @affiliate.name || @affiliate.email %>,</p>
+    
+    <p>Thank you for joining the VPN9 Affiliate Program! We're excited to have you as a partner.</p>
+    
+    <h3>Your Account Details:</h3>
+    <ul>
+      <li><strong>Affiliate Code:</strong> <%= @affiliate.code %></li>
+      <li><strong>Commission Rate:</strong> <%= @affiliate.commission_rate %>%</li>
+      <li><strong>Account Status:</strong> <%= @affiliate.status.capitalize %></li>
+    </ul>
+    
+    <% if @affiliate.pending? %>
+      <p>Your account is currently pending approval. We'll review your application within 24-48 hours and notify you once it's approved.</p>
+    <% else %>
+      <p>Your account is active and ready to use! You can start promoting VPN9 immediately.</p>
+    <% end %>
+    
+    <h3>Getting Started:</h3>
+    <ol>
+      <li>Log in to your dashboard at <%= link_to login_affiliates_url, login_affiliates_url %></li>
+      <li>Get your unique referral links</li>
+      <li>Start promoting VPN9 to your audience</li>
+      <li>Track your performance and earnings in real-time</li>
+    </ol>
+    
+    <p>If you have any questions, feel free to reach out to our affiliate support team.</p>
+    
+    <p>Best regards,<br>
+    The VPN9 Team</p>
+  </body>
+</html>

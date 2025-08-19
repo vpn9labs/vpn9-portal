@@ -1,0 +1,39 @@
+# VPN9 Robots.txt
+# https://vpn9.com/
+# See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/internal/
+Disallow: /session
+Disallow: /password_reset/
+Disallow: /affiliates/
+Disallow: /downloads/temp/
+
+# Sitemap location (dynamically generated)
+Sitemap: https://vpn9.com/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Allow search engines to index images
+User-agent: Googlebot-Image
+Disallow:
+
+User-agent: Bingbot
+Disallow: /admin/
+Disallow: /api/internal/
+
+# Block bad bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /

@@ -1,0 +1,61 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+stockholm_relay:
+  name: stockholm-wireguard
+  hostname: stockholm.vpn9.com
+  ipv4_address: 185.213.154.65
+  ipv6_address: "2a03:1b20:5:f011:31::a03e"
+  public_key: "4INOdg6fWHcR4BmLZ.MOJzaBKoUqMfQonDXBaij3ok3="
+  port: 51820
+  status: active
+  location: stockholm
+
+se_relay_1:
+  name: se1-wireguard
+  hostname: se1.vpn9.com
+  ipv4_address: 185.213.154.66
+  ipv6_address: "2a03:1b20:5:f011:31::a03f"
+  public_key: "5JMPeO7gXIbR5CnUa/NPNK4L5GqUnreF0/Bozai4pl4="
+  port: 51820
+  status: active
+  location: stockholm
+
+se_relay_2:
+  name: se2-wireguard
+  hostname: se2.vpn9.com
+  ipv4_address: 185.213.154.67
+  ipv6_address: "2a03:1b20:5:f011:31::a040"
+  public_key: "6KNQfP8hYjdS6CoCb0NPOLaM6HrGnSfGpE1CQai5qm5="
+  port: 51820
+  status: active
+  location: stockholm
+
+se_relay_3:
+  name: se3-wireguard
+  hostname: se3.vpn9.com
+  ipv4_address: 185.213.154.68
+  ipv6_address: "2a03:1b20:5:f011:31::a041"
+  public_key: "7LOrgQ9iZkeT7DpVc1OQQMbNaMrHgTgGqF2DRbj6rn6="
+  port: 51820
+  status: maintenance
+  location: gothenburg
+
+us_relay_1:
+  name: us1-wireguard
+  hostname: us1.vpn9.com
+  ipv4_address: 192.168.1.100
+  ipv6_address: ""
+  public_key: "8MPshR0jaldU8EpWd2PRRNcObsIhUhRhH3ECbk7s0="
+  port: 51820
+  status: active
+  location: new_york
+
+uk_relay_inactive:
+  name: uk1-wireguard
+  hostname: uk1.vpn9.com
+  ipv4_address: 10.0.0.1
+  ipv6_address: ""
+  public_key: "9NQtiS1kbmeV9FqXe3QSSPdPctuJviSiI4FDcl8t1p7="
+  port: 51820
+  status: inactive
+  location: london

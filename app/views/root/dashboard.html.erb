@@ -1,0 +1,222 @@
+<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto">
+    <% if session[:show_credentials] %>
+      <div class="bg-white shadow sm:rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">
+            <% if session[:show_credentials]['account_type'] == 'anonymous' %>
+              Anonymous Account Created Successfully!
+            <% else %>
+              Account Created Successfully!
+            <% end %>
+          </h3>
+          <div class="mt-2 max-w-xl text-sm text-gray-500">
+            <% if session[:show_credentials]['account_type'] == 'anonymous' %>
+              <p>Your anonymous VPN9 account has been created. <strong>IMPORTANT:</strong> Save your passphrase immediately - there is no way to recover this account if you lose it!</p>
+            <% else %>
+              <p>Your VPN9 account has been created. Save your passphrase in a secure location - this is your primary credential to access your account:</p>
+            <% end %>
+          </div>
+          
+          <div class="mt-5 space-y-4">
+            <div class="bg-indigo-50 border border-indigo-200 rounded-md p-4">
+              <h4 class="text-sm font-medium text-indigo-800 mb-2">Your Passphrase</h4>
+              <div class="font-mono text-lg bg-white px-3 py-2 rounded border break-all">
+                <%= session[:show_credentials]['passphrase'] %>
+              </div>
+              <p class="mt-2 text-xs text-indigo-600">
+                <% if session[:show_credentials]['has_password'] %>
+                  Note: Append your password after a colon when signing in (passphrase:password)
+                <% else %>
+                  This is your complete sign-in credential
+                <% end %>
+              </p>
+            </div>
+            
+            <div class="bg-purple-50 border border-purple-200 rounded-md p-4">
+              <h4 class="text-sm font-medium text-purple-800 mb-2">Recovery Code</h4>
+              <div class="font-mono text-sm bg-white px-3 py-2 rounded border break-all">
+                <%= session[:show_credentials]['recovery_code'] %>
+              </div>
+              <p class="mt-2 text-xs text-purple-600">
+                <% if session[:show_credentials]['account_type'] == 'anonymous' %>
+                  This is your ONLY recovery option - save it in a secure location!
+                <% else %>
+                  Keep this safe - you can also use email recovery if needed
+                <% end %>
+              </p>
+            </div>
+          </div>
+          
+          <div class="mt-5 bg-red-50 border border-red-200 rounded-md p-4">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800">
+                  Important: Save These Credentials Now
+                </h3>
+                <div class="mt-2 text-sm text-red-700">
+                  <p>This is the <strong>only time</strong> your passphrase will be shown. We cannot recover it for you.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-5">
+            <button onclick="printCredentials()" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              Print Credentials
+            </button>
+            <button onclick="copyCredentials()" class="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              Copy Passphrase
+            </button>
+            <a href="<%= root_path %>?dismiss=true" class="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              I've Saved Them
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <script>
+        function copyCredentials() {
+          const passphrase = '<%= session[:show_credentials]['passphrase'] %>';
+          
+          // Try the modern clipboard API first
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(passphrase).then(function() {
+              alert('Passphrase copied to clipboard!');
+            }, function(err) {
+              // Fallback to the old method
+              fallbackCopyTextToClipboard(passphrase);
+            });
+          } else {
+            // Use fallback for non-secure contexts (HTTP)
+            fallbackCopyTextToClipboard(passphrase);
+          }
+        }
+        
+        function fallbackCopyTextToClipboard(text) {
+          const textArea = document.createElement("textarea");
+          textArea.value = text;
+          
+          // Avoid scrolling to bottom
+          textArea.style.top = "0";
+          textArea.style.left = "0";
+          textArea.style.position = "fixed";
+          textArea.style.opacity = "0";
+          
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          
+          try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+              alert('Passphrase copied to clipboard!');
+            } else {
+              alert('Failed to copy passphrase. Please copy it manually.');
+            }
+          } catch (err) {
+            console.error('Fallback: Could not copy text: ', err);
+            alert('Failed to copy passphrase. Please copy it manually.');
+          }
+          
+          document.body.removeChild(textArea);
+        }
+        
+        function printCredentials() {
+          const printWindow = window.open('', '_blank');
+          printWindow.document.write(`
+            <html>
+              <head><title>VPN9 Account Credentials</title></head>
+              <body style="font-family: monospace; padding: 20px;">
+                <h2>VPN9 Account Credentials</h2>
+                <p><strong>Save these in a secure location!</strong></p>
+                <p><strong>Passphrase:</strong><br><%= session[:show_credentials]['passphrase'] %></p>
+                <p><strong>Recovery Code:</strong><br><%= session[:show_credentials]['recovery_code'] %></p>
+                <% if session[:show_credentials]['has_password'] %>
+                  <p><em>Note: You set an additional password. Append it after a colon when signing in.</em></p>
+                <% end %>
+                <p><em>Generated on: ${new Date().toLocaleString()}</em></p>
+              </body>
+            </html>
+          `);
+          printWindow.document.close();
+          printWindow.print();
+        }
+      </script>
+      
+    <% else %>
+      <div class="text-center">
+        <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+          Welcome to VPN9
+        </h1>
+        <p class="mt-6 text-lg leading-8 text-gray-600">
+          You're signed in to your private VPN account.
+        </p>
+        
+        <% if Current.user.has_active_subscription? %>
+          <div class="mt-8 bg-green-50 border border-green-200 rounded-lg p-6">
+            <h3 class="text-lg font-medium text-green-900">Active Subscription</h3>
+            <p class="mt-2 text-sm text-green-700">
+              Your VPN access is active for <%= Current.user.current_subscription.days_remaining %> more days
+            </p>
+            <%= link_to "View Subscription", subscriptions_path, class: "mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200" %>
+          </div>
+        <% else %>
+          <div class="mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+            <h3 class="text-lg font-medium text-yellow-900">No Active Subscription</h3>
+            <p class="mt-2 text-sm text-yellow-700">
+              Subscribe to activate your VPN access
+            </p>
+            <%= link_to "View Plans", plans_path, class: "mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200" %>
+          </div>
+        <% end %>
+        
+        <div class="mt-10">
+          <!-- Active Devices Card -->
+          <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="flex items-baseline">
+                    <span class="text-sm font-medium text-gray-500">Active Devices:</span>
+                    <span class="ml-2 text-2xl font-semibold text-gray-900"><%= Current.user.devices.count %></span>
+                    <span class="ml-2 text-sm text-gray-500">/ <%= Current.user.device_limit %></span>
+                  </div>
+                  <% if Current.user.devices_remaining == 0 %>
+                    <p class="mt-1 text-xs text-orange-600">Device limit reached</p>
+                  <% elsif Current.user.devices_remaining == 1 %>
+                    <p class="mt-1 text-xs text-gray-500">1 device slot remaining</p>
+                  <% else %>
+                    <p class="mt-1 text-xs text-gray-500"><%= Current.user.devices_remaining %> device slots remaining</p>
+                  <% end %>
+                </div>
+                <div>
+                  <%= link_to "Manage Devices →", devices_path, class: "text-sm font-medium text-indigo-600 hover:text-indigo-500" %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-10 flex items-center justify-center gap-x-6">
+          <a href="#" class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Download VPN Client</a>
+          <a href="#" class="text-sm font-semibold leading-6 text-gray-900">Setup Guide <span aria-hidden="true">→</span></a>
+        </div>
+        
+        <div class="mt-12 pt-8 border-t border-gray-200">
+          <p class="text-sm text-gray-500">
+            Need to leave? 
+            <%= link_to "Delete your account", new_account_deletion_path, 
+                class: "text-red-600 hover:text-red-500 underline",
+                data: { turbo_confirm: "Are you sure you want to proceed with account deletion?" } %>
+          </p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

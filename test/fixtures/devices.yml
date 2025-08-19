@@ -1,0 +1,16 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one_device:
+  user: one
+  name: swift-falcon-4823
+  public_key: device_one_public_key_wireguard_base64
+
+two_device:
+  user: two
+  name: brave-shield-7291
+  public_key: device_two_public_key_wireguard_base64
+
+another_device:
+  user: one
+  name: secure-fortress-3159
+  public_key: another_device_public_key_wireguard_base64

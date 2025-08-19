@@ -1,0 +1,67 @@
+<%= form_with(model: [:admin, relay], local: true) do |form| %>
+  <% if relay.errors.any? %>
+    <div class="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+      <h2 class="font-bold mb-2"><%= pluralize(relay.errors.count, "error") %> prohibited this relay from being saved:</h2>
+      <ul class="list-disc list-inside">
+        <% relay.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-4">
+    <%= form.label :name, class: "block text-gray-700 text-sm font-bold mb-2" %>
+    <%= form.text_field :name, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+  </div>
+
+  <div class="mb-4">
+    <%= form.label :location_id, "Location", class: "block text-gray-700 text-sm font-bold mb-2" %>
+    <%= form.select :location_id, 
+        options_for_select(@locations.map { |l| ["#{l.city}, #{l.country_name} #{l.country_flag}", l.id] }, relay.location_id),
+        { prompt: "Select a location" },
+        class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+  </div>
+
+  <div class="mb-4">
+    <%= form.label :hostname, class: "block text-gray-700 text-sm font-bold mb-2" %>
+    <%= form.text_field :hostname, placeholder: "relay1.example.com", class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+    <div>
+      <%= form.label :ipv4_address, "IPv4 Address", class: "block text-gray-700 text-sm font-bold mb-2" %>
+      <%= form.text_field :ipv4_address, placeholder: "192.168.1.1", class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    </div>
+
+    <div>
+      <%= form.label :ipv6_address, "IPv6 Address (optional)", class: "block text-gray-700 text-sm font-bold mb-2" %>
+      <%= form.text_field :ipv6_address, placeholder: "2001:db8::1", class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <%= form.label :public_key, "WireGuard Public Key", class: "block text-gray-700 text-sm font-bold mb-2" %>
+    <%= form.text_area :public_key, rows: 2, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline font-mono text-sm" %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <div>
+      <%= form.label :port, "Port", class: "block text-gray-700 text-sm font-bold mb-2" %>
+      <%= form.number_field :port, placeholder: "51820", class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    </div>
+
+    <div>
+      <%= form.label :status, class: "block text-gray-700 text-sm font-bold mb-2" %>
+      <%= form.select :status, 
+          options_for_select(Relay.statuses.map { |k, v| [k.humanize, k] }, relay.status),
+          {},
+          class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    </div>
+  </div>
+
+  <div class="flex items-center justify-between">
+    <%= form.submit class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" %>
+    <%= link_to "Cancel", admin_relays_path, class: "bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" %>
+  </div>
+<% end %>

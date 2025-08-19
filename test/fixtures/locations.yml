@@ -1,0 +1,31 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+stockholm:
+  country_code: SE
+  city: Stockholm
+  latitude: 59.3293
+  longitude: 18.0686
+
+gothenburg:
+  country_code: SE
+  city: Gothenburg
+  latitude: 57.7089
+  longitude: 11.9746
+
+new_york:
+  country_code: US
+  city: New York
+  latitude: 40.7128
+  longitude: -74.0060
+
+london:
+  country_code: GB
+  city: London
+  latitude: 51.5074
+  longitude: -0.1278
+
+tokyo:
+  country_code: JP
+  city: Tokyo
+  latitude: 35.6762
+  longitude: 139.6503

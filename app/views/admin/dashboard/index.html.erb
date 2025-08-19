@@ -1,0 +1,78 @@
+<div class="mb-8">
+  <h1 class="text-2xl font-semibold text-gray-900">Dashboard</h1>
+</div>
+
+<div class="mb-8">
+  <dl class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
+    <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+      <dt class="truncate text-sm font-medium text-gray-500">Total Users</dt>
+      <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900"><%= @users_count %></dd>
+    </div>
+    
+    <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+      <dt class="truncate text-sm font-medium text-gray-500">Active Subscriptions</dt>
+      <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900"><%= @active_subscriptions_count %></dd>
+    </div>
+    
+    <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+      <dt class="truncate text-sm font-medium text-gray-500">Total Successful Payments</dt>
+      <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900"><%= @total_payments %></dd>
+    </div>
+  </dl>
+</div>
+
+<div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+  <div class="bg-white shadow overflow-hidden rounded-lg">
+    <div class="px-4 py-5 sm:px-6">
+      <h3 class="text-lg font-medium leading-6 text-gray-900">Recent Payments</h3>
+    </div>
+    <div class="border-t border-gray-200">
+      <ul class="divide-y divide-gray-200">
+        <% @recent_payments.each do |payment| %>
+          <li class="px-4 py-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-900">
+                  <%= link_to payment.user.email_address || "User ##{payment.user.id}", admin_user_path(payment.user), class: "hover:underline" %>
+                </p>
+                <p class="text-sm text-gray-500">
+                  <%= payment.plan.name %> - <%= number_to_currency(payment.amount) %>
+                </p>
+              </div>
+              <div class="text-sm text-gray-500">
+                <%= payment.created_at.strftime("%B %d, %Y") %>
+              </div>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="bg-white shadow overflow-hidden rounded-lg">
+    <div class="px-4 py-5 sm:px-6">
+      <h3 class="text-lg font-medium leading-6 text-gray-900">Recent Users</h3>
+    </div>
+    <div class="border-t border-gray-200">
+      <ul class="divide-y divide-gray-200">
+        <% @recent_users.each do |user| %>
+          <li class="px-4 py-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-900">
+                  <%= link_to user.email_address || "User ##{user.id}", admin_user_path(user), class: "hover:underline" %>
+                </p>
+                <p class="text-sm text-gray-500">
+                  Status: <%= user.status.humanize %>
+                </p>
+              </div>
+              <div class="text-sm text-gray-500">
+                <%= user.created_at.strftime("%B %d, %Y") %>
+              </div>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</div>
