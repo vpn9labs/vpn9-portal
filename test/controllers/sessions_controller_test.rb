@@ -192,11 +192,12 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
     # Delete the user while they're logged in
     @anonymous_user.soft_delete!
+    assert @anonymous_user.deleted?
 
-    # Try to access a protected page
-    get root_url
+    # Try to access a protected page that requires authentication
+    get new_account_deletion_url
 
-    # Should be redirected to sign in page
+    # Should be redirected to sign in page when accessing protected resource
     assert_redirected_to new_session_url
   end
 

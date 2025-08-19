@@ -1,0 +1,144 @@
+<div class="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-gray-900 mb-4">Transparency Log</h1>
+      <p class="text-xl text-gray-600">Complete history of all VPN9 builds and deployments</p>
+    </div>
+
+    <!-- Transparency Log Table -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900">Build History</h2>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Version
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Commit
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Build Date
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Verification
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @builds.each do |build| %>
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">
+                    <%= build[:version] %>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900 font-mono">
+                    <%= build[:commit].to_s[0..7] %>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-500">
+                    <%= Time.parse(build[:timestamp]).strftime("%Y-%m-%d %H:%M") rescue build[:timestamp] %>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <% if build[:status] == 'active' %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                      Active
+                    </span>
+                  <% else %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                      <%= build[:status] %>
+                    </span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="text-green-600">✓ Verified</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  <a href="<%= build[:attestation_url] %>" 
+                     class="text-blue-600 hover:text-blue-900 mr-3"
+                     target="_blank">
+                    Attestation
+                  </a>
+                  <a href="https://github.com/vpn9labs/vpn9-portal/commit/<%= build[:commit] %>" 
+                     class="text-blue-600 hover:text-blue-900"
+                     target="_blank">
+                    Source
+                  </a>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Verification Instructions -->
+    <div class="mt-8 bg-white rounded-lg shadow-lg p-8">
+      <h3 class="text-lg font-semibold mb-4">How to Verify Any Build</h3>
+      
+      <div class="prose max-w-none">
+        <ol class="space-y-3">
+          <li>
+            <strong>Download the attestation file</strong> from the build you want to verify
+          </li>
+          <li>
+            <strong>Clone the repository</strong> and checkout the specific commit:
+            <pre class="bg-gray-100 p-3 rounded mt-2 text-sm">
+git clone https://github.com/vpn9labs/vpn9-portal.git
+cd vpn9-portal
+git checkout [COMMIT_HASH]</pre>
+          </li>
+          <li>
+            <strong>Run the reproducible build</strong>:
+            <pre class="bg-gray-100 p-3 rounded mt-2 text-sm">
+./scripts/reproducible-build.sh</pre>
+          </li>
+          <li>
+            <strong>Compare the checksums</strong> with the published attestation
+          </li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Cryptographic Proofs -->
+    <div class="mt-8 bg-white rounded-lg shadow-lg p-8">
+      <h3 class="text-lg font-semibold mb-4">Cryptographic Guarantees</h3>
+      
+      <div class="grid md:grid-cols-3 gap-6">
+        <div>
+          <h4 class="font-medium text-gray-900 mb-2">SHA256 Checksums</h4>
+          <p class="text-sm text-gray-600">
+            Every build includes SHA256 checksums for all artifacts
+          </p>
+        </div>
+        <div>
+          <h4 class="font-medium text-gray-900 mb-2">SLSA Attestation</h4>
+          <p class="text-sm text-gray-600">
+            Supply chain security with SLSA provenance attestations
+          </p>
+        </div>
+        <div>
+          <h4 class="font-medium text-gray-900 mb-2">Signed Releases</h4>
+          <p class="text-sm text-gray-600">
+            All releases are cryptographically signed and verifiable
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

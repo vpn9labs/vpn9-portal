@@ -119,12 +119,12 @@ jobs:
             }],
             "predicate": {
               "builder": {
-                "id": "https://github.com/vpn9/vpn9-portal/.github/workflows/reproducible-build.yml"
+                "id": "https://github.com/vpn9labs/vpn9-portal/.github/workflows/reproducible-build.yml"
               },
               "buildType": "https://github.com/slsa-framework/slsa-github-generator/container@v1",
               "invocation": {
                 "configSource": {
-                  "uri": "https://github.com/vpn9/vpn9-portal",
+                  "uri": "https://github.com/vpn9labs/vpn9-portal",
                   "digest": {
                     "sha1": "${{ steps.vars.outputs.commit }}"
                   },

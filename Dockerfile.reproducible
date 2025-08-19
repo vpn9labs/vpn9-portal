@@ -129,7 +129,7 @@ ARG BUILD_TIMESTAMP
 LABEL org.opencontainers.image.version="${BUILD_VERSION}" \
       org.opencontainers.image.revision="${BUILD_COMMIT}" \
       org.opencontainers.image.created="${BUILD_TIMESTAMP}" \
-      org.opencontainers.image.source="https://github.com/vpn9/vpn9-portal" \
+      org.opencontainers.image.source="https://github.com/vpn9labs/vpn9-portal" \
       org.opencontainers.image.vendor="VPN9" \
       org.opencontainers.image.title="VPN9 Portal" \
       org.opencontainers.image.description="Reproducible build of VPN9 Portal"

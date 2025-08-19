@@ -21,7 +21,7 @@ class RootControllerTest < ActionDispatch::IntegrationTest
     get root_url
     assert_response :success
     # Now shows teaser page by default
-    assert_match "True Privacy is", response.body
+    assert_match "True Privacy.", response.body
     assert_match "Coming Soon", response.body
   end
 
@@ -291,7 +291,7 @@ class RootControllerTest < ActionDispatch::IntegrationTest
     get root_url
     assert_response :success
     # Should show teaser page for unauthenticated users
-    assert_match "True Privacy is", response.body
+    assert_match "True Privacy.", response.body
     assert_match "Coming Soon", response.body
   end
 

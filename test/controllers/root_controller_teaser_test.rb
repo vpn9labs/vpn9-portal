@@ -7,7 +7,7 @@ class RootControllerTeaserTest < ActionDispatch::IntegrationTest
     get root_url
     assert_response :success
     # Should have teaser elements by default
-    assert_match "True Privacy is", response.body
+    assert_match "True Privacy.", response.body
     assert_match "Coming Soon", response.body
     assert_match "Get Early Access", response.body
   end
@@ -104,7 +104,7 @@ class RootControllerTeaserTest < ActionDispatch::IntegrationTest
       ref: "producthunt"
     }
     assert_response :success
-    assert_match "True Privacy is", response.body
+    assert_match "True Privacy.", response.body
     assert_select "form#notification-form"
   end
 

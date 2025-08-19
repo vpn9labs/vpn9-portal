@@ -1,6 +1,11 @@
 Rails.application.routes.draw do
   root to: "root#index"
 
+  # Public attestation and verification pages
+  get "/verify", to: "attestation#verify", as: :verify
+  get "/transparency", to: "attestation#transparency", as: :transparency
+  get "/security", to: "attestation#security", as: :security
+
   get "/signup", to: "signups#new"
   post "/signup", to: "signups#create"
   resource :session
@@ -161,6 +166,10 @@ Rails.application.routes.draw do
       # DNS leak test endpoint
       get :dns_leak_test, to: "dns_leak_test#show"
       get "dns_leak_test/results", to: "dns_leak_test#results"
+
+      # Runtime attestation and verification
+      get :attestation, to: "attestation#show"
+      get "attestation/verify", to: "attestation#verify"
     end
   end
 

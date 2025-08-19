@@ -75,7 +75,7 @@ VPN9 is a privacy-focused VPN service that open sources all of its code. This re
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/vpn9/vpn9-portal.git
+git clone https://github.com/vpn9labs/vpn9-portal.git
 cd vpn9-portal
 ```
 
@@ -268,7 +268,7 @@ This project is open source and available under the [MIT License](LICENSE).
 ## Support
 
 - **VPN9**: [vpn9.com](https://vpn9.com)
-- **Issues**: [GitHub Issues](https://github.com/vpn9/vpn9-portal/issues)
+- **Issues**: [GitHub Issues](https://github.com/vpn9labs/vpn9-portal/issues)
 
 ## Acknowledgments
 

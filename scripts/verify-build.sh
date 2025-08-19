@@ -41,7 +41,7 @@ download_artifacts() {
     echo -e "${YELLOW}Downloading published artifacts...${NC}"
     
     # Download from GitHub releases or your artifact storage
-    local base_url="https://github.com/vpn9/vpn9-portal/releases/download/${version}"
+    local base_url="https://github.com/vpn9labs/vpn9-portal/releases/download/${version}"
     
     # Download attestation
     if [ ! -f "${VERIFICATION_DIR}/attestation-${version}.json" ]; then

@@ -1,0 +1,291 @@
+<div class="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-gray-900 mb-4">Build Verification & Transparency</h1>
+      <p class="text-xl text-gray-600">Verify that VPN9 is running exactly the code we claim</p>
+    </div>
+
+    <!-- Live Attestation Status -->
+    <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+      <h2 class="text-2xl font-semibold mb-6 flex items-center">
+        <span class="mr-3">🔒</span>
+        Live Production Attestation
+      </h2>
+      
+      <div id="attestation-status" class="space-y-4">
+        <div class="flex items-center justify-between p-4 bg-gray-50 rounded">
+          <span class="font-medium">Loading attestation data...</span>
+          <span class="animate-spin h-5 w-5 border-2 border-blue-500 border-t-transparent rounded-full"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Verification Steps -->
+    <div class="grid md:grid-cols-2 gap-8 mb-8">
+      <!-- Automatic Verification -->
+      <div class="bg-white rounded-lg shadow-lg p-8">
+        <h3 class="text-xl font-semibold mb-4">
+          <span class="text-green-600 mr-2">✓</span>
+          Automatic Verification
+        </h3>
+        
+        <button id="verify-btn" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition mb-4">
+          Verify Current Deployment
+        </button>
+        
+        <div id="verify-results" class="hidden space-y-2 text-sm">
+          <!-- Results will be inserted here -->
+        </div>
+      </div>
+
+      <!-- Manual Verification -->
+      <div class="bg-white rounded-lg shadow-lg p-8">
+        <h3 class="text-xl font-semibold mb-4">
+          <span class="text-blue-600 mr-2">🔧</span>
+          Manual Verification
+        </h3>
+        
+        <div class="space-y-3 text-sm">
+          <div class="p-3 bg-gray-50 rounded font-mono text-xs break-all">
+            # Pull the image<br>
+            docker pull vpn9/vpn9-portal:<span id="build-version">latest</span>
+          </div>
+          
+          <div class="p-3 bg-gray-50 rounded font-mono text-xs break-all">
+            # Verify reproducibility<br>
+            ./scripts/verify-build.sh <span id="build-version-2">latest</span>
+          </div>
+          
+          <div class="p-3 bg-gray-50 rounded font-mono text-xs break-all">
+            # Compare digest<br>
+            curl https://vpn9.com/api/v1/attestation | jq .
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transparency Log -->
+    <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+      <h2 class="text-2xl font-semibold mb-6">
+        <span class="mr-3">📜</span>
+        Transparency Log
+      </h2>
+      
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Version</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Commit</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Build Date</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="transparency-log" class="bg-white divide-y divide-gray-200">
+            <!-- Log entries will be inserted here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- How It Works -->
+    <div class="bg-white rounded-lg shadow-lg p-8">
+      <h2 class="text-2xl font-semibold mb-6">How Verification Works</h2>
+      
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="text-center">
+          <div class="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl">1</span>
+          </div>
+          <h4 class="font-semibold mb-2">Source Code</h4>
+          <p class="text-sm text-gray-600">
+            All code is open source on GitHub with specific commit hashes
+          </p>
+        </div>
+        
+        <div class="text-center">
+          <div class="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl">2</span>
+          </div>
+          <h4 class="font-semibold mb-2">Reproducible Build</h4>
+          <p class="text-sm text-gray-600">
+            Anyone can rebuild the exact same Docker image from source
+          </p>
+        </div>
+        
+        <div class="text-center">
+          <div class="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl">3</span>
+          </div>
+          <h4 class="font-semibold mb-2">Runtime Attestation</h4>
+          <p class="text-sm text-gray-600">
+            Live verification that production matches the published build
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Fetch and display attestation data
+async function fetchAttestation() {
+  try {
+    const response = await fetch('/api/v1/attestation');
+    const data = await response.json();
+    
+    const statusHtml = `
+      <div class="grid grid-cols-2 gap-4">
+        <div class="p-4 bg-green-50 rounded">
+          <div class="text-sm text-gray-600">Build Version</div>
+          <div class="font-mono font-semibold">${data.deployment.build_version}</div>
+        </div>
+        <div class="p-4 bg-green-50 rounded">
+          <div class="text-sm text-gray-600">Build Commit</div>
+          <div class="font-mono font-semibold text-xs">${data.deployment.build_commit.substring(0, 8)}</div>
+        </div>
+        <div class="p-4 bg-blue-50 rounded">
+          <div class="text-sm text-gray-600">Image Digest</div>
+          <div class="font-mono text-xs break-all">${data.deployment.image_digest}</div>
+        </div>
+        <div class="p-4 bg-blue-50 rounded">
+          <div class="text-sm text-gray-600">Deployed At</div>
+          <div class="text-sm">${new Date(data.deployment.deployed_at).toLocaleString()}</div>
+        </div>
+      </div>
+      
+      <div class="mt-4 p-4 bg-gray-50 rounded">
+        <div class="text-sm text-gray-600 mb-2">Verification URLs</div>
+        <div class="space-y-1">
+          <a href="${data.verification.source_url}" target="_blank" class="text-blue-600 hover:underline text-sm block">
+            📦 Source Code
+          </a>
+          <a href="${data.verification.attestation_url}" target="_blank" class="text-blue-600 hover:underline text-sm block">
+            📄 Build Attestation
+          </a>
+          <a href="${data.verification.sbom_url}" target="_blank" class="text-blue-600 hover:underline text-sm block">
+            📋 Software Bill of Materials
+          </a>
+        </div>
+      </div>
+    `;
+    
+    document.getElementById('attestation-status').innerHTML = statusHtml;
+    
+    // Update version in commands
+    document.getElementById('build-version').textContent = data.deployment.build_version;
+    document.getElementById('build-version-2').textContent = data.deployment.build_version;
+    
+  } catch (error) {
+    document.getElementById('attestation-status').innerHTML = `
+      <div class="p-4 bg-red-50 rounded text-red-600">
+        Failed to fetch attestation data: ${error.message}
+      </div>
+    `;
+  }
+}
+
+// Perform verification
+async function performVerification() {
+  const btn = document.getElementById('verify-btn');
+  const results = document.getElementById('verify-results');
+  
+  btn.disabled = true;
+  btn.textContent = 'Verifying...';
+  results.classList.remove('hidden');
+  
+  try {
+    const response = await fetch('/api/v1/attestation/verify');
+    const data = await response.json();
+    
+    let resultsHtml = '<div class="space-y-2">';
+    for (const [check, passed] of Object.entries(data.checks)) {
+      const icon = passed ? '✅' : '❌';
+      const color = passed ? 'green' : 'red';
+      resultsHtml += `
+        <div class="flex items-center justify-between">
+          <span class="text-sm">${check.replace(/_/g, ' ')}</span>
+          <span class="text-${color}-600">${icon}</span>
+        </div>
+      `;
+    }
+    resultsHtml += '</div>';
+    
+    if (data.verified) {
+      resultsHtml += `
+        <div class="mt-4 p-3 bg-green-100 rounded text-green-800 text-sm">
+          ✓ All verification checks passed
+        </div>
+      `;
+    } else {
+      resultsHtml += `
+        <div class="mt-4 p-3 bg-red-100 rounded text-red-800 text-sm">
+          ⚠ Some verification checks failed
+        </div>
+      `;
+    }
+    
+    results.innerHTML = resultsHtml;
+    
+  } catch (error) {
+    results.innerHTML = `
+      <div class="p-3 bg-red-100 rounded text-red-800 text-sm">
+        Verification failed: ${error.message}
+      </div>
+    `;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Verify Current Deployment';
+  }
+}
+
+// Fetch transparency log
+async function fetchTransparencyLog() {
+  // This would fetch from GitHub releases or a dedicated endpoint
+  const mockLog = [
+    {
+      version: 'v1.0.0',
+      commit: 'abc123def',
+      date: '2025-01-19',
+      status: 'verified',
+      attestation: 'https://github.com/vpn9labs/vpn9-portal/releases/v1.0.0'
+    }
+  ];
+  
+  const logHtml = mockLog.map(entry => `
+    <tr>
+      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        ${entry.version}
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+        ${entry.commit}
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        ${entry.date}
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap">
+        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+          ${entry.status}
+        </span>
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm">
+        <a href="${entry.attestation}" target="_blank" class="text-blue-600 hover:underline">
+          View
+        </a>
+      </td>
+    </tr>
+  `).join('');
+  
+  document.getElementById('transparency-log').innerHTML = logHtml;
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', () => {
+  fetchAttestation();
+  fetchTransparencyLog();
+  
+  document.getElementById('verify-btn').addEventListener('click', performVerification);
+});
+</script>

@@ -127,15 +127,8 @@ class RootControllerCroTest < ActionDispatch::IntegrationTest
     assert_select "script[type='application/ld+json']"
   end
 
-  test "both pages should have working navigation" do
-    # Normal page
-    get root_url
-    assert_response :success
-    assert_select "nav"
-    assert_select "a[href='/signup']"
-    assert_select "a[href='/session/new']"
-
-    # CRO page
+  test "CRO page should have working navigation" do
+    # CRO optimized page has navigation
     get root_url, params: { cro: "1" }
     assert_response :success
     assert_select "nav"

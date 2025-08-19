@@ -1,0 +1,207 @@
+<div class="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
+  <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-gray-900 mb-4">Security & Verification</h1>
+      <p class="text-xl text-gray-600">How VPN9's reproducible builds ensure your security</p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="prose prose-lg max-w-none">
+      <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <h2 class="text-2xl font-semibold mb-6">🔒 Our Security Commitment</h2>
+        
+        <p class="mb-4">
+          VPN9 is the first VPN provider to offer fully reproducible server builds with runtime attestation. 
+          This means you can verify that our servers are running exactly the code we claim, with no hidden 
+          modifications or backdoors.
+        </p>
+        
+        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 my-6">
+          <p class="font-semibold text-blue-900">Key Principle:</p>
+          <p class="text-blue-800">
+            You don't need to trust us - you can verify everything yourself.
+          </p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <h2 class="text-2xl font-semibold mb-6">✅ What You Can Verify</h2>
+        
+        <ul class="space-y-3">
+          <li class="flex items-start">
+            <span class="text-green-600 mr-3 mt-1">✓</span>
+            <div>
+              <strong>Source Code</strong> - All server code is open source on GitHub
+            </div>
+          </li>
+          <li class="flex items-start">
+            <span class="text-green-600 mr-3 mt-1">✓</span>
+            <div>
+              <strong>Build Process</strong> - Reproducible builds mean identical binaries from source
+            </div>
+          </li>
+          <li class="flex items-start">
+            <span class="text-green-600 mr-3 mt-1">✓</span>
+            <div>
+              <strong>Runtime State</strong> - Live attestation of what's actually running
+            </div>
+          </li>
+          <li class="flex items-start">
+            <span class="text-green-600 mr-3 mt-1">✓</span>
+            <div>
+              <strong>No Modifications</strong> - Verify no files have been changed post-deployment
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <h2 class="text-2xl font-semibold mb-6">🛠️ Verification Methods</h2>
+        
+        <div class="space-y-6">
+          <div>
+            <h3 class="text-lg font-semibold mb-2">1. Quick Web Verification</h3>
+            <p class="mb-2">Visit our verification dashboard for instant checks:</p>
+            <a href="/verify" class="inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+              Open Verification Dashboard
+            </a>
+          </div>
+          
+          <div>
+            <h3 class="text-lg font-semibold mb-2">2. API Verification</h3>
+            <pre class="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
+curl https://vpn9.com/api/v1/attestation | jq .
+curl https://vpn9.com/api/v1/attestation/verify | jq .</pre>
+          </div>
+          
+          <div>
+            <h3 class="text-lg font-semibold mb-2">3. Manual Build Verification</h3>
+            <pre class="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
+# Clone and build
+git clone https://github.com/vpn9labs/vpn9-portal.git
+cd vpn9-portal
+./scripts/reproducible-build.sh
+
+# Verify against production
+./scripts/verify-build.sh production</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <h2 class="text-2xl font-semibold mb-6">🏗️ Build Reproducibility</h2>
+        
+        <p class="mb-4">
+          Our builds are deterministic, meaning the same source code always produces 
+          bit-for-bit identical binaries. This is achieved through:
+        </p>
+        
+        <ul class="list-disc pl-6 space-y-2 mb-4">
+          <li>Fixed timestamps (SOURCE_DATE_EPOCH)</li>
+          <li>Pinned dependencies with checksums</li>
+          <li>Deterministic build environments</li>
+          <li>Cryptographic verification at each step</li>
+        </ul>
+        
+        <p>
+          Anyone can rebuild our software and verify it matches what's running in production.
+        </p>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <h2 class="text-2xl font-semibold mb-6">📋 Software Bill of Materials (SBOM)</h2>
+        
+        <p class="mb-4">
+          Every build includes a complete SBOM listing all components and dependencies:
+        </p>
+        
+        <ul class="list-disc pl-6 space-y-2">
+          <li>All Ruby gems with exact versions</li>
+          <li>System packages and libraries</li>
+          <li>Node.js dependencies</li>
+          <li>Base image components</li>
+        </ul>
+        
+        <p class="mt-4">
+          Download SBOMs from our 
+          <a href="https://github.com/vpn9labs/vpn9-portal/releases" class="text-blue-600 hover:underline" target="_blank">
+            GitHub releases
+          </a>.
+        </p>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <h2 class="text-2xl font-semibold mb-6">🔐 Cryptographic Guarantees</h2>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="border rounded-lg p-4">
+            <h4 class="font-semibold mb-2">SHA256 Checksums</h4>
+            <p class="text-sm text-gray-600">
+              All artifacts include SHA256 checksums for integrity verification
+            </p>
+          </div>
+          <div class="border rounded-lg p-4">
+            <h4 class="font-semibold mb-2">SLSA Attestations</h4>
+            <p class="text-sm text-gray-600">
+              Supply chain security with SLSA provenance
+            </p>
+          </div>
+          <div class="border rounded-lg p-4">
+            <h4 class="font-semibold mb-2">Signed Releases</h4>
+            <p class="text-sm text-gray-600">
+              Cryptographically signed builds when configured
+            </p>
+          </div>
+          <div class="border rounded-lg p-4">
+            <h4 class="font-semibold mb-2">Runtime Signatures</h4>
+            <p class="text-sm text-gray-600">
+              Live attestations signed by production servers
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <h2 class="text-2xl font-semibold mb-6">🐛 Security Bug Bounty</h2>
+        
+        <p class="mb-4">
+          Found a security issue? We offer rewards for responsible disclosure:
+        </p>
+        
+        <ul class="list-disc pl-6 space-y-2 mb-4">
+          <li>Build reproducibility failures</li>
+          <li>Attestation bypass vulnerabilities</li>
+          <li>Supply chain security issues</li>
+          <li>Any security vulnerabilities</li>
+        </ul>
+        
+        <p>
+          Report to: <a href="mailto:security@vpn9.com" class="text-blue-600 hover:underline">security@vpn9.com</a>
+        </p>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-lg p-8">
+        <h2 class="text-2xl font-semibold mb-6">📚 Learn More</h2>
+        
+        <div class="space-y-3">
+          <a href="/transparency" class="block text-blue-600 hover:underline">
+            → View Transparency Log
+          </a>
+          <a href="https://github.com/vpn9labs/vpn9-portal/blob/main/docs/REPRODUCIBLE_BUILDS.md" 
+             class="block text-blue-600 hover:underline" target="_blank">
+            → Reproducible Builds Documentation
+          </a>
+          <a href="https://github.com/vpn9labs/vpn9-portal/blob/main/docs/RUNTIME_VERIFICATION.md" 
+             class="block text-blue-600 hover:underline" target="_blank">
+            → Runtime Verification Guide
+          </a>
+          <a href="https://github.com/vpn9labs/vpn9-portal" 
+             class="block text-blue-600 hover:underline" target="_blank">
+            → Source Code on GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
