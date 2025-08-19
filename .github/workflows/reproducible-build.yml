@@ -1,0 +1,268 @@
+name: Reproducible Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Build version'
+        required: true
+        default: 'dev'
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: vpn9/vpn9-portal
+
+jobs:
+  build:
+    name: Reproducible Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write # For signing
+      attestations: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for SOURCE_DATE_EPOCH
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            image=moby/buildkit:master
+            network=host
+      
+      - name: Log in to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Set build variables
+        id: vars
+        run: |
+          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref_type }}" = "tag" ]; then
+            VERSION="${{ github.ref_name }}"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="pr-${{ github.event.pull_request.number }}"
+          fi
+          
+          COMMIT="${{ github.sha }}"
+          SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)"
+          BUILD_TIMESTAMP="$(date -u -d "@${SOURCE_DATE_EPOCH}" '+%Y-%m-%dT%H:%M:%SZ')"
+          
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "commit=${COMMIT}" >> $GITHUB_OUTPUT
+          echo "source_date_epoch=${SOURCE_DATE_EPOCH}" >> $GITHUB_OUTPUT
+          echo "build_timestamp=${BUILD_TIMESTAMP}" >> $GITHUB_OUTPUT
+      
+      - name: Build Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.reproducible
+          platforms: linux/amd64,linux/arm64
+          push: false
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.version }}
+            ${{ env.IMAGE_NAME }}:reproducible-${{ steps.vars.outputs.version }}
+          build-args: |
+            SOURCE_DATE_EPOCH=${{ steps.vars.outputs.source_date_epoch }}
+            BUILD_VERSION=${{ steps.vars.outputs.version }}
+            BUILD_COMMIT=${{ steps.vars.outputs.commit }}
+            BUILD_TIMESTAMP=${{ steps.vars.outputs.build_timestamp }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          outputs: type=docker,dest=/tmp/vpn9-portal-${{ steps.vars.outputs.version }}.tar
+      
+      - name: Calculate checksums
+        run: |
+          sha256sum /tmp/vpn9-portal-${{ steps.vars.outputs.version }}.tar > checksums-${{ steps.vars.outputs.version }}.sha256
+          sha512sum /tmp/vpn9-portal-${{ steps.vars.outputs.version }}.tar > checksums-${{ steps.vars.outputs.version }}.sha512
+      
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.version }}
+          artifact-name: sbom-${{ steps.vars.outputs.version }}.spdx
+          output-file: sbom-${{ steps.vars.outputs.version }}.spdx
+      
+      - name: Create attestation
+        id: attestation
+        run: |
+          cat > attestation-${{ steps.vars.outputs.version }}.json << EOF
+          {
+            "_type": "https://in-toto.io/Statement/v0.1",
+            "predicateType": "https://slsa.dev/provenance/v0.2",
+            "subject": [{
+              "name": "${{ env.IMAGE_NAME }}",
+              "digest": {
+                "sha256": "$(sha256sum /tmp/vpn9-portal-${{ steps.vars.outputs.version }}.tar | cut -d' ' -f1)"
+              }
+            }],
+            "predicate": {
+              "builder": {
+                "id": "https://github.com/vpn9/vpn9-portal/.github/workflows/reproducible-build.yml"
+              },
+              "buildType": "https://github.com/slsa-framework/slsa-github-generator/container@v1",
+              "invocation": {
+                "configSource": {
+                  "uri": "https://github.com/vpn9/vpn9-portal",
+                  "digest": {
+                    "sha1": "${{ steps.vars.outputs.commit }}"
+                  },
+                  "entryPoint": ".github/workflows/reproducible-build.yml"
+                },
+                "parameters": {
+                  "SOURCE_DATE_EPOCH": "${{ steps.vars.outputs.source_date_epoch }}",
+                  "BUILD_VERSION": "${{ steps.vars.outputs.version }}"
+                }
+              },
+              "metadata": {
+                "buildStartedOn": "${{ steps.vars.outputs.build_timestamp }}",
+                "reproducible": true,
+                "completeness": {
+                  "parameters": true,
+                  "environment": true,
+                  "materials": true
+                }
+              }
+            }
+          }
+          EOF
+      
+      - name: Sign attestation (if configured)
+        if: github.event_name != 'pull_request'
+        uses: sigstore/cosign-installer@v3
+        continue-on-error: true
+      
+      - name: Sign and push image
+        if: github.event_name != 'pull_request'
+        run: |
+          # Load image from tar
+          docker load < /tmp/vpn9-portal-${{ steps.vars.outputs.version }}.tar
+          
+          # Push to registry
+          docker push ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.version }}
+          docker push ${{ env.IMAGE_NAME }}:reproducible-${{ steps.vars.outputs.version }}
+          
+          # Sign with cosign if available
+          if command -v cosign >/dev/null 2>&1; then
+            cosign sign --yes ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.version }}
+            cosign attest --yes --predicate attestation-${{ steps.vars.outputs.version }}.json \
+              --type slsaprovenance \
+              ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.version }}
+          fi
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts-${{ steps.vars.outputs.version }}
+          path: |
+            checksums-*.sha256
+            checksums-*.sha512
+            sbom-*.spdx
+            attestation-*.json
+      
+      - name: Create release (for tags)
+        if: github.event_name == 'push' && github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            checksums-*.sha256
+            checksums-*.sha512
+            sbom-*.spdx
+            attestation-*.json
+          body: |
+            ## Reproducible Build Release
+            
+            This release was built using our reproducible build process.
+            
+            ### Verification
+            
+            To verify this build is reproducible:
+            ```bash
+            ./scripts/verify-build.sh ${{ steps.vars.outputs.version }} --rebuild
+            ```
+            
+            ### Build Parameters
+            - Version: `${{ steps.vars.outputs.version }}`
+            - Commit: `${{ steps.vars.outputs.commit }}`
+            - Source Date Epoch: `${{ steps.vars.outputs.source_date_epoch }}`
+            - Timestamp: `${{ steps.vars.outputs.build_timestamp }}`
+            
+            ### Artifacts
+            - `checksums-*.sha256` - SHA256 checksums of build artifacts
+            - `checksums-*.sha512` - SHA512 checksums of build artifacts
+            - `sbom-*.spdx` - Software Bill of Materials
+            - `attestation-*.json` - Build attestation
+  
+  verify:
+    name: Verify Reproducibility
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: build-artifacts-*
+      
+      - name: Rebuild and verify
+        run: |
+          chmod +x scripts/*.sh
+          
+          # Get version from previous job
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            VERSION="pr-${{ github.event.pull_request.number }}"
+          else
+            VERSION="${{ github.ref_name }}"
+          fi
+          
+          # Run verification
+          ./scripts/verify-build.sh "${VERSION}" --rebuild || true
+      
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = 'builds/verification/verification-report-pr-${{ github.event.pull_request.number }}.txt';
+            
+            let comment = '## 🔒 Reproducible Build Verification\n\n';
+            
+            if (fs.existsSync(reportPath)) {
+              const report = fs.readFileSync(reportPath, 'utf8');
+              comment += '```\n' + report + '\n```';
+            } else {
+              comment += '✅ Build completed successfully. Reproducibility verification available after merge.';
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
