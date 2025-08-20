@@ -48,8 +48,18 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GHCR_TOKEN }}
         id: docker_login
+      
+      - name: Verify login status
+        if: github.event_name != 'pull_request'
+        run: |
+          echo "Login outcome: ${{ steps.docker_login.outcome }}"
+          echo "Login conclusion: ${{ steps.docker_login.conclusion }}"
+          if [ "${{ steps.docker_login.outcome }}" != "success" ]; then
+            echo "::error::Docker login failed!"
+            exit 1
+          fi
       
       - name: Set build variables
         id: vars
