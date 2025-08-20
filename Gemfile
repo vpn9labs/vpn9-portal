@@ -88,6 +88,6 @@ gem "kaminari", "~> 1.2"
 gem "geocoder", "~> 1.8"
 
 # Countries data
-gem "countries", "~> 6.0"
+gem "countries", "~> 8.0"
 
 gem "kredis", "~> 1.8"
