@@ -82,8 +82,8 @@ jobs:
           platforms: linux/amd64
           push: false
           tags: |
-            ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}
-            ${{ steps.vars.outputs.image_name }}:reproducible-${{ steps.vars.outputs.version }}
+            vpn9-portal:${{ steps.vars.outputs.version }}
+            vpn9-portal:reproducible-${{ steps.vars.outputs.version }}
           build-args: |
             SOURCE_DATE_EPOCH=${{ steps.vars.outputs.source_date_epoch }}
             BUILD_VERSION=${{ steps.vars.outputs.version }}
@@ -101,6 +101,9 @@ jobs:
       - name: Load Docker image for SBOM generation
         run: |
           docker load < /tmp/vpn9-portal-${{ steps.vars.outputs.version }}.tar
+          # Retag images with full registry path
+          docker tag vpn9-portal:${{ steps.vars.outputs.version }} ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}
+          docker tag vpn9-portal:reproducible-${{ steps.vars.outputs.version }} ${{ steps.vars.outputs.image_name }}:reproducible-${{ steps.vars.outputs.version }}
       
       - name: Generate SBOM
         uses: anchore/sbom-action@v0
@@ -114,51 +117,60 @@ jobs:
         run: |
           cat > attestation-${{ steps.vars.outputs.version }}.json << EOF
           {
-            "buildType": "https://github.com/slsa-framework/slsa-github-generator/container@v1",
-            "builder": {
-              "id": "https://github.com/vpn9labs/vpn9-portal/.github/workflows/reproducible-build.yml",
-              "version": {
-                "gitCommit": "${{ steps.vars.outputs.commit }}"
-              }
-            },
-            "invocation": {
-              "configSource": {
-                "uri": "https://github.com/${{ github.repository }}",
-                "digest": {
-                  "sha1": "${{ steps.vars.outputs.commit }}"
-                },
-                "entryPoint": ".github/workflows/reproducible-build.yml"
-              },
-              "parameters": {
-                "SOURCE_DATE_EPOCH": "${{ steps.vars.outputs.source_date_epoch }}",
-                "BUILD_VERSION": "${{ steps.vars.outputs.version }}"
-              }
-            },
-            "materials": [
+            "_type": "https://in-toto.io/Statement/v1",
+            "subject": [
               {
-                "uri": "https://github.com/${{ github.repository }}",
+                "name": "${{ steps.vars.outputs.image_name }}",
                 "digest": {
-                  "sha1": "${{ steps.vars.outputs.commit }}"
+                  "sha256": "$(sha256sum /tmp/vpn9-portal-${{ steps.vars.outputs.version }}.tar | cut -d' ' -f1)"
                 }
               }
             ],
-            "metadata": {
-              "buildStartedOn": "${{ steps.vars.outputs.build_timestamp }}",
-              "buildFinishedOn": "${{ steps.vars.outputs.build_timestamp }}",
-              "reproducible": true,
-              "completeness": {
-                "parameters": true,
-                "environment": true,
-                "materials": true
-              }
-            },
-            "runDetails": {
-              "builder": {
-                "id": "https://github.com/vpn9labs/vpn9-portal/.github/workflows/reproducible-build.yml"
+            "predicateType": "https://slsa.dev/provenance/v1",
+            "predicate": {
+              "buildDefinition": {
+                "buildType": "https://github.com/slsa-framework/slsa-github-generator/container@v1",
+                "externalParameters": {
+                  "source": {
+                    "uri": "https://github.com/${{ github.repository }}",
+                    "digest": {
+                      "sha1": "${{ steps.vars.outputs.commit }}"
+                    }
+                  },
+                  "builderImage": "docker.io/library/ruby:3.4.5-slim",
+                  "configSource": {
+                    "uri": "https://github.com/${{ github.repository }}",
+                    "digest": {
+                      "sha1": "${{ steps.vars.outputs.commit }}"
+                    },
+                    "entryPoint": ".github/workflows/reproducible-build.yml"
+                  }
+                },
+                "internalParameters": {
+                  "SOURCE_DATE_EPOCH": "${{ steps.vars.outputs.source_date_epoch }}",
+                  "BUILD_VERSION": "${{ steps.vars.outputs.version }}"
+                },
+                "resolvedDependencies": [
+                  {
+                    "uri": "https://github.com/${{ github.repository }}",
+                    "digest": {
+                      "sha1": "${{ steps.vars.outputs.commit }}"
+                    }
+                  }
+                ]
               },
-              "metadata": {
-                "invocationId": "${{ github.run_id }}-${{ github.run_attempt }}",
-                "startedOn": "${{ steps.vars.outputs.build_timestamp }}"
+              "runDetails": {
+                "builder": {
+                  "id": "https://github.com/actions/runner",
+                  "version": {
+                    "github-actions": "${{ github.run_id }}"
+                  }
+                },
+                "metadata": {
+                  "invocationId": "${{ github.run_id }}-${{ github.run_attempt }}",
+                  "startedOn": "${{ steps.vars.outputs.build_timestamp }}",
+                  "finishedOn": "${{ steps.vars.outputs.build_timestamp }}"
+                }
               }
             }
           }
@@ -173,9 +185,12 @@ jobs:
         if: github.event_name != 'pull_request' && steps.docker_login.outcome == 'success'
         run: |
           # Image should already be loaded from the SBOM generation step
-          # Check if image exists, if not load it
+          # Check if image exists, if not load and retag it
           if ! docker image inspect ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }} >/dev/null 2>&1; then
             docker load < /tmp/vpn9-portal-${{ steps.vars.outputs.version }}.tar
+            # Retag images with full registry path
+            docker tag vpn9-portal:${{ steps.vars.outputs.version }} ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}
+            docker tag vpn9-portal:reproducible-${{ steps.vars.outputs.version }} ${{ steps.vars.outputs.image_name }}:reproducible-${{ steps.vars.outputs.version }}
           fi
           
           # Push to GitHub Container Registry
@@ -186,7 +201,7 @@ jobs:
           if command -v cosign >/dev/null 2>&1; then
             cosign sign --yes ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}
             cosign attest --yes --predicate attestation-${{ steps.vars.outputs.version }}.json \
-              --type slsaprovenance1 \
+              --type https://slsa.dev/provenance/v1 \
               ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}
           fi
       
