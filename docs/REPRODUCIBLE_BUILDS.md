@@ -138,7 +138,7 @@ To verify that a VPN9 Portal image is authentic and matches the source:
 
 1. **Download the verification script**:
 ```bash
-curl -O https://raw.githubusercontent.com/vpn9/vpn9-portal/main/scripts/verify-build.sh
+curl -O https://raw.githubusercontent.com/vpn9labs/vpn9-portal/main/scripts/verify-build.sh
 chmod +x verify-build.sh
 ```
 
@@ -175,7 +175,7 @@ git checkout v1.0.0
 4. **Compare with published image**:
 ```bash
 # Pull the published image
-docker pull vpn9/vpn9-portal:v1.0.0
+docker pull ghcr.io/vpn9labs/vpn9-portal:v1.0.0
 
 # The script will automatically compare checksums
 ```
@@ -189,7 +189,7 @@ docker pull vpn9/vpn9-portal:v1.0.0
 | `BUILD_VERSION` | Version tag for the build | Git tag or commit hash |
 | `BUILD_COMMIT` | Git commit hash | Current HEAD |
 | `SOURCE_DATE_EPOCH` | Unix timestamp for reproducibility | Last commit timestamp |
-| `IMAGE_NAME` | Docker image name | vpn9/vpn9-portal |
+| `IMAGE_NAME` | Docker image name | ghcr.io/vpn9labs/vpn9-portal |
 | `PLATFORMS` | Target platforms | linux/amd64,linux/arm64 |
 | `VERIFY_REPRODUCIBLE` | Verify build reproducibility | false |
 

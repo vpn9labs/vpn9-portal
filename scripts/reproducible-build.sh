@@ -23,7 +23,8 @@ BUILD_VERSION="${BUILD_VERSION:-$(git describe --tags --always)}"
 BUILD_COMMIT="${BUILD_COMMIT:-$(git rev-parse HEAD)}"
 SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(git log -1 --format=%ct)}"
 BUILD_TIMESTAMP="$(date -u -d "@${SOURCE_DATE_EPOCH}" '+%Y-%m-%dT%H:%M:%SZ')"
-IMAGE_NAME="${IMAGE_NAME:-vpn9/vpn9-portal}"
+REPO="${GITHUB_REPOSITORY:-vpn9labs/vpn9-portal}"
+IMAGE_NAME="${IMAGE_NAME:-ghcr.io/${REPO}}"
 IMAGE_TAG="${IMAGE_TAG:-${BUILD_VERSION}}"
 
 # Platform configuration (single arch for reproducible builds)

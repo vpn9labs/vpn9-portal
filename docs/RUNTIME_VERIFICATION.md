@@ -30,7 +30,7 @@ Returns:
     "deployed_at": "2025-01-19T10:00:00Z"
   },
   "verification": {
-    "docker_image": "vpn9/vpn9-portal:v1.0.0",
+    "docker_image": "ghcr.io/vpn9labs/vpn9-portal:v1.0.0",
     "source_url": "https://github.com/vpn9labs/vpn9-portal/tree/dae214e1",
     "attestation_url": "..."
   }
@@ -55,10 +55,10 @@ PROD_DIGEST=$(curl -s https://vpn9.com/api/v1/attestation | jq -r .deployment.im
 #### Step 2: Pull and Verify Docker Image
 ```bash
 # Pull the exact image running in production
-docker pull vpn9/vpn9-portal:${PROD_VERSION}
+docker pull ghcr.io/vpn9labs/vpn9-portal:${PROD_VERSION}
 
 # Check its digest matches
-docker inspect vpn9/vpn9-portal:${PROD_VERSION} --format='{{.Id}}' | grep ${PROD_DIGEST}
+docker inspect ghcr.io/vpn9labs/vpn9-portal:${PROD_VERSION} --format='{{.Id}}' | grep ${PROD_DIGEST}
 ```
 
 #### Step 3: Rebuild from Source
@@ -120,7 +120,7 @@ Each build includes SLSA provenance attestation:
 curl -O https://github.com/vpn9labs/vpn9-portal/releases/download/${VERSION}/attestation-${VERSION}.json
 
 # Verify with cosign (if configured)
-cosign verify-attestation vpn9/vpn9-portal:${VERSION}
+cosign verify-attestation ghcr.io/vpn9labs/vpn9-portal:${VERSION}
 ```
 
 ### Runtime Signature

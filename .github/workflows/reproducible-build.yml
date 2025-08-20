@@ -16,8 +16,7 @@ on:
         default: 'dev'
 
 env:
-  REGISTRY: docker.io
-  IMAGE_NAME: vpn9/vpn9-portal
+  REGISTRY: ghcr.io
 
 jobs:
   build:
@@ -42,13 +41,13 @@ jobs:
             image=moby/buildkit:master
             network=host
       
-      - name: Log in to Docker Hub
+      - name: Log in to GitHub Container Registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
         id: docker_login
       
@@ -66,11 +65,13 @@ jobs:
           COMMIT="${{ github.sha }}"
           SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)"
           BUILD_TIMESTAMP="$(date -u -d "@${SOURCE_DATE_EPOCH}" '+%Y-%m-%dT%H:%M:%SZ')"
+          IMAGE_NAME="${{ env.REGISTRY }}/${{ github.repository }}"
           
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "commit=${COMMIT}" >> $GITHUB_OUTPUT
           echo "source_date_epoch=${SOURCE_DATE_EPOCH}" >> $GITHUB_OUTPUT
           echo "build_timestamp=${BUILD_TIMESTAMP}" >> $GITHUB_OUTPUT
+          echo "image_name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
       
       - name: Build Docker image
         id: build
@@ -81,8 +82,8 @@ jobs:
           platforms: linux/amd64
           push: false
           tags: |
-            ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.version }}
-            ${{ env.IMAGE_NAME }}:reproducible-${{ steps.vars.outputs.version }}
+            ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}
+            ${{ steps.vars.outputs.image_name }}:reproducible-${{ steps.vars.outputs.version }}
           build-args: |
             SOURCE_DATE_EPOCH=${{ steps.vars.outputs.source_date_epoch }}
             BUILD_VERSION=${{ steps.vars.outputs.version }}
@@ -104,7 +105,7 @@ jobs:
       - name: Generate SBOM
         uses: anchore/sbom-action@v0
         with:
-          image: ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.version }}
+          image: ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}
           artifact-name: sbom-${{ steps.vars.outputs.version }}.spdx
           output-file: sbom-${{ steps.vars.outputs.version }}.spdx
       
@@ -113,40 +114,51 @@ jobs:
         run: |
           cat > attestation-${{ steps.vars.outputs.version }}.json << EOF
           {
-            "_type": "https://in-toto.io/Statement/v0.1",
-            "predicateType": "https://slsa.dev/provenance/v0.2",
-            "subject": [{
-              "name": "${{ env.IMAGE_NAME }}",
-              "digest": {
-                "sha256": "$(sha256sum /tmp/vpn9-portal-${{ steps.vars.outputs.version }}.tar | cut -d' ' -f1)"
+            "buildType": "https://github.com/slsa-framework/slsa-github-generator/container@v1",
+            "builder": {
+              "id": "https://github.com/vpn9labs/vpn9-portal/.github/workflows/reproducible-build.yml",
+              "version": {
+                "gitCommit": "${{ steps.vars.outputs.commit }}"
               }
-            }],
-            "predicate": {
+            },
+            "invocation": {
+              "configSource": {
+                "uri": "https://github.com/${{ github.repository }}",
+                "digest": {
+                  "sha1": "${{ steps.vars.outputs.commit }}"
+                },
+                "entryPoint": ".github/workflows/reproducible-build.yml"
+              },
+              "parameters": {
+                "SOURCE_DATE_EPOCH": "${{ steps.vars.outputs.source_date_epoch }}",
+                "BUILD_VERSION": "${{ steps.vars.outputs.version }}"
+              }
+            },
+            "materials": [
+              {
+                "uri": "https://github.com/${{ github.repository }}",
+                "digest": {
+                  "sha1": "${{ steps.vars.outputs.commit }}"
+                }
+              }
+            ],
+            "metadata": {
+              "buildStartedOn": "${{ steps.vars.outputs.build_timestamp }}",
+              "buildFinishedOn": "${{ steps.vars.outputs.build_timestamp }}",
+              "reproducible": true,
+              "completeness": {
+                "parameters": true,
+                "environment": true,
+                "materials": true
+              }
+            },
+            "runDetails": {
               "builder": {
                 "id": "https://github.com/vpn9labs/vpn9-portal/.github/workflows/reproducible-build.yml"
               },
-              "buildType": "https://github.com/slsa-framework/slsa-github-generator/container@v1",
-              "invocation": {
-                "configSource": {
-                  "uri": "https://github.com/vpn9labs/vpn9-portal",
-                  "digest": {
-                    "sha1": "${{ steps.vars.outputs.commit }}"
-                  },
-                  "entryPoint": ".github/workflows/reproducible-build.yml"
-                },
-                "parameters": {
-                  "SOURCE_DATE_EPOCH": "${{ steps.vars.outputs.source_date_epoch }}",
-                  "BUILD_VERSION": "${{ steps.vars.outputs.version }}"
-                }
-              },
               "metadata": {
-                "buildStartedOn": "${{ steps.vars.outputs.build_timestamp }}",
-                "reproducible": true,
-                "completeness": {
-                  "parameters": true,
-                  "environment": true,
-                  "materials": true
-                }
+                "invocationId": "${{ github.run_id }}-${{ github.run_attempt }}",
+                "startedOn": "${{ steps.vars.outputs.build_timestamp }}"
               }
             }
           }
@@ -162,20 +174,20 @@ jobs:
         run: |
           # Image should already be loaded from the SBOM generation step
           # Check if image exists, if not load it
-          if ! docker image inspect ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.version }} >/dev/null 2>&1; then
+          if ! docker image inspect ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }} >/dev/null 2>&1; then
             docker load < /tmp/vpn9-portal-${{ steps.vars.outputs.version }}.tar
           fi
           
-          # Push to registry
-          docker push ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.version }}
-          docker push ${{ env.IMAGE_NAME }}:reproducible-${{ steps.vars.outputs.version }}
+          # Push to GitHub Container Registry
+          docker push ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}
+          docker push ${{ steps.vars.outputs.image_name }}:reproducible-${{ steps.vars.outputs.version }}
           
           # Sign with cosign if available
           if command -v cosign >/dev/null 2>&1; then
-            cosign sign --yes ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.version }}
+            cosign sign --yes ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}
             cosign attest --yes --predicate attestation-${{ steps.vars.outputs.version }}.json \
-              --type slsaprovenance \
-              ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.version }}
+              --type slsaprovenance1 \
+              ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}
           fi
       
       - name: Upload build artifacts
@@ -201,6 +213,11 @@ jobs:
             ## Reproducible Build Release
             
             This release was built using our reproducible build process.
+            
+            ### Container Images
+            Available on GitHub Container Registry:
+            - `${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}`
+            - `${{ steps.vars.outputs.image_name }}:reproducible-${{ steps.vars.outputs.version }}`
             
             ### Verification
             

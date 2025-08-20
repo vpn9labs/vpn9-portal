@@ -135,8 +135,9 @@ rebuild_from_source() {
 # Function to compare builds
 compare_builds() {
     local version=$1
-    local original_image="${2:-vpn9/vpn9-portal:${version}}"
-    local rebuilt_image="${3:-vpn9/vpn9-portal:reproducible-${version}}"
+    local repo="${GITHUB_REPOSITORY:-vpn9labs/vpn9-portal}"
+    local original_image="${2:-ghcr.io/${repo}:${version}}"
+    local rebuilt_image="${3:-ghcr.io/${repo}:reproducible-${version}}"
     
     echo -e "\n${YELLOW}Comparing builds...${NC}"
     
