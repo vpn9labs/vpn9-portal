@@ -72,7 +72,7 @@ All dependencies are locked to specific versions:
 Each build generates:
 - SHA256/SHA512 checksums
 - SBOM (Software Bill of Materials)
-- SLSA provenance attestation
+- SLSA provenance attestation (GitHub Artifact Attestations for files; OCI attestations in GHCR for images)
 - Signature (when configured)
 
 ## Architecture
@@ -123,12 +123,12 @@ vpn9-portal/
 │   ├── vpn9-portal-v1.0.0.tar # Exported image
 │   ├── checksums-v1.0.0.sha256 # Checksums
 │   ├── sbom-v1.0.0.spdx       # Software BOM
-│   └── attestations/
-│       └── attestation-v1.0.0.json
 └── .github/
     └── workflows/
         └── reproducible-build.yml # CI/CD automation
 ```
+
+Note: Provenance attestations are stored by GitHub (for artifacts) and in GHCR (for images), not in the repository files.
 
 ## Verification Instructions
 
@@ -151,6 +151,29 @@ chmod +x verify-build.sh
 ```bash
 cat builds/verification/verification-report-v1.0.0.txt
 ```
+
+### Verifying Artifact Attestations
+
+We publish GitHub Artifact Attestations for key build outputs (image tarball, checksums, SBOM) and for the pushed container image.
+
+1. Install GitHub CLI and authenticate:
+```bash
+gh auth login
+```
+
+2. Verify an artifact attestation (replace path and version as needed):
+```bash
+gh attestation verify /tmp/vpn9-portal-v1.0.0.tar
+gh attestation verify checksums-v1.0.0.sha256
+gh attestation verify sbom-v1.0.0.spdx
+```
+
+3. Verify a container image attestation stored in the registry:
+```bash
+gh attestation verify ghcr.io/vpn9labs/vpn9-portal@sha256:<digest>
+```
+
+If verification succeeds, you'll see a confirmation that the artifact is covered by a valid provenance attestation issued by this repository's workflow.
 
 ### For Security Researchers
 

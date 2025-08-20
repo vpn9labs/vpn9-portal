@@ -125,71 +125,16 @@ jobs:
           artifact-name: sbom-${{ steps.vars.outputs.version }}.spdx
           output-file: sbom-${{ steps.vars.outputs.version }}.spdx
       
-      - name: Create attestation
-        id: attestation
-        run: |
-          cat > attestation-${{ steps.vars.outputs.version }}.json << EOF
-          {
-            "_type": "https://in-toto.io/Statement/v1",
-            "subject": [
-              {
-                "name": "${{ steps.vars.outputs.image_name }}",
-                "digest": {
-                  "sha256": "$(sha256sum /tmp/vpn9-portal-${{ steps.vars.outputs.version }}.tar | cut -d' ' -f1)"
-                }
-              }
-            ],
-            "predicateType": "https://slsa.dev/provenance/v1",
-            "predicate": {
-              "buildDefinition": {
-                "buildType": "https://github.com/slsa-framework/slsa-github-generator/container@v1",
-                "externalParameters": {
-                  "source": {
-                    "uri": "https://github.com/${{ github.repository }}",
-                    "digest": {
-                      "sha1": "${{ steps.vars.outputs.commit }}"
-                    }
-                  },
-                  "builderImage": "docker.io/library/ruby:3.4.5-slim",
-                  "configSource": {
-                    "uri": "https://github.com/${{ github.repository }}",
-                    "digest": {
-                      "sha1": "${{ steps.vars.outputs.commit }}"
-                    },
-                    "entryPoint": ".github/workflows/reproducible-build.yml"
-                  }
-                },
-                "internalParameters": {
-                  "SOURCE_DATE_EPOCH": "${{ steps.vars.outputs.source_date_epoch }}",
-                  "BUILD_VERSION": "${{ steps.vars.outputs.version }}"
-                },
-                "resolvedDependencies": [
-                  {
-                    "uri": "https://github.com/${{ github.repository }}",
-                    "digest": {
-                      "sha1": "${{ steps.vars.outputs.commit }}"
-                    }
-                  }
-                ]
-              },
-              "runDetails": {
-                "builder": {
-                  "id": "https://github.com/actions/runner",
-                  "version": {
-                    "github-actions": "${{ github.run_id }}"
-                  }
-                },
-                "metadata": {
-                  "invocationId": "${{ github.run_id }}-${{ github.run_attempt }}",
-                  "startedOn": "${{ steps.vars.outputs.build_timestamp }}",
-                  "finishedOn": "${{ steps.vars.outputs.build_timestamp }}"
-                }
-              }
-            }
-          }
-          EOF
-      
-      - name: Sign attestation (if configured)
+      - name: Attest build provenance for artifacts
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: |
+            /tmp/vpn9-portal-${{ steps.vars.outputs.version }}.tar
+            checksums-${{ steps.vars.outputs.version }}.sha256
+            checksums-${{ steps.vars.outputs.version }}.sha512
+            sbom-${{ steps.vars.outputs.version }}.spdx
+      # Install cosign for optional image signing
+      - name: Install cosign (for signing)
         if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@v3
         continue-on-error: true
@@ -222,10 +167,34 @@ jobs:
           # Sign with cosign if available
           if command -v cosign >/dev/null 2>&1; then
             cosign sign --yes ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}
-            cosign attest --yes --predicate attestation-${{ steps.vars.outputs.version }}.json \
-              --type https://slsa.dev/provenance/v1 \
-              ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}
           fi
+
+      - name: Get image digest
+        if: |
+          github.event_name != 'pull_request' && 
+          steps.docker_login.conclusion == 'success' &&
+          (github.event_name == 'push' || github.event_name == 'release' || github.event_name == 'workflow_dispatch')
+        id: image_digest
+        run: |
+          set -euo pipefail
+          DIGEST=$(docker buildx imagetools inspect ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }} | grep -m1 'Digest:' | awk '{print $2}')
+          if [ -z "$DIGEST" ]; then
+            echo "::error::Failed to resolve image digest"
+            exit 1
+          fi
+          echo "Resolved digest: $DIGEST"
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+
+      - name: Attest container image provenance
+        if: |
+          github.event_name != 'pull_request' && 
+          steps.docker_login.conclusion == 'success' &&
+          (github.event_name == 'push' || github.event_name == 'release' || github.event_name == 'workflow_dispatch')
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}
+          subject-digest: ${{ steps.image_digest.outputs.digest }}
+          push-to-registry: true
       
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -235,7 +204,6 @@ jobs:
             checksums-*.sha256
             checksums-*.sha512
             sbom-*.spdx
-            attestation-*.json
       
       - name: Create release (for tags)
         if: github.event_name == 'push' && github.ref_type == 'tag'
@@ -245,7 +213,6 @@ jobs:
             checksums-*.sha256
             checksums-*.sha512
             sbom-*.spdx
-            attestation-*.json
           body: |
             ## Reproducible Build Release
             
@@ -273,7 +240,6 @@ jobs:
             - `checksums-*.sha256` - SHA256 checksums of build artifacts
             - `checksums-*.sha512` - SHA512 checksums of build artifacts
             - `sbom-*.spdx` - Software Bill of Materials
-            - `attestation-*.json` - Build attestation
   
   verify:
     name: Verify Reproducibility
