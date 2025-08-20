@@ -97,6 +97,10 @@ jobs:
           sha256sum /tmp/vpn9-portal-${{ steps.vars.outputs.version }}.tar > checksums-${{ steps.vars.outputs.version }}.sha256
           sha512sum /tmp/vpn9-portal-${{ steps.vars.outputs.version }}.tar > checksums-${{ steps.vars.outputs.version }}.sha512
       
+      - name: Load Docker image for SBOM generation
+        run: |
+          docker load < /tmp/vpn9-portal-${{ steps.vars.outputs.version }}.tar
+      
       - name: Generate SBOM
         uses: anchore/sbom-action@v0
         with:
@@ -156,8 +160,11 @@ jobs:
       - name: Sign and push image
         if: github.event_name != 'pull_request' && steps.docker_login.outcome == 'success'
         run: |
-          # Load image from tar
-          docker load < /tmp/vpn9-portal-${{ steps.vars.outputs.version }}.tar
+          # Image should already be loaded from the SBOM generation step
+          # Check if image exists, if not load it
+          if ! docker image inspect ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.version }} >/dev/null 2>&1; then
+            docker load < /tmp/vpn9-portal-${{ steps.vars.outputs.version }}.tar
+          fi
           
           # Push to registry
           docker push ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.version }}
