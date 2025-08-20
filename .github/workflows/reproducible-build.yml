@@ -42,13 +42,13 @@ jobs:
             network=host
       
       - name: Log in to GitHub Container Registry
+        # Only login for non-PR events (push, release, workflow_dispatch)
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true
         id: docker_login
       
       - name: Set build variables
@@ -65,13 +65,16 @@ jobs:
           COMMIT="${{ github.sha }}"
           SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)"
           BUILD_TIMESTAMP="$(date -u -d "@${SOURCE_DATE_EPOCH}" '+%Y-%m-%dT%H:%M:%SZ')"
-          IMAGE_NAME="${{ env.REGISTRY }}/${{ github.repository }}"
+          # Use lowercase for the repository name to match GHCR requirements
+          IMAGE_NAME="${{ env.REGISTRY }}/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')"
           
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "commit=${COMMIT}" >> $GITHUB_OUTPUT
           echo "source_date_epoch=${SOURCE_DATE_EPOCH}" >> $GITHUB_OUTPUT
           echo "build_timestamp=${BUILD_TIMESTAMP}" >> $GITHUB_OUTPUT
           echo "image_name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
+          echo "Repository: ${{ github.repository }}"
+          echo "Image name: ${IMAGE_NAME}"
       
       - name: Build Docker image
         id: build
@@ -182,8 +185,17 @@ jobs:
         continue-on-error: true
       
       - name: Sign and push image
-        if: github.event_name != 'pull_request' && steps.docker_login.outcome == 'success'
+        # Only push for non-PR events when login succeeded
+        # Prevents pushes from forks which won't have write permissions
+        if: |
+          github.event_name != 'pull_request' && 
+          steps.docker_login.conclusion == 'success' &&
+          (github.event_name == 'push' || github.event_name == 'release' || github.event_name == 'workflow_dispatch')
         run: |
+          echo "Event: ${{ github.event_name }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Attempting to push to: ${{ steps.vars.outputs.image_name }}"
           # Image should already be loaded from the SBOM generation step
           # Check if image exists, if not load and retag it
           if ! docker image inspect ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }} >/dev/null 2>&1; then
