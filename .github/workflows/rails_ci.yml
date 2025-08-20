@@ -89,6 +89,9 @@ jobs:
           VPN9_POSTGRES_HOST: 127.0.0.1
           VPN9_POSTGRES_USERNAME: vpn9
           VPN9_POSTGRES_PASSWORD: vpn9
+          ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY: test_primary_key_32_chars_minimum_____
+          ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY: test_deterministic_key_32_chars_min
+          ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT: test_key_derivation_salt_32_chars__
           GOOGLE_CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
         run: bin/rails db:test:prepare test test:system
 
