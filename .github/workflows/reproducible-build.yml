@@ -192,7 +192,7 @@ jobs:
           (github.event_name == 'push' || github.event_name == 'release' || github.event_name == 'workflow_dispatch')
         uses: actions/attest-build-provenance@v1
         with:
-          subject-name: ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}
+          subject-name: ${{ steps.vars.outputs.image_name }}
           subject-digest: ${{ steps.image_digest.outputs.digest }}
           push-to-registry: true
       
