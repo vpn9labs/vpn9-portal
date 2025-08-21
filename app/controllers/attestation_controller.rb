@@ -26,14 +26,18 @@ class AttestationController < ApplicationController
 
   private
 
+  def build_info
+    BuildInfo.current
+  end
+
   def fetch_transparency_log
     # In production, this would fetch from GitHub releases or a database
     # For now, return mock data for development
     [
       {
-        version: ENV["BUILD_VERSION"] || "development",
-        commit: ENV["BUILD_COMMIT"] || git_commit || "unknown",
-        timestamp: ENV["BUILD_TIMESTAMP"] || Time.current.iso8601,
+        version: build_info.version.presence || "development",
+        commit: build_info.commit.presence || git_commit || "unknown",
+        timestamp: build_info.created.presence || Time.current.iso8601,
         status: "active",
         attestation_url: "#"
       }

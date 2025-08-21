@@ -147,12 +147,16 @@ RUN groupadd --system --gid 1000 rails && \
 # Set reproducible file timestamps (only for critical directories)
 RUN touch -d "@${SOURCE_DATE_EPOCH}" /rails /rails/public /rails/public/assets 2>/dev/null || true
 
-USER 1000:1000
-
-# Add build metadata as environment variables and labels
 ARG BUILD_VERSION
 ARG BUILD_COMMIT
 ARG BUILD_TIMESTAMP
+
+# Bake non-sensitive build metadata into a read-only file for in-container attestation
+RUN mkdir -p /usr/share/vpn9 && \
+    printf '{ "version": "%s", "commit": "%s", "created": "%s" }\n' "$BUILD_VERSION" "$BUILD_COMMIT" "$BUILD_TIMESTAMP" > /usr/share/vpn9/build-info.json && \
+    chmod 0444 /usr/share/vpn9/build-info.json
+
+USER 1000:1000
 
 ENV BUILD_VERSION=${BUILD_VERSION} \
     BUILD_COMMIT=${BUILD_COMMIT} \

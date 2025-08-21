@@ -37,12 +37,10 @@ module Api
         deployment = json_response["deployment"]
 
         assert deployment.key?("image_digest")
-        assert deployment.key?("container_id")
         assert deployment.key?("build_version")
         assert deployment.key?("build_commit")
         assert deployment.key?("build_timestamp")
         assert deployment.key?("deployed_at")
-        assert deployment.key?("hostname")
         assert deployment.key?("environment")
       end
 
@@ -299,7 +297,6 @@ module Api
         proof_data = json_response["proof"]["data"]
 
         assert proof_data.key?("timestamp")
-        assert proof_data.key?("container_id")
         assert proof_data.key?("image_digest")
         assert proof_data.key?("build_commit")
 

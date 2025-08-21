@@ -203,6 +203,92 @@ kamal setup # First time only
 kamal deploy
 ```
 
+### Supply Build Metadata and Digest
+
+During build and deploy, we set immutable build metadata and inject the actual image digest for runtime attestation:
+
+```bash
+# Build args (non-sensitive metadata)
+docker build \
+  --build-arg BUILD_VERSION=$(git describe --tags --always) \
+  --build-arg BUILD_COMMIT=$(git rev-parse HEAD) \
+  --build-arg BUILD_TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ) \
+  -t docker.io/vpn9/vpn9-portal:$(git describe --tags --always) .
+
+# Push and capture digest
+docker push docker.io/vpn9/vpn9-portal:$(git describe --tags --always)
+digest=$(docker inspect docker.io/vpn9/vpn9-portal:$(git describe --tags --always) --format='{{index .RepoDigests 0}}' | sed 's/.*@//')
+echo "Digest: $digest"
+
+# Deploy by immutable digest and inject it to the container as a file or env var
+# Example (docker run):
+docker run -e DOCKER_IMAGE_DIGEST="sha256:${digest#sha256:}" \
+  -p 3000:3000 docker.io/vpn9/vpn9-portal:$(git describe --tags --always)
+```
+
+Kubernetes example to pin by digest and surface it in the pod:
+
+```yaml
+containers:
+  - name: vpn9-portal
+    image: docker.io/vpn9/vpn9-portal@sha256:<digest>
+    env:
+      - name: DOCKER_IMAGE_DIGEST
+        value: sha256:<digest>
+```
+
+## Image Verification, SBOM, and Attestation
+
+The image embeds non-sensitive build metadata at `/usr/share/vpn9/build-info.json` and exposes a runtime attestation endpoint.
+
+### Verify the running image digest
+
+- Docker:
+```bash
+docker inspect <container_id> --format '{{.Image}}'
+docker inspect docker.io/vpn9/vpn9-portal:<version> --format '{{index .RepoDigests 0}}'
+```
+
+- Kubernetes:
+```bash
+kubectl get pod <pod> -o jsonpath='{.status.containerStatuses[?(@.name=="vpn9-portal")].imageID}'
+# docker-pullable://docker.io/vpn9/vpn9-portal@sha256:...
+```
+
+### Verify signature with Cosign
+
+```bash
+cosign verify docker.io/vpn9/vpn9-portal@sha256:<digest>
+```
+
+### Check build metadata from inside the container
+
+```bash
+cat /usr/share/vpn9/build-info.json
+# { "version": "v1.2.3", "commit": "<sha>", "created": "<timestamp>" }
+```
+
+Note: In production and other non-development/test environments, the application will refuse to boot if `/usr/share/vpn9/build-info.json` is missing or invalid. This enforces that all deployments are traceable to a specific build.
+
+### Runtime attestation endpoint
+
+- `GET /api/v1/attestation` returns:
+  - build_version, build_commit, build_timestamp (from build-info.json/ENV)
+  - image_digest (from injected file/env)
+  - verification URLs and checksums
+
+- `GET /api/v1/attestation/verify` compares the injected digest to the expected one when provided and includes a signed proof if server keys are configured.
+
+### SBOM and Provenance
+
+- We publish SBOM and provenance alongside releases. Verify that the SBOM corresponds to the signed image digest.
+
+### Recommended user workflow
+
+1. Pull by digest and verify signature.
+2. Run the container with the digest injected as `DOCKER_IMAGE_DIGEST` (or a mounted file at `/run/image-digest`).
+3. Call `/api/v1/attestation` from inside your environment and confirm the reported digest matches what you deployed.
+
 ### Manual Deployment
 
 1. Precompile assets:

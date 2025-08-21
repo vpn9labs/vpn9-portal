@@ -12,34 +12,33 @@ module Api
       # GET /api/v1/attestation
       # Returns current runtime attestation information
       def show
+        info = BuildInfo.current
         render json: {
           status: "running",
           deployment: {
-            image_digest: current_image_digest,
-            container_id: current_container_id,
-            build_version: build_version,
-            build_commit: build_commit,
-            build_timestamp: build_timestamp,
+            image_digest: info.image_digest,
+            build_version: resolved_build_version,
+            build_commit: resolved_build_commit,
+            build_timestamp: info.created.presence || Time.current.iso8601,
             deployed_at: deployment_timestamp,
-            hostname: Socket.gethostname,
             environment: Rails.env
           },
           verification: {
-            docker_image: "vpn9/vpn9-portal:#{build_version}",
-            dockerfile_url: "https://github.com/vpn9labs/vpn9-portal/blob/#{build_commit}/Dockerfile",
-            source_url: "https://github.com/vpn9labs/vpn9-portal/tree/#{build_commit}",
+            docker_image: "vpn9/vpn9-portal:#{info.version.presence || "development"}",
+            dockerfile_url: "https://github.com/vpn9labs/vpn9-portal/blob/#{info.commit.presence || git_commit || "unknown"}/Dockerfile",
+            source_url: "https://github.com/vpn9labs/vpn9-portal/tree/#{info.commit.presence || git_commit || "unknown"}",
             build_log_url: "https://github.com/vpn9labs/vpn9-portal/actions/runs/#{ENV['GITHUB_RUN_ID']}",
-            attestation_url: "https://github.com/vpn9labs/vpn9-portal/releases/download/#{build_version}/attestation-#{build_version}.json",
-            sbom_url: "https://github.com/vpn9labs/vpn9-portal/releases/download/#{build_version}/sbom-#{build_version}.spdx"
+            attestation_url: "https://github.com/vpn9labs/vpn9-portal/releases/download/#{info.version.presence || "development"}/attestation-#{info.version.presence || "development"}.json",
+            sbom_url: "https://github.com/vpn9labs/vpn9-portal/releases/download/#{info.version.presence || "development"}/sbom-#{info.version.presence || "development"}.spdx"
           },
           checksums: {
             image_sha256: image_checksum,
             source_sha256: source_checksum
           },
           instructions: {
-            verify_build: "docker pull vpn9/vpn9-portal:#{build_version} && ./scripts/verify-build.sh #{build_version}",
-            compare_digest: "docker inspect vpn9/vpn9-portal:#{build_version} --format='{{.Id}}'",
-            rebuild_from_source: "git checkout #{build_commit} && ./scripts/reproducible-build.sh"
+            verify_build: "docker pull vpn9/vpn9-portal:#{resolved_build_version} && ./scripts/verify-build.sh #{resolved_build_version}",
+            compare_digest: "docker inspect vpn9/vpn9-portal:#{resolved_build_version} --format='{{.Id}}'",
+            rebuild_from_source: "git checkout #{resolved_build_commit} && ./scripts/reproducible-build.sh"
           }
         }
       end
@@ -58,15 +57,10 @@ module Api
       end
 
       # GET /api/v1/attestation/debug
-      # Debug endpoint to check Docker label reading
+      # Debug endpoint (redacts container identifiers)
       def debug
-        container_id = current_container_id
-
         render json: {
-          container: {
-            id: container_id,
-            hostname: ENV["HOSTNAME"]
-          },
+          container: {},
           environment: {
             build_version: ENV["BUILD_VERSION"],
             build_commit: ENV["BUILD_COMMIT"],
@@ -78,39 +72,53 @@ module Api
 
       private
 
-      def current_image_digest
-        # Attestation requires explicit injection at deploy time
-        return "sha256:test1234567890" if Rails.env.test?
-        ENV["DOCKER_IMAGE_DIGEST"]
+      def build_info
+        @build_info ||= begin
+          path = "/usr/share/vpn9/build-info.json"
+          if File.exist?(path)
+            JSON.parse(File.read(path))
+          else
+            {}
+          end
+        rescue JSON::ParserError
+          {}
+        end
       end
 
-      def current_container_id
-        # Read container ID from cgroup or Docker
-        return "test-container-id" if Rails.env.test?
-
-        File.read("/proc/self/cgroup").match(/docker\/([a-f0-9]{64})/)&.captures&.first ||
-          ENV["HOSTNAME"]
-      rescue
-        "unknown"
+      def read_first_existing_file(*paths)
+        paths.compact.each do |path|
+          next unless path && File.exist?(path)
+          begin
+            content = File.read(path).to_s.strip
+            return content unless content.empty?
+          rescue
+            next
+          end
+        end
+        nil
       end
 
-      def build_version
-        ENV["BUILD_VERSION"] || "development"
-      end
+      # image digest paths handled by BuildInfo
 
-      def build_commit
-        ENV["BUILD_COMMIT"] || git_commit || "unknown"
-      end
+      # Container identifiers intentionally not exposed for privacy
 
-      def build_timestamp
-        ENV["BUILD_TIMESTAMP"] || Time.current.iso8601
-      end
+      # build version/commit/timestamp now provided by BuildInfo
 
       def git_commit
         return "" if Rails.env.test? # Return empty string for test
         `git rev-parse HEAD 2>/dev/null`.strip.presence
       rescue
         nil
+      end
+
+      def resolved_build_version
+        info = BuildInfo.current
+        info.version.presence || "development"
+      end
+
+      def resolved_build_commit
+        info = BuildInfo.current
+        info.commit.presence || git_commit.presence || "unknown"
       end
 
       def deployment_timestamp
@@ -147,13 +155,14 @@ module Api
       end
 
       def verify_image_digest
-        expected = ENV["EXPECTED_IMAGE_DIGEST"]
-        actual = current_image_digest
+        info = BuildInfo.current
+        expected = info.expected_image_digest
+        actual = info.image_digest
         expected.present? && actual.present? && expected == actual
       end
 
       def verify_source_commit
-        expected = build_commit
+        expected = resolved_build_commit
         actual = `git rev-parse HEAD`.strip rescue nil
         expected.present? && actual.present? && expected == actual
       end
@@ -178,9 +187,8 @@ module Api
         # Generate cryptographic proof of verification
         data = {
           timestamp: Time.current.to_i,
-          container_id: current_container_id,
-          image_digest: current_image_digest,
-          build_commit: build_commit
+          image_digest: BuildInfo.current.image_digest,
+          build_commit: resolved_build_commit
         }
 
         # Sign with server's private key if available
