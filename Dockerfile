@@ -162,13 +162,13 @@ ARG BUILD_TIMESTAMP
 # Also compute a deterministic filesystem hash over critical paths and embed as fs_hash
 RUN mkdir -p /usr/share/vpn9 && \
     FS_HASH=$( \
-      set -euo pipefail; \
-      export LANG=C LC_ALL=C; \
-      paths=(/rails/app /rails/lib /rails/config); \
-      existing=(); \
-      for p in "${paths[@]}"; do [ -e "$p" ] && existing+=("$p"); done; \
-      if [ ${#existing[@]} -gt 0 ]; then \
-        find "${existing[@]}" -type f -not -path "/rails/config/environments/development.rb" -not -path "/rails/config/environments/test.rb" -print0 \
+      set -eu; \
+      LANG=C; LC_ALL=C; export LANG LC_ALL; \
+      paths="/rails/app /rails/lib /rails/config"; \
+      existing=""; \
+      for p in $paths; do [ -e "$p" ] && existing="$existing $p"; done; \
+      if [ -n "$existing" ]; then \
+        find $existing -type f -not -path "/rails/config/environments/development.rb" -not -path "/rails/config/environments/test.rb" -print0 \
           | sort -z \
           | xargs -0 sha256sum \
           | sha256sum \
