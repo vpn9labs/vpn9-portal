@@ -79,4 +79,8 @@ class Payment < ApplicationRecord
       CommissionService.process_payment(self)
     end
   end
+
+  def generate_webhook_secret!
+    update!(webhook_secret: SecureRandom.hex(32))
+  end
 end

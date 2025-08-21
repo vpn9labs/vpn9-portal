@@ -27,7 +27,7 @@ Geocoder.configure(
 )
 Geocoder::Lookup::Test.set_default_stub([
   {
-    "coordinates" => [50.0, 10.0],
+    "coordinates" => [ 50.0, 10.0 ],
     "latitude" => 50.0,
     "longitude" => 10.0,
     "country" => "Test Country"

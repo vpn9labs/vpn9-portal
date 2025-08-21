@@ -82,13 +82,27 @@ class PaymentsController < ApplicationController
     payment_id = params[:external_id] || params[:order_id]
     payment = Payment.find_by(id: payment_id)
 
-    if payment
-      payment.update_from_webhook!(params)
-      head :ok
-    else
+    # If payment does not exist, return 404
+    unless payment
       Rails.logger.warn "Webhook received for unknown payment: #{payment_id}"
       head :not_found
+      return
     end
+
+    # Verify webhook authenticity when a secret is set
+    if payment.webhook_secret.present?
+      unless ActiveSupport::SecurityUtils.secure_compare(
+        params[:secret].to_s,
+        payment.webhook_secret.to_s
+      )
+        head :unauthorized
+        return
+      end
+    end
+
+    # Update payment status
+    payment.update_from_webhook!(params)
+    head :ok
   rescue => e
     Rails.logger.error "Webhook processing failed: #{e.message}"
     head :internal_server_error

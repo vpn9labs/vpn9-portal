@@ -27,11 +27,12 @@ class PaymentProcessor
     def create_payment(crypto, payment, plan)
       case processor_type
       when :bitcart
+        payment.generate_webhook_secret!
         response = client.create_invoice(
           amount: payment.amount,
           currency: payment.currency,
           external_id: payment.id.to_s,
-          callback_url: Rails.application.routes.url_helpers.webhook_payments_url(host: webhook_host),
+          callback_url: Rails.application.routes.url_helpers.webhook_payments_url(host: webhook_host, secret: payment.webhook_secret),
           crypto: crypto.upcase
         )
 
