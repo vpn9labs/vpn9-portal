@@ -79,7 +79,7 @@ gem "grpc", "~> 1.74"
 gem "grpc-tools", "~> 1.74"
 
 # JWT for API authentication
-gem "jwt", "~> 2.7"
+gem "jwt", "~> 3.1"
 
 # Pagination
 gem "kaminari", "~> 1.2"
