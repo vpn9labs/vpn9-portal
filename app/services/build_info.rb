@@ -23,7 +23,7 @@ class BuildInfo
     @current = new(path: path, require_file: require_file)
   end
 
-  attr_reader :version, :commit, :created
+  attr_reader :version, :commit, :created, :fs_hash
 
   def initialize(path:, require_file: true)
     data = read_json_file(path)
@@ -42,6 +42,7 @@ class BuildInfo
     @version = data["version"].to_s
     @commit = data["commit"].to_s
     @created = data["created"].to_s
+    @fs_hash = data["fs_hash"].to_s
   end
 
   def image_digest

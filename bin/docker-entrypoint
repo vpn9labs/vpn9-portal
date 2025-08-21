@@ -6,6 +6,11 @@ if [ -z "${LD_PRELOAD+x}" ]; then
     export LD_PRELOAD
 fi
 
+# Verify build integrity before proceeding
+if [ -x "/rails/bin/verify-build-integrity" ]; then
+  /rails/bin/verify-build-integrity
+fi
+
 # If running the rails server then create or migrate existing database
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
   ./bin/rails db:prepare

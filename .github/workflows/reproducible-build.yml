@@ -117,6 +117,29 @@ jobs:
           # Retag images with full registry path
           docker tag vpn9-portal:${{ steps.vars.outputs.version }} ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}
           docker tag vpn9-portal:reproducible-${{ steps.vars.outputs.version }} ${{ steps.vars.outputs.image_name }}:reproducible-${{ steps.vars.outputs.version }}
+
+      - name: Keylessly sign embedded build-info and embed signature in image
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          IMAGE="${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}"
+          CID=$(docker create "$IMAGE" /bin/true)
+          trap 'docker rm -f "$CID" >/dev/null 2>&1 || true' EXIT
+          docker cp "$CID":/usr/share/vpn9/build-info.json ./build-info.json
+
+          # Sign with Sigstore keyless; emits signature and certificate
+          cosign sign-blob --yes \
+            --output-signature build-info.sig \
+            --output-certificate build-info.pem \
+            build-info.json
+
+          # Copy signature, certificate, and cosign verifier into image, then commit
+          docker cp build-info.sig "$CID":/usr/share/vpn9/build-info.sig
+          docker cp build-info.pem "$CID":/usr/share/vpn9/build-info.pem
+          docker cp "$(command -v cosign)" "$CID":/usr/local/bin/cosign
+          docker commit "$CID" "$IMAGE" >/dev/null
+          docker rm -f "$CID" >/dev/null
+          trap - EXIT
       
       - name: Generate SBOM
         uses: anchore/sbom-action@v0

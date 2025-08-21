@@ -139,6 +139,10 @@ ENV PATH=/usr/local/bun/bin:$PATH
 RUN mkdir -p tmp/pids tmp/cache log storage && \
     touch log/production.log
 
+# Ensure integrity verifier is executable
+RUN chmod +x /rails/bin/docker-entrypoint || true && \
+    chmod +x /rails/bin/verify-build-integrity || true
+
 # Create non-root user with fixed UID/GID
 RUN groupadd --system --gid 1000 rails && \
     useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
@@ -152,8 +156,23 @@ ARG BUILD_COMMIT
 ARG BUILD_TIMESTAMP
 
 # Bake non-sensitive build metadata into a read-only file for in-container attestation
+# Also compute a deterministic filesystem hash over critical paths and embed as fs_hash
 RUN mkdir -p /usr/share/vpn9 && \
-    printf '{ "version": "%s", "commit": "%s", "created": "%s" }\n' "$BUILD_VERSION" "$BUILD_COMMIT" "$BUILD_TIMESTAMP" > /usr/share/vpn9/build-info.json && \
+    FS_HASH=$( \
+      set -euo pipefail; \
+      export LANG=C LC_ALL=C; \
+      paths=(/rails/app /rails/lib /rails/config); \
+      existing=(); \
+      for p in "${paths[@]}"; do [ -e "$p" ] && existing+=("$p"); done; \
+      if [ ${#existing[@]} -gt 0 ]; then \
+        find "${existing[@]}" -type f -not -path "/rails/config/environments/development.rb" -not -path "/rails/config/environments/test.rb" -print0 \
+          | sort -z \
+          | xargs -0 sha256sum \
+          | sha256sum \
+          | awk '{print $1}'; \
+      fi \
+    ) && \
+    printf '{ "version": "%s", "commit": "%s", "created": "%s", "fs_hash": "%s" }\n' "$BUILD_VERSION" "$BUILD_COMMIT" "$BUILD_TIMESTAMP" "$FS_HASH" > /usr/share/vpn9/build-info.json && \
     chmod 0444 /usr/share/vpn9/build-info.json
 
 USER 1000:1000

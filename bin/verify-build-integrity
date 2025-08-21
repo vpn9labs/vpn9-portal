@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+BUILD_INFO_PATH="/usr/share/vpn9/build-info.json"
+BUILD_INFO_SIG_PATH="/usr/share/vpn9/build-info.sig"
+BUILD_INFO_CERT_PATH="/usr/share/vpn9/build-info.pem"
+
+# Skip in development/test if desired
+if [ "${RAILS_ENV:-production}" != "production" ]; then
+  exit 0
+fi
+
+if [ ! -f "$BUILD_INFO_PATH" ]; then
+  echo "[integrity] build-info.json missing at $BUILD_INFO_PATH" >&2
+  exit 1
+fi
+
+# Verify signature if present; require in production
+if [ ! -f "$BUILD_INFO_SIG_PATH" ] || [ ! -f "$BUILD_INFO_CERT_PATH" ]; then
+  echo "[integrity] build-info signature or certificate missing" >&2
+  exit 1
+fi
+
+if ! command -v cosign >/dev/null 2>&1; then
+  echo "[integrity] cosign binary not found for signature verification" >&2
+  exit 1
+fi
+
+# Verify the blob signature against certificate with identity and issuer checks
+# GitHub Actions OIDC issuer and repo identity regex
+COSIGN_EXPERIMENTAL=1 \
+cosign verify-blob \
+  --certificate "$BUILD_INFO_CERT_PATH" \
+  --signature "$BUILD_INFO_SIG_PATH" \
+  --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+  --certificate-identity-regexp "^https://github.com/.+/(workflow/)?[^@]+@.+$" \
+  "$BUILD_INFO_PATH" >/dev/null
+
+# Extract fs_hash from JSON
+FS_HASH_EXPECTED=$(awk -F '"' '/"fs_hash"/ {print $4}' "$BUILD_INFO_PATH" || true)
+if [ -z "$FS_HASH_EXPECTED" ]; then
+  echo "[integrity] fs_hash missing in build-info.json" >&2
+  exit 1
+fi
+
+# Compute current FS hash
+compute_fs_hash() {
+  set -euo pipefail
+  export LANG=C LC_ALL=C
+  # Only hash existing paths to avoid errors
+  paths=(/rails/app /rails/lib /rails/config)
+  existing=()
+  for p in "${paths[@]}"; do
+    [ -e "$p" ] && existing+=("$p")
+  done
+  if [ ${#existing[@]} -eq 0 ]; then
+    echo ""; return
+  fi
+  # Create stable list of files
+  find "${existing[@]}" -type f -not -path "/rails/config/environments/development.rb" -not -path "/rails/config/environments/test.rb" -print0 \
+    | sort -z \
+    | xargs -0 sha256sum \
+    | sha256sum \
+    | awk '{print $1}'
+}
+
+FS_HASH_ACTUAL=$(compute_fs_hash)
+
+if [ -z "$FS_HASH_ACTUAL" ]; then
+  echo "[integrity] failed to compute filesystem hash" >&2
+  exit 1
+fi
+
+if [ "$FS_HASH_ACTUAL" != "$FS_HASH_EXPECTED" ]; then
+  echo "[integrity] filesystem hash mismatch" >&2
+  echo "expected: $FS_HASH_EXPECTED" >&2
+  echo "actual:   $FS_HASH_ACTUAL" >&2
+  exit 1
+fi
+
+echo "[integrity] build-info signature and filesystem hash verified"
+exit 0
+
+
