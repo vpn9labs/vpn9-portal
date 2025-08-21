@@ -108,6 +108,49 @@ clean:
 	@docker buildx rm vpn9-builder 2>/dev/null || true
 	@echo "Build artifacts cleaned"
 
+# -----------------------
+# Version management
+# -----------------------
+
+# Print CalVer+git version, e.g. v2025.08.20-gabcdef1
+version:
+	@echo "$(CALVER_VERSION)"
+
+# Print version metadata as JSON
+version-json:
+	@printf '{\n'
+	@printf '  "app": "vpn9-portal",\n'
+	@printf '  "version": "%s",\n' "$(CALVER_VERSION)"
+	@printf '  "commit_sha": "%s",\n' "$(BUILD_COMMIT)"
+	@printf '  "source_date_epoch": "%s",\n' "$(SOURCE_DATE_EPOCH)"
+	@printf '  "build_timestamp": "%s"\n' "$(BUILD_TIMESTAMP)"
+	@printf '}\n'
+
+# Emit env exports that can be eval'd in shells or consumed by CI
+version-export:
+	@echo "APP_VERSION=$(CALVER_VERSION)"
+	@echo "GIT_SHA=$(BUILD_COMMIT)"
+	@echo "SOURCE_DATE_EPOCH=$(SOURCE_DATE_EPOCH)"
+	@echo "BUILD_TIMESTAMP=$(BUILD_TIMESTAMP)"
+
+# Create and push an annotated git tag for the current commit
+version-tag:
+	@if git rev-parse -q --verify "refs/tags/$(CALVER_VERSION)" >/dev/null 2>&1; then \
+		echo "Tag $(CALVER_VERSION) already exists"; \
+	else \
+		echo "Creating tag $(CALVER_VERSION)"; \
+		git tag -a "$(CALVER_VERSION)" -m "Release $(CALVER_VERSION)"; \
+		echo "Pushing tag to $(REMOTE)"; \
+		git push "$(REMOTE)" "$(CALVER_VERSION)"; \
+	fi
+
+# Print recommended OCI label values for the current build
+docker-labels:
+	@echo "org.opencontainers.image.version=$(CALVER_VERSION)"
+	@echo "org.opencontainers.image.revision=$(BUILD_COMMIT)"
+	@echo "org.opencontainers.image.created=$(BUILD_TIMESTAMP)"
+	@echo "org.opencontainers.image.source=$$(git config --get remote.$(REMOTE).url | sed 's/.git$$//')"
+
 # Development targets
 .PHONY: dev-build dev-test
 
