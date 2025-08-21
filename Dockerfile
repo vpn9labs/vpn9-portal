@@ -108,7 +108,7 @@ RUN which bun && bun --version
 # Build JavaScript and CSS assets
 RUN bun run build && bun run build:css
 
-# Precompiling assets for production without requiring secret RAILS_MASTER_KEY  
+# Precompiling assets for production without requiring secret RAILS_MASTER_KEY
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
 # Strip timestamps from compiled assets for reproducibility (only if directory exists)
