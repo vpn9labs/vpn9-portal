@@ -127,27 +127,43 @@ jobs:
         if: github.event_name != 'pull_request'
         run: |
           set -euo pipefail
-          IMAGE="${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}"
-          CID=$(docker create "$IMAGE" /bin/true)
-          trap 'docker rm -f "$CID" >/dev/null 2>&1 || true' EXIT
-          docker cp "$CID":/usr/share/vpn9/build-info.json ./build-info.json
+          
+          # Sign both the main and reproducible images
+          for variant in "${{ steps.vars.outputs.version }}" "reproducible-${{ steps.vars.outputs.version }}"; do
+            IMAGE="${{ steps.vars.outputs.image_name }}:${variant}"
+            echo "Signing image: $IMAGE"
+            
+            # Extract original CMD before creating container
+            ORIGINAL_CMD=$(docker inspect "$IMAGE" --format='{{json .Config.Cmd}}')
+            ORIGINAL_ENTRYPOINT=$(docker inspect "$IMAGE" --format='{{json .Config.Entrypoint}}')
+            
+            CID=$(docker create "$IMAGE" /bin/true)
+            trap 'docker rm -f "$CID" >/dev/null 2>&1 || true' EXIT
+            docker cp "$CID":/usr/share/vpn9/build-info.json ./build-info.json
 
-          # Sign with Sigstore keyless; emits signature and certificate
-          cosign sign-blob --yes \
-            --output-signature build-info.sig \
-            --output-certificate build-info.pem \
-            build-info.json
+            # Sign with Sigstore keyless; emits signature and certificate (only once)
+            if [ ! -f build-info.sig ]; then
+              cosign sign-blob --yes \
+                --output-signature build-info.sig \
+                --output-certificate build-info.pem \
+                build-info.json
+              # Ensure files are world-readable for non-root runtime user inside image
+              chmod 0444 build-info.sig build-info.pem
+            fi
 
-          # Ensure files are world-readable for non-root runtime user inside image
-          chmod 0444 build-info.sig build-info.pem
-
-          # Copy signature, certificate, and cosign verifier into image, then commit
-          docker cp build-info.sig "$CID":/usr/share/vpn9/build-info.sig
-          docker cp build-info.pem "$CID":/usr/share/vpn9/build-info.pem
-          docker cp "$(command -v cosign)" "$CID":/usr/local/bin/cosign
-          docker commit "$CID" "$IMAGE" >/dev/null
-          docker rm -f "$CID" >/dev/null
-          trap - EXIT
+            # Copy signature, certificate, and cosign verifier into image, then commit with original CMD
+            docker cp build-info.sig "$CID":/usr/share/vpn9/build-info.sig
+            docker cp build-info.pem "$CID":/usr/share/vpn9/build-info.pem
+            docker cp "$(command -v cosign)" "$CID":/usr/local/bin/cosign
+            
+            # Commit while preserving original CMD and ENTRYPOINT
+            docker commit \
+              --change "CMD $ORIGINAL_CMD" \
+              --change "ENTRYPOINT $ORIGINAL_ENTRYPOINT" \
+              "$CID" "$IMAGE" >/dev/null
+            docker rm -f "$CID" >/dev/null
+            trap - EXIT
+          done
       
       - name: Generate SBOM
         uses: anchore/sbom-action@v0
