@@ -138,6 +138,9 @@ jobs:
             --output-certificate build-info.pem \
             build-info.json
 
+          # Ensure files are world-readable for non-root runtime user inside image
+          chmod 0444 build-info.sig build-info.pem
+
           # Copy signature, certificate, and cosign verifier into image, then commit
           docker cp build-info.sig "$CID":/usr/share/vpn9/build-info.sig
           docker cp build-info.pem "$CID":/usr/share/vpn9/build-info.pem
