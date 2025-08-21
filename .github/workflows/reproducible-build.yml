@@ -118,6 +118,11 @@ jobs:
           docker tag vpn9-portal:${{ steps.vars.outputs.version }} ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}
           docker tag vpn9-portal:reproducible-${{ steps.vars.outputs.version }} ${{ steps.vars.outputs.image_name }}:reproducible-${{ steps.vars.outputs.version }}
 
+      # Install cosign for keyless signing and later image signing
+      - name: Install cosign (for signing)
+        if: github.event_name != 'pull_request'
+        uses: sigstore/cosign-installer@v3
+
       - name: Keylessly sign embedded build-info and embed signature in image
         if: github.event_name != 'pull_request'
         run: |
@@ -156,11 +161,7 @@ jobs:
             checksums-${{ steps.vars.outputs.version }}.sha256
             checksums-${{ steps.vars.outputs.version }}.sha512
             sbom-${{ steps.vars.outputs.version }}.spdx
-      # Install cosign for optional image signing
-      - name: Install cosign (for signing)
-        if: github.event_name != 'pull_request'
-        uses: sigstore/cosign-installer@v3
-        continue-on-error: true
+      # cosign already installed above
       
       - name: Sign and push image
         # Only push for non-PR events when login succeeded
