@@ -34,10 +34,15 @@ cosign verify-blob \
   --signature "$BUILD_INFO_SIG_PATH" \
   --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
   --certificate-identity-regexp "^https://github.com/vpn9labs/vpn9-portal(/|@).+$" \
-  "$BUILD_INFO_PATH" >/dev/null
+  "$BUILD_INFO_PATH" >/dev/null 2>/dev/null
 
 # Extract fs_hash from JSON
-FS_HASH_EXPECTED=$(awk -F '"' '/"fs_hash"/ {print $4}' "$BUILD_INFO_PATH" || true)
+# Extract fs_hash robustly from JSON without jq
+FS_HASH_EXPECTED=$(grep -o '"fs_hash"[^"]*"[^"]*"' "$BUILD_INFO_PATH" | head -n1 | cut -d '"' -f4 || true)
+# Fallback extraction with sed if grep path fails
+if [ -z "$FS_HASH_EXPECTED" ]; then
+  FS_HASH_EXPECTED=$(sed -n 's/.*\"fs_hash\"[[:space:]]*:[[:space:]]*\"\([^\"]*\)\".*/\1/p' "$BUILD_INFO_PATH" | head -n1 || true)
+fi
 if [ -z "$FS_HASH_EXPECTED" ]; then
   echo "[integrity] fs_hash missing in build-info.json" >&2
   exit 1
