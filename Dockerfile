@@ -16,6 +16,9 @@
 ARG RUBY_VERSION=3.4.5
 FROM docker.io/library/ruby:${RUBY_VERSION}-slim@sha256:0d2adfa1930d67ee79e5d16c3610f4fbed43c98e98dbda14c2811b8197211c74 AS base
 
+# Label for Kamal
+LABEL service="web"
+
 # Set reproducible build timestamp (default to a fixed past date)
 ARG SOURCE_DATE_EPOCH=1700000000
 ENV SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH}

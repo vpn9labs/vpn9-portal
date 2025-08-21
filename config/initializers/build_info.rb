@@ -1,6 +1,4 @@
-# frozen_string_literal: true
+# Ensure build info is optionally loaded (do not require file during build/precompile)
+require Rails.root.join("app/services/build_info")
 
-# Ensure build info is present in non-development/test environments
-unless Rails.env.development? || Rails.env.test?
-  BuildInfo.current
-end
+BuildInfo.current
