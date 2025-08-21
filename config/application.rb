@@ -29,6 +29,6 @@ module Vpn9
     config.active_record.encryption.key_derivation_salt = ENV["ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT"]
 
     require Rails.root.join("lib/webhook_ip_whitelist")
-    config.middleware.use ::WebhookIPWhitelist
+    config.middleware.use ::WebhookIpWhitelist
   end
 end

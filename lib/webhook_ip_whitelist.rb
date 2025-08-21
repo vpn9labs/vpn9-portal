@@ -1,4 +1,4 @@
-class WebhookIPWhitelist
+class WebhookIpWhitelist
   ALLOWED_IPS = ENV["BITCART_WEBHOOK_IPS"]&.split(",") || []
 
   def initialize(app)
