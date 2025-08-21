@@ -71,7 +71,7 @@ class AffiliateTrackingTest < ActionDispatch::IntegrationTest
       "status" => "PAID",
       "transaction_id" => "TX123",
       "external_id" => payment.id
-    })
+    }, "127.0.0.1")
 
     # Verify payment is successful
     assert payment.reload.successful?

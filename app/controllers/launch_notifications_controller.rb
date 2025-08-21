@@ -5,7 +5,6 @@ class LaunchNotificationsController < ApplicationController
     @notification = LaunchNotification.new(notification_params)
 
     # Store request information
-    @notification.ip_address = request.remote_ip
     @notification.user_agent = request.user_agent
     @notification.referrer = request.referrer
     @notification.source = request.host

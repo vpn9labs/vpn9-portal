@@ -61,7 +61,7 @@ class PaymentsController < ApplicationController
         status = PaymentProcessor.get_payment_status(@payment.crypto_currency, @payment.processor_id)
 
         if status && status["status"] != "UNPAID"
-          @payment.update_from_webhook!(status)
+          @payment.update_status!(status["status"])
         end
       rescue ::BitcartClient::Error => e
         Rails.logger.error "Failed to check payment status: #{e.message}"
@@ -101,7 +101,7 @@ class PaymentsController < ApplicationController
     end
 
     # Update payment status
-    payment.update_from_webhook!(params)
+    payment.update_from_webhook!(params, request.remote_ip)
     head :ok
   rescue => e
     Rails.logger.error "Webhook processing failed: #{e.message}"

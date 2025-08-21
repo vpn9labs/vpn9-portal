@@ -56,7 +56,6 @@ class LaunchNotificationsControllerTest < ActionDispatch::IntegrationTest
     notification = LaunchNotification.last
     assert_equal "tracker@example.com", notification.email
     assert_equal "Test Browser", notification.user_agent
-    assert notification.ip_address.present?
     assert_equal false, notification.notified
   end
 

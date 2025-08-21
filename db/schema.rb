@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_21_072636) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_21_085542) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -116,7 +116,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_072636) do
 
   create_table "launch_notifications", force: :cascade do |t|
     t.string "email", null: false
-    t.string "ip_address"
     t.string "user_agent"
     t.string "referrer"
     t.boolean "notified", default: false, null: false
@@ -303,6 +302,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_072636) do
     t.text "deletion_reason"
     t.index ["deleted_at"], name: "index_users_on_deleted_at"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true, where: "(email_address IS NOT NULL)"
+  end
+
+  create_table "webhook_logs", force: :cascade do |t|
+    t.string "webhookable_type", null: false
+    t.bigint "webhookable_id", null: false
+    t.string "ip_address", null: false
+    t.string "status"
+    t.datetime "processed_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["webhookable_type", "webhookable_id"], name: "index_webhook_logs_on_webhookable"
   end
 
   add_foreign_key "admin_sessions", "admins"

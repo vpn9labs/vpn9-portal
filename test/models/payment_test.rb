@@ -88,7 +88,7 @@ class PaymentTest < ActiveSupport::TestCase
       "amount_received" => "0.0012345"
     }
 
-    @payment.update_from_webhook!(webhook_data)
+    @payment.update_from_webhook!(webhook_data, "127.0.0.1")
 
     assert_equal "paid", @payment.status
     assert_equal webhook_data, @payment.processor_data
@@ -181,5 +181,182 @@ class PaymentTest < ActiveSupport::TestCase
     assert_includes Payment.successful, @payment
     assert_includes Payment.successful, overpaid_payment
     assert_not_includes Payment.successful, pending_payment
+  end
+
+  # Tests for update_status! method
+  test "update_status! should update status to paid when PAID" do
+    @payment.save!
+    @payment.update_status!("PAID")
+    assert_equal "paid", @payment.status
+  end
+
+  test "update_status! should update status to partial when PARTIAL" do
+    @payment.save!
+    @payment.update_status!("PARTIAL")
+    assert_equal "partial", @payment.status
+  end
+
+  test "update_status! should update status to overpaid when OVERPAID" do
+    @payment.save!
+    @payment.update_status!("OVERPAID")
+    assert_equal "overpaid", @payment.status
+  end
+
+  test "update_status! should update status to expired when EXPIRED" do
+    @payment.save!
+    @payment.update_status!("EXPIRED")
+    assert_equal "expired", @payment.status
+  end
+
+  test "update_status! should update status to failed for unknown status" do
+    @payment.save!
+    @payment.update_status!("UNKNOWN")
+    assert_equal "failed", @payment.status
+  end
+
+  test "update_status! should call check_for_successful_payment!" do
+    @payment.save!
+    @payment.expects(:check_for_successful_payment!)
+    @payment.update_status!("PAID")
+  end
+
+  test "update_status! should persist the changes" do
+    @payment.save!
+    @payment.update_status!("PAID")
+    @payment.reload
+    assert_equal "paid", @payment.status
+  end
+
+  # Tests for update_from_webhook! method
+  test "update_from_webhook! should create webhook log" do
+    @payment.save!
+    webhook_data = {
+      "status" => "PAID",
+      "transaction_id" => "TX123"
+    }
+
+    assert_difference "WebhookLog.count", 1 do
+      @payment.update_from_webhook!(webhook_data, "192.168.1.1")
+    end
+
+    log = @payment.webhook_logs.last
+    assert_equal "PAID", log.status
+    assert_equal "192.168.1.1", log.ip_address
+    assert_not_nil log.processed_at
+  end
+
+  test "update_from_webhook! should store transaction_id" do
+    @payment.save!
+    webhook_data = {
+      "status" => "PAID",
+      "transaction_id" => "TX12345"
+    }
+
+    @payment.update_from_webhook!(webhook_data, "127.0.0.1")
+    assert_equal "TX12345", @payment.transaction_id
+  end
+
+  test "update_from_webhook! should store processor_data" do
+    @payment.save!
+    webhook_data = {
+      "status" => "PAID",
+      "transaction_id" => "TX123",
+      "crypto_currency" => "BTC",
+      "crypto_amount" => "0.001"
+    }
+
+    @payment.update_from_webhook!(webhook_data, "127.0.0.1")
+    assert_equal webhook_data, @payment.processor_data
+  end
+
+  test "update_from_webhook! should prevent replay attacks" do
+    @payment.save!
+    webhook_data = {
+      "status" => "PAID",
+      "transaction_id" => "TX123"
+    }
+
+    # First webhook should succeed
+    @payment.update_from_webhook!(webhook_data, "127.0.0.1")
+
+    # Second webhook with same status should raise error
+    assert_raises(RuntimeError, "Duplicate webhook detected") do
+      @payment.update_from_webhook!(webhook_data, "127.0.0.1")
+    end
+  end
+
+  test "update_from_webhook! should allow different status updates" do
+    @payment.save!
+
+    # First webhook - partial payment
+    webhook_data1 = {
+      "status" => "PARTIAL",
+      "transaction_id" => "TX123"
+    }
+    @payment.update_from_webhook!(webhook_data1, "127.0.0.1")
+    assert_equal "partial", @payment.status
+
+    # Second webhook - paid (different status, should be allowed)
+    webhook_data2 = {
+      "status" => "PAID",
+      "transaction_id" => "TX123"
+    }
+    assert_nothing_raised do
+      @payment.update_from_webhook!(webhook_data2, "127.0.0.1")
+    end
+    assert_equal "paid", @payment.status
+  end
+
+  test "update_from_webhook! should call check_for_successful_payment!" do
+    @payment.save!
+    webhook_data = {
+      "status" => "PAID",
+      "transaction_id" => "TX123"
+    }
+
+    # check_for_successful_payment! is called once in update_status!
+    @payment.expects(:check_for_successful_payment!).once
+    @payment.update_from_webhook!(webhook_data, "127.0.0.1")
+  end
+
+  # Tests for check_for_successful_payment! method
+  test "check_for_successful_payment! should process completion for paid payment" do
+    @payment.status = :paid
+    @payment.save!
+
+    @payment.expects(:process_completion!)
+    CommissionService.expects(:process_payment).with(@payment)
+
+    @payment.check_for_successful_payment!
+  end
+
+  test "check_for_successful_payment! should process completion for overpaid payment" do
+    @payment.status = :overpaid
+    @payment.save!
+
+    @payment.expects(:process_completion!)
+    CommissionService.expects(:process_payment).with(@payment)
+
+    @payment.check_for_successful_payment!
+  end
+
+  test "check_for_successful_payment! should not process for pending payment" do
+    @payment.status = :pending
+    @payment.save!
+
+    @payment.expects(:process_completion!).never
+    CommissionService.expects(:process_payment).never
+
+    @payment.check_for_successful_payment!
+  end
+
+  test "check_for_successful_payment! should not process for failed payment" do
+    @payment.status = :failed
+    @payment.save!
+
+    @payment.expects(:process_completion!).never
+    CommissionService.expects(:process_payment).never
+
+    @payment.check_for_successful_payment!
   end
 end

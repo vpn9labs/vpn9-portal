@@ -2,7 +2,6 @@
 
 one:
   email: notification_one@example.com
-  ip_address: 127.0.0.1
   user_agent: Test Browser
   referrer: https://example.com
   notified: false
@@ -10,7 +9,6 @@ one:
 
 two:
   email: notification_two@example.com
-  ip_address: 127.0.0.2
   user_agent: Test Browser 2
   referrer: https://example.org
   notified: true

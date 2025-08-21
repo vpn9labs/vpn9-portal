@@ -6,6 +6,7 @@ class Payment < ApplicationRecord
   belongs_to :plan
   belongs_to :subscription, optional: true
   has_one :commission
+  has_many :webhook_logs, as: :webhookable
 
   # Only include payments from non-deleted users by default
   default_scope { joins(:user).merge(User.all) }
@@ -52,9 +53,9 @@ class Payment < ApplicationRecord
     end
   end
 
-  # Update payment status from webhook
-  def update_from_webhook!(webhook_data)
-    case webhook_data["status"]
+  # Update status without saving
+  def update_status!(status)
+    case status
     when "PAID"
       self.status = :paid
     when "PARTIAL"
@@ -67,11 +68,31 @@ class Payment < ApplicationRecord
       self.status = :failed
     end
 
-    self.transaction_id = webhook_data["transaction_id"]
-    self.processor_data = webhook_data
     save!
 
-    # Process subscription if payment is successful
+    check_for_successful_payment!
+  end
+
+  # Update payment status from webhook
+  def update_from_webhook!(webhook_data, request_ip)
+    # Prevent replay attacks
+    if webhook_logs.where(status: webhook_data["status"]).exists?
+      raise "Duplicate webhook detected"
+    end
+
+    # Log the webhook
+    webhook_logs.create!(
+      status: webhook_data["status"],
+      ip_address: request_ip,
+      processed_at: Time.current
+    )
+
+    self.transaction_id = webhook_data["transaction_id"]
+    self.processor_data = webhook_data
+    update_status!(webhook_data["status"])
+  end
+
+  def check_for_successful_payment!
     if successful?
       process_completion!
 

@@ -138,8 +138,11 @@ class PaymentFlowTest < ActionDispatch::IntegrationTest
     }
 
     existing_subscription.reload
+    # Allow for small timing differences during test execution
     expected_expires_at = original_expires_at + @plan.duration_days.days
-    assert_in_delta expected_expires_at.to_i, existing_subscription.expires_at.to_i, 1
+    actual_difference = (existing_subscription.expires_at - original_expires_at).to_i
+    expected_difference = @plan.duration_days.days.to_i
+    assert_equal expected_difference, actual_difference, "Subscription should be extended by exactly #{@plan.duration_days} days"
   end
 
   test "failed payment flow" do
