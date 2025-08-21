@@ -18,6 +18,22 @@ require_relative "../config/environment"
 require "rails/test_help"
 require "mocha/minitest"
 
+# Ensure Geocoder never makes external calls in tests
+# Use the in-memory test lookup with a fast timeout and a safe default stub
+Geocoder.configure(
+  lookup: :test,
+  ip_lookup: :test,
+  timeout: 0.01
+)
+Geocoder::Lookup::Test.set_default_stub([
+  {
+    "coordinates" => [50.0, 10.0],
+    "latitude" => 50.0,
+    "longitude" => 10.0,
+    "country" => "Test Country"
+  }
+])
+
 module ActiveSupport
   class TestCase
     # Run tests in parallel with specified workers

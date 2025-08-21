@@ -4,9 +4,6 @@ class LocationTest < ActiveSupport::TestCase
   setup do
     @location = locations(:stockholm)
 
-    # Configure geocoder for testing
-    Geocoder.configure(lookup: :test)
-
     # Set up default geocoding stub
     Geocoder::Lookup::Test.set_default_stub([
       {

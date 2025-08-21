@@ -8,9 +8,6 @@ class Admin::LocationsControllerTest < ActionDispatch::IntegrationTest
     # Sign in as admin
     sign_in_admin(@admin)
 
-    # Configure geocoder for testing
-    Geocoder.configure(lookup: :test)
-
     # Stub geocoding to avoid external API calls
     stub_geocoding
   end
