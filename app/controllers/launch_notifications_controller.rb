@@ -29,7 +29,7 @@ class LaunchNotificationsController < ApplicationController
           render json: {
             success: false,
             error: @notification.errors.full_messages.first
-          }, status: :unprocessable_entity
+          }, status: :unprocessable_content
         }
         format.html {
           redirect_to root_path(teaser: 1),

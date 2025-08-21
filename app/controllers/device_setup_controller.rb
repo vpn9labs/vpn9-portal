@@ -25,7 +25,7 @@ class DeviceSetupController < ApplicationController
                 disposition: "attachment"
     else
       @locations = Location.joins(:relays).where(relays: { status: :active }).distinct
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 

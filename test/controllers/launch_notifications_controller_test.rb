@@ -20,7 +20,7 @@ class LaunchNotificationsControllerTest < ActionDispatch::IntegrationTest
       post launch_notifications_url, params: { email: "existing@example.com" }, as: :json
     end
 
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
     json_response = JSON.parse(response.body)
     assert_not json_response["success"]
     assert_match /already on the waiting list/i, json_response["error"]
@@ -31,7 +31,7 @@ class LaunchNotificationsControllerTest < ActionDispatch::IntegrationTest
       post launch_notifications_url, params: { email: "invalid-email" }, as: :json
     end
 
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
     json_response = JSON.parse(response.body)
     assert_not json_response["success"]
     assert json_response["error"].present?
@@ -42,7 +42,7 @@ class LaunchNotificationsControllerTest < ActionDispatch::IntegrationTest
       post launch_notifications_url, params: { email: "" }, as: :json
     end
 
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
     json_response = JSON.parse(response.body)
     assert_not json_response["success"]
   end

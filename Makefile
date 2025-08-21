@@ -1,7 +1,7 @@
 # VPN9 Portal Reproducible Build Makefile
 # This Makefile provides convenient targets for reproducible builds
 
-.PHONY: help build verify push clean publish release
+.PHONY: help build verify push clean publish release version version-json version-export version-tag docker-labels
 
 # Default target
 help:
@@ -13,6 +13,11 @@ help:
 	@echo "  make push           - Push image to Docker Hub"
 	@echo "  make publish        - Build, verify, and push"
 	@echo "  make release        - Create a new release with artifacts"
+	@echo "  make version        - Print CalVer+git version (vYYYY.MM.DD-g<sha>)"
+	@echo "  make version-json   - Print version info as JSON (for tooling)"
+	@echo "  make version-export - Print env exports for app/CI (APP_VERSION, GIT_SHA, etc.)"
+	@echo "  make version-tag    - Create and push annotated git tag for the current commit"
+	@echo "  make docker-labels  - Print recommended OCI labels for the current build"
 	@echo "  make clean          - Clean build artifacts"
 	@echo ""
 	@echo "Environment variables:"
@@ -33,6 +38,14 @@ SOURCE_DATE_EPOCH ?= $(shell git log -1 --format=%ct)
 IMAGE_NAME ?= vpn9/vpn9-portal
 PLATFORM ?= linux/amd64
 VERIFY_REPRODUCIBLE ?= false
+# Git remote used for tagging/pushing
+REMOTE ?= origin
+
+# Versioning helpers (CalVer + short SHA)
+SHORT_SHA := $(shell git rev-parse --short=7 HEAD)
+BUILD_DATE := $(shell date -u -d @$(SOURCE_DATE_EPOCH) +%Y.%m.%d)
+CALVER_VERSION := v$(BUILD_DATE)-g$(SHORT_SHA)
+BUILD_TIMESTAMP := $(shell date -u -d @$(SOURCE_DATE_EPOCH) '+%Y-%m-%dT%H:%M:%SZ')
 
 # Directories
 SCRIPTS_DIR := scripts
