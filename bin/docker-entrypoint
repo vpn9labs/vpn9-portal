@@ -8,20 +8,40 @@ if [ -z "${LD_PRELOAD+x}" ]; then
     export LD_PRELOAD
 fi
 
+# Skip integrity check for readiness probes
+if [ "$1" = "/bin/true" ] || [ "$1" = "/bin/sh" ]; then
+  echo "[docker-entrypoint] Running readiness probe: $@"
+  exec "${@}"
+fi
+
 # Verify build integrity before proceeding
 if [ -x "/rails/bin/verify-build-integrity" ]; then
   /rails/bin/verify-build-integrity
 fi
 
-# If running the rails server then create or migrate existing database
-if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
-  echo "[docker-entrypoint] Running database preparation..."
+# Check if we're starting the Rails server (works with thrust wrapper too)
+RUN_DB_PREPARE=false
+for arg in "$@"; do
+  if [ "$arg" = "server" ]; then
+    # Found server command, check if rails is also present
+    for check_arg in "$@"; do
+      if [[ "$check_arg" == *"rails"* ]]; then
+        RUN_DB_PREPARE=true
+        break
+      fi
+    done
+  fi
+done
+
+if [ "$RUN_DB_PREPARE" = true ]; then
+  echo "[docker-entrypoint] Detected Rails server startup, preparing database..."
   ./bin/rails db:prepare || {
-    echo "[docker-entrypoint] Database preparation failed with exit code $?"
+    echo "[docker-entrypoint] ERROR: Database preparation failed with exit code $?"
+    echo "[docker-entrypoint] Check that database is accessible and credentials are correct"
     exit 1
   }
-  echo "[docker-entrypoint] Database preparation completed"
+  echo "[docker-entrypoint] Database preparation completed successfully"
 fi
 
-echo "[docker-entrypoint] Executing command: exec $@"
+echo "[docker-entrypoint] Executing command: $@"
 exec "${@}"
