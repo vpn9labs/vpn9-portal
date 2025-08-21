@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_21_085542) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_22_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -306,12 +306,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_085542) do
 
   create_table "webhook_logs", force: :cascade do |t|
     t.string "webhookable_type", null: false
-    t.bigint "webhookable_id", null: false
     t.string "ip_address", null: false
     t.string "status"
     t.datetime "processed_at", precision: nil
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "webhookable_id", null: false
     t.index ["webhookable_type", "webhookable_id"], name: "index_webhook_logs_on_webhookable"
   end
 
