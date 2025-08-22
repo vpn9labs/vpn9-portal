@@ -46,7 +46,15 @@ class BuildInfo
       repo_digests = image["RepoDigests"]
       debug("ImageDigestResolver.resolve: RepoDigests count=#{repo_digests.is_a?(Array) ? repo_digests.size : 0}")
       if repo_digests.is_a?(Array) && repo_digests.any?
-        preferred = repo_digests.find { |d| d.include?("ghcr.io/") } || repo_digests.first
+        preferred = repo_digests.find do |d|
+          host = begin
+            # Docker repo digest looks like "<host>/<org>/<repo>@sha256:..."; extract the host
+            d.split("/", 2).first
+          rescue
+            nil
+          end
+          host == "ghcr.io"
+        end || repo_digests.first
         BuildInfo::ImageDigest.new(preferred.to_s)
       else
         nil
