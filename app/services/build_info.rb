@@ -26,9 +26,13 @@ require "rbconfig"
 #   Optional content hash of the build filesystem, when provided by the build pipeline.
 #   @return [String, nil]
 class BuildInfo
-  BUILD_INFO_PATH = "/usr/share/vpn9/build-info.json"
   # Default path to the build-info JSON file written during the image build.
   # @return [String]
+  BUILD_INFO_PATH = "/usr/share/vpn9/build-info.json"
+
+  # TTL for the image digest cache in seconds (10 minutes)
+  # @return [Integer]
+  IMAGE_DIGEST_TTL_SECONDS = 600
 
   # Return memoized instance of {BuildInfo}. In development and test, the
   # JSON file is not required by default.
@@ -90,26 +94,34 @@ class BuildInfo
   # @return [BuildInfo::ImageDigest, nil] value object with `repository@sha256:...`
   # @see ImageDigestResolver
   def image_digest
-    return @image_digest if defined?(@image_digest)
-
     # Avoid external calls during tests to keep them fast/deterministic
     if Rails.env.test?
       Rails.logger.debug("BuildInfo.image_digest: test environment detected, skipping Docker lookup") if defined?(Rails)
-      @image_digest = nil
-      return @image_digest
+      return nil
     end
+
+    cache_key = "build_info:image_digest:v1"
+    cached = Rails.cache.read(cache_key)
+    return cached if cached
 
     resolver = ImageDigestResolver.new(
       docker_proxy_base_url: docker_proxy_base_url,
       logger: defined?(Rails) ? Rails.logger : nil,
       env: defined?(Rails) ? Rails.env : nil
     )
-    @image_digest = resolver.resolve
-    Rails.logger.info("BuildInfo.image_digest: resolved actual image digest='#{@image_digest}'") if defined?(Rails) && @image_digest
-    @image_digest
+
+    resolved = resolver.resolve
+    if resolved
+      Rails.cache.write(cache_key, resolved, expires_in: IMAGE_DIGEST_TTL_SECONDS)
+      Rails.logger.info("BuildInfo.image_digest: resolved actual image digest='#{resolved}'") if defined?(Rails)
+      return resolved
+    end
+
+    # Do not cache failures
+    nil
   rescue StandardError => e
     Rails.logger.warn("BuildInfo.image_digest: error while resolving image digest: #{e.class} #{e.message}") if defined?(Rails)
-    @image_digest = nil
+    nil
   end
 
   # Resolve the expected image digest for the running build by querying the
