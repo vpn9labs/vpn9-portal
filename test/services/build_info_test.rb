@@ -114,7 +114,7 @@ class BuildInfoTest < ActiveSupport::TestCase
     assert_equal "http://example:1234", info.send(:docker_proxy_base_url)
 
     ENV["DOCKER_PROXY_URL"] = nil
-    assert_equal "http://dockerproxy:2375", info.send(:docker_proxy_base_url)
+    assert_equal "http://vpn9-portal-dockerproxy:2375", info.send(:docker_proxy_base_url)
   end
 
   test "docker_container_id returns hostname or nil on error" do
@@ -174,6 +174,7 @@ class BuildInfoTest < ActiveSupport::TestCase
     def ok.body; @body; end
     def ok.[](header); (@headers ||= {})[header]; end
     def ok.[]=(header, value); (@headers ||= {})[header] = value; end
+    def ok.each_header; (@headers ||= {}).each; end
     ok["Docker-Content-Digest"] = "sha256:deadbeef"
 
     fake_http = Object.new
@@ -186,6 +187,81 @@ class BuildInfoTest < ActiveSupport::TestCase
       digest = info.send(:fetch_ghcr_digest, repository: "ghcr.io/acme/app", tag: "1.0.0")
       assert_equal "sha256:deadbeef", digest
     end
+  end
+
+  test "fetch_ghcr_digest selects per-platform digest from manifest list" do
+    info = BuildInfo.load!(require_file: false, path: @tmp_dir.join("missing.json").to_s)
+
+    # Stub resolve_current_platform to a known pair
+    def info.send_resolve_current_platform_for_test
+      [ "linux", "amd64" ]
+    end
+    info.define_singleton_method(:resolve_current_platform) { send_resolve_current_platform_for_test }
+
+    head = Net::HTTPOK.new("1.1", "200", "OK")
+    head.instance_variable_set(:@read, true)
+    head.instance_variable_set(:@body, "")
+    def head.body; @body; end
+    def head.[](header); (@headers ||= {})[header]; end
+    def head.[]=(header, value); (@headers ||= {})[header] = value; end
+    def head.each_header; (@headers ||= {}).each; end
+
+    get = Net::HTTPOK.new("1.1", "200", "OK")
+    get.instance_variable_set(:@read, true)
+    manifest = {
+      "schemaVersion" => 2,
+      "manifests" => [
+        { "digest" => "sha256:not-this", "platform" => { "os" => "linux", "architecture" => "arm64" } },
+        { "digest" => "sha256:pick-me", "platform" => { "os" => "linux", "architecture" => "amd64" } }
+      ]
+    }.to_json
+    get.instance_variable_set(:@body, manifest)
+    def get.body; @body; end
+    def get.[](header); (@headers ||= {})[header]; end
+    def get.[]=(header, value); (@headers ||= {})[header] = value; end
+    def get.each_header; (@headers ||= {}).each; end
+
+    # HTTP client that returns head then get
+    calls = []
+    fake_http = Object.new
+    def fake_http.use_ssl=(v); end
+    def fake_http.open_timeout=(v); end
+    def fake_http.read_timeout=(v); end
+    fake_http.define_singleton_method(:request) do |req|
+      @__calls ||= 0
+      @__calls += 1
+      @__calls == 1 ? head : get
+    end
+
+    with_redefined(Net::HTTP, :new, proc { |_host, _port| fake_http }) do
+      digest = info.send(:fetch_ghcr_digest, repository: "ghcr.io/acme/app", tag: "latest")
+      assert_equal "sha256:pick-me", digest
+    end
+  end
+
+  test "ImageDigest value object behavior" do
+    ref = BuildInfo::ImageDigest.new("ghcr.io/acme/app@sha256:abcd")
+    assert_equal "ghcr.io/acme/app", ref.repository
+    assert_equal "sha256:abcd", ref.digest
+    assert_equal "ghcr.io/acme/app@sha256:abcd", ref.to_s
+    assert ref == BuildInfo::ExpectedImageDigest.new("ghcr.io/acme/app@sha256:abcd")
+    assert ref != BuildInfo::ImageDigest.new("ghcr.io/acme/app@sha256:efef")
+  end
+
+  test "extract_digest_from_manifest_response falls back to header" do
+    info = BuildInfo.load!(require_file: false, path: @tmp_dir.join("missing.json").to_s)
+
+    resp = Net::HTTPOK.new("1.1", "200", "OK")
+    resp.instance_variable_set(:@read, true)
+    resp.instance_variable_set(:@body, "{}")
+    def resp.body; @body; end
+    def resp.[](header); (@headers ||= {})[header]; end
+    def resp.[]=(header, value); (@headers ||= {})[header] = value; end
+    def resp.each_header; (@headers ||= {}).each; end
+    resp["docker-content-digest"] = "sha256:from-header"
+
+    digest = info.send(:extract_digest_from_manifest_response, resp)
+    assert_equal "sha256:from-header", digest
   end
 
   test "docker_get_json returns parsed JSON on success else nil" do
