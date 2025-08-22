@@ -241,37 +241,27 @@ async function performVerification() {
   }
 }
 
-// Fetch transparency log
+// Fetch transparency log from controller endpoint
 async function fetchTransparencyLog() {
   try {
-    const resp = await fetch('https://api.github.com/repos/vpn9labs/vpn9-portal/releases?per_page=10');
-    if (!resp.ok) throw new Error(`GitHub API error ${resp.status}`);
-    const releases = await resp.json();
+    const resp = await fetch('/api/v1/transparency');
+    if (!resp.ok) throw new Error(`API error ${resp.status}`);
+    const builds = await resp.json();
 
-    const rows = releases.map(rel => {
-      const version = rel.tag_name || rel.name || 'unknown';
-      const body = rel.body || '';
-      const commitMatch = body.match(/Commit:\s*`?([0-9a-f]{7,40})`?/i);
-      const commit = (commitMatch && commitMatch[1]) || rel.target_commitish || '';
-      const date = new Date(rel.published_at || rel.created_at || Date.now()).toLocaleString();
-      const status = 'published';
-
-      let attestation = rel.html_url;
-      if (Array.isArray(rel.assets)) {
-        const asset = rel.assets.find(a => /^attestation-.*\.json$/.test(a.name || ''));
-        if (asset && asset.browser_download_url) attestation = asset.browser_download_url;
-      }
-
+    const rows = builds.map(build => {
+      const date = new Date(build.timestamp).toLocaleString();
+      const statusClass = build.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800';
+      
       return `
         <tr>
-          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${version}</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">${(commit || '').slice(0,8)}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${build.version}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">${(build.commit || '').slice(0,8)}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${date}</td>
           <td class="px-6 py-4 whitespace-nowrap">
-            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">${status}</span>
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${build.status}</span>
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-sm">
-            <a href="${attestation}" target="_blank" class="text-blue-600 hover:underline">View</a>
+            <a href="${build.attestation_url}" target="_blank" class="text-blue-600 hover:underline">View</a>
           </td>
         </tr>
       `;

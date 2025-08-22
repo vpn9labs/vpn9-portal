@@ -171,6 +171,7 @@ Rails.application.routes.draw do
       get :attestation, to: "attestation#show"
       get "attestation/verify", to: "attestation#verify"
       get "attestation/debug", to: "attestation#debug"
+      get :transparency, to: "attestation#transparency"
     end
   end
 

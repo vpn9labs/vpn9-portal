@@ -56,6 +56,13 @@ module Api
         }
       end
 
+      # GET /api/v1/transparency
+      # Returns transparency log data using the same service as the web controller
+      def transparency
+        builds = GithubReleasesService.fetch_builds
+        render json: builds
+      end
+
       # GET /api/v1/attestation/debug
       # Debug endpoint (redacts container identifiers)
       def debug

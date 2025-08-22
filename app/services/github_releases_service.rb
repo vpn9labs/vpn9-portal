@@ -1,0 +1,90 @@
+# frozen_string_literal: true
+
+require "json"
+require "net/http"
+require "uri"
+
+# Service for fetching and processing GitHub releases for transparency log
+class GithubReleasesService
+  def self.fetch_builds
+    new.fetch_builds
+  end
+
+  def initialize
+    @build_info = BuildInfo.current
+  end
+
+  def fetch_builds
+    # Avoid external API calls in test environment
+    return fallback_builds if Rails.env.test?
+
+    Rails.cache.fetch("transparency_releases_v1", expires_in: 5.minutes) do
+      fetch_from_github
+    end
+  rescue StandardError
+    fallback_builds
+  end
+
+  private
+
+  attr_reader :build_info
+
+  def fetch_from_github
+    uri = URI.parse("https://api.github.com/repos/vpn9labs/vpn9-portal/releases?per_page=10")
+    response = Net::HTTP.get_response(uri)
+
+    unless response.is_a?(Net::HTTPSuccess)
+      return fallback_builds
+    end
+
+    releases = JSON.parse(response.body)
+    builds = Array(releases).map do |rel|
+      version = rel["tag_name"].presence || rel["name"].to_s.presence || "unknown"
+      body = rel["body"].to_s
+      commit = body[/Commit:\s*`?([0-9a-f]{7,40})`?/i, 1].presence || rel["target_commitish"].to_s
+      timestamp = rel["published_at"].presence || rel["created_at"].presence || Time.current.iso8601
+
+      asset_url = nil
+      if rel["assets"].is_a?(Array)
+        asset = rel["assets"].find { |a| a["name"].to_s =~ /\Aattestation-.*\.json\z/ }
+        asset_url = asset && asset["browser_download_url"].to_s
+      end
+
+      {
+        version: version,
+        commit: commit,
+        timestamp: timestamp,
+        status: (version == build_info.version.presence ? "active" : "published"),
+        attestation_url: asset_url.presence || rel["html_url"].to_s
+      }
+    end
+
+    # Sort by timestamp descending (newest first)
+    builds.sort_by do |build|
+      begin
+        Time.parse(build[:timestamp].to_s)
+      rescue StandardError
+        # Fallback for invalid timestamps
+        Time.at(0)
+      end
+    end.reverse
+  end
+
+  def fallback_builds
+    [
+      {
+        version: build_info.version.presence || "development",
+        commit: build_info.commit.presence || git_commit || "unknown",
+        timestamp: build_info.created.presence || Time.current.iso8601,
+        status: "active",
+        attestation_url: "#"
+      }
+    ]
+  end
+
+  def git_commit
+    `git rev-parse HEAD 2>/dev/null`.strip.presence
+  rescue
+    nil
+  end
+end
