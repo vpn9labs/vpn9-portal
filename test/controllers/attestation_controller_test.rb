@@ -3,7 +3,7 @@ require "test_helper"
 class AttestationControllerTest < ActionDispatch::IntegrationTest
   # Test that all attestation pages are publicly accessible without authentication
   test "should get verify page without authentication" do
-    get verify_path
+    get attestation_path
     assert_response :success
     assert_select "h1", text: "Build Verification & Transparency"
   end
@@ -22,7 +22,7 @@ class AttestationControllerTest < ActionDispatch::IntegrationTest
 
   # Test that pages use the public layout by checking for public layout markers
   test "verify page uses public layout" do
-    get verify_path
+    get attestation_path
     assert_response :success
     # Check for elements that would only be in public layout
     assert_match /Build Verification/, response.body
@@ -44,21 +44,21 @@ class AttestationControllerTest < ActionDispatch::IntegrationTest
 
   # Test content rendering
   test "verify page includes attestation status section" do
-    get verify_path
+    get attestation_path
     assert_response :success
     assert_select "#attestation-status"
     assert_select "h2", text: /Live Production Attestation/
   end
 
   test "verify page includes verification button" do
-    get verify_path
+    get attestation_path
     assert_response :success
     assert_select "#verify-btn"
     assert_select "button", text: "Verify Current Deployment"
   end
 
   test "verify page includes manual verification instructions" do
-    get verify_path
+    get attestation_path
     assert_response :success
     assert_select "h3", text: /Manual Verification/
     assert_match /docker pull vpn9\/vpn9-portal/, response.body
@@ -98,7 +98,7 @@ class AttestationControllerTest < ActionDispatch::IntegrationTest
 
   # Test JavaScript includes for dynamic functionality
   test "verify page includes necessary JavaScript" do
-    get verify_path
+    get attestation_path
     assert_response :success
     assert_match /fetchAttestation/, response.body
     assert_match /performVerification/, response.body
@@ -120,7 +120,7 @@ class AttestationControllerTest < ActionDispatch::IntegrationTest
 
   # Test response formats
   test "pages respond with HTML content type" do
-    get verify_path
+    get attestation_path
     assert_equal "text/html; charset=utf-8", response.content_type
 
     get transparency_path
@@ -153,7 +153,7 @@ class AttestationControllerTest < ActionDispatch::IntegrationTest
   test "security page links to verify page" do
     get security_path
     assert_response :success
-    assert_select "a[href=?]", verify_path
+    assert_select "a[href=?]", attestation_path
   end
 
   # Test error handling
@@ -162,7 +162,7 @@ class AttestationControllerTest < ActionDispatch::IntegrationTest
     original_build_version = ENV["BUILD_VERSION"]
     ENV["BUILD_VERSION"] = nil
 
-    get verify_path
+    get attestation_path
     assert_response :success
     # Should still render without errors
 
@@ -171,7 +171,7 @@ class AttestationControllerTest < ActionDispatch::IntegrationTest
 
   # Test mobile responsiveness classes
   test "pages include responsive design classes" do
-    get verify_path
+    get attestation_path
     assert_response :success
     assert_select "[class*='md:grid-cols']"
     assert_select "[class*='sm:px']"
@@ -180,7 +180,7 @@ class AttestationControllerTest < ActionDispatch::IntegrationTest
 
   # Test security headers presence
   test "pages do not leak sensitive information" do
-    get verify_path
+    get attestation_path
     assert_response :success
     # Should not contain private keys or secrets
     refute_match /RAILS_MASTER_KEY/, response.body
@@ -191,7 +191,7 @@ class AttestationControllerTest < ActionDispatch::IntegrationTest
   # Test that pages load quickly
   test "pages load within reasonable time" do
     start_time = Time.current
-    get verify_path
+    get attestation_path
     load_time = Time.current - start_time
 
     assert_response :success
@@ -200,7 +200,7 @@ class AttestationControllerTest < ActionDispatch::IntegrationTest
 
   # Test page titles and meta information
   test "pages have appropriate titles" do
-    get verify_path
+    get attestation_path
     assert_select "h1", "Build Verification & Transparency"
 
     get transparency_path
@@ -212,7 +212,7 @@ class AttestationControllerTest < ActionDispatch::IntegrationTest
 
   # Test API endpoint references
   test "verify page includes correct API endpoint URLs" do
-    get verify_path
+    get attestation_path
     assert_response :success
     assert_match %r{/api/v1/attestation}, response.body
     assert_match %r{/api/v1/attestation/verify}, response.body

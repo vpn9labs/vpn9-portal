@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   root to: "root#index"
 
   # Public attestation and verification pages
-  get "/verify", to: "attestation#verify", as: :verify
+  get "/attestation", to: "attestation#show", as: :verify
   get "/transparency", to: "attestation#transparency", as: :transparency
   get "/security", to: "attestation#security", as: :security
 
