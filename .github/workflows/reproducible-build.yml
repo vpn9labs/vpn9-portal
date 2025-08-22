@@ -288,6 +288,9 @@ jobs:
     name: Verify Reproducibility
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     if: github.event_name == 'pull_request'
     
     steps:
