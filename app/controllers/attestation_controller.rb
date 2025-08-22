@@ -31,6 +31,9 @@ class AttestationController < ApplicationController
   end
 
   def fetch_transparency_log
+    # Avoid external API calls in test environment
+    return fallback_transparency_log if Rails.env.test?
+
     Rails.cache.fetch("transparency_releases_v1", expires_in: 5.minutes) do
       uri = URI.parse("https://api.github.com/repos/vpn9labs/vpn9-portal/releases?per_page=10")
       response = Net::HTTP.get_response(uri)
