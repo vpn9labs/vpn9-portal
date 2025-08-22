@@ -94,8 +94,9 @@ class BuildInfo
   # @return [BuildInfo::ImageDigest, nil] value object with `repository@sha256:...`
   # @see ImageDigestResolver
   def image_digest
-    # Avoid external calls during tests to keep them fast/deterministic
+    # In test mode, check for memoized value first
     if Rails.env.test?
+      return @image_digest if defined?(@image_digest)
       Rails.logger.debug("BuildInfo.image_digest: test environment detected, skipping Docker lookup") if defined?(Rails)
       return nil
     end
