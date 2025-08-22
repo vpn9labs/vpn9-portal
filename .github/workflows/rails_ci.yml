@@ -2,9 +2,6 @@ permissions:
   contents: read
 name: Rails CI
 
-permissions:
-  contents: read
-
 on:
   pull_request:
   push:
@@ -81,7 +78,7 @@ jobs:
         uses: browser-actions/setup-chrome@v2
         with:
           chrome-version: stable
-      
+
       - name: Verify Chrome
         run: |
           echo "Chrome path: ${{ steps.setup-chrome.outputs.chrome-path }}"
