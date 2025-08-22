@@ -6,19 +6,64 @@ require "uri"
 require "socket"
 require "rbconfig"
 
+# Public: Provides metadata about the currently running build and helpers to
+# introspect the Docker image that is executing the app. Also exposes helpers
+# to resolve the expected content-addressable digest from the container
+# registry for verification.
+#
+# YARD docs use Markdown.
+#
+# @!attribute [r] version
+#   The human-readable build version (e.g., tag or semantic version).
+#   @return [String]
+# @!attribute [r] commit
+#   Git commit SHA for this build, if available.
+#   @return [String]
+# @!attribute [r] created
+#   ISO8601 timestamp when the build was created.
+#   @return [String]
+# @!attribute [r] fs_hash
+#   Optional content hash of the build filesystem, when provided by the build pipeline.
+#   @return [String, nil]
 class BuildInfo
   BUILD_INFO_PATH = "/usr/share/vpn9/build-info.json"
+  # Default path to the build-info JSON file written during the image build.
+  # @return [String]
 
+  # Return memoized instance of {BuildInfo}. In development and test, the
+  # JSON file is not required by default.
+  #
+  # @return [BuildInfo]
+  # @see .load!
   def self.current
     @current ||= load!(require_file: !Rails.env.development? && !Rails.env.test?)
   end
 
+  # Replace the memoized instance with a fresh one.
+  #
+  # @param require_file [Boolean] whether to raise if file is missing/invalid
+  # @param path [String] absolute path to the build-info JSON
+  # @return [BuildInfo]
+  # @raise [RuntimeError] when file is required but missing or invalid
   def self.load!(require_file: true, path: BUILD_INFO_PATH)
     @current = new(path: path, require_file: require_file)
   end
 
   attr_reader :version, :commit, :created, :fs_hash
 
+  # Create a new instance by reading a JSON file that contains build metadata.
+  #
+  # @param path [String] absolute path to the build-info JSON
+  # @param require_file [Boolean] whether to raise if file is missing/invalid
+  # @return [void]
+  # @raise [RuntimeError] when file is required but missing
+  # @example Minimal JSON structure
+  #   {
+  #     "version": "v1.2.3",
+  #     "commit": "abcdef1",
+  #     "created": "2025-08-20T12:34:56Z",
+  #     "fs_hash": "sha256:..." # optional
+  #   }
   def initialize(path:, require_file: true)
     data = read_json_file(path)
 
@@ -39,9 +84,11 @@ class BuildInfo
     @fs_hash = data["fs_hash"].to_s
   end
 
-  # Resolve the running image's content-addressable digest via Docker Engine API (read-only proxy)
-  # Returns a string like "ghcr.io/vpn9labs/vpn9-portal@sha256:..." or nil when unavailable
-
+  # Resolve the content-addressable digest of the currently running container
+  # image by querying the Docker Engine (via a read-only proxy). Memoized.
+  #
+  # @return [BuildInfo::ImageDigest, nil] value object with `repository@sha256:...`
+  # @see ImageDigestResolver
   def image_digest
     return @image_digest if defined?(@image_digest)
 
@@ -65,6 +112,13 @@ class BuildInfo
     @image_digest = nil
   end
 
+  # Resolve the expected image digest for the running build by querying the
+  # container registry for a set of candidate tags. Prefers the reproducible
+  # tag, then the version, then the container start tag (if not "latest").
+  # Memoized.
+  #
+  # @return [BuildInfo::ExpectedImageDigest, nil]
+  # @see ExpectedImageDigestResolver
   def expected_image_digest
     return @expected_image_digest if defined?(@expected_image_digest)
 
@@ -121,11 +175,20 @@ class BuildInfo
 
   private
 
+  # Base URL for the internal Docker Engine read-only proxy.
+  #
+  # @api private
+  # @return [String]
   def docker_proxy_base_url
     # Default to the accessory service name reachable inside the app network
     ENV["DOCKER_PROXY_URL"].presence || "http://vpn9-portal-dockerproxy:2375"
   end
 
+  # Perform a GET request against the Docker Engine proxy and parse JSON.
+  #
+  # @api private
+  # @param path [String] request path beginning with "/"
+  # @return [Hash, Array, nil] parsed JSON on success, else nil
   def docker_get_json(path)
     base = docker_proxy_base_url
     uri = URI.join(base.end_with?("/") ? base : base + "/", path.sub(%r{^/}, ""))
@@ -148,6 +211,10 @@ class BuildInfo
     nil
   end
 
+  # Resolve the current container ID (Docker sets hostname to container ID).
+  #
+  # @api private
+  # @return [String, nil]
   def docker_container_id
     # Docker sets the container hostname to the container ID by default
     Socket.gethostname.to_s.strip.presence
@@ -156,6 +223,11 @@ class BuildInfo
     nil
   end
 
+  # Read and parse a JSON file from disk.
+  #
+  # @api private
+  # @param path [String]
+  # @return [Hash, nil] nil if file missing or invalid JSON
   def read_json_file(path)
     return nil unless File.exist?(path)
     JSON.parse(File.read(path))
@@ -163,6 +235,11 @@ class BuildInfo
     nil
   end
 
+  # Return the first file content that exists and is non-empty.
+  #
+  # @api private
+  # @param paths [Array<String>]
+  # @return [String, nil]
   def read_first_existing_file(paths)
     paths.each do |path|
       next unless File.exist?(path)
@@ -172,8 +249,12 @@ class BuildInfo
     nil
   end
 
-  # Determine the registry repository to query for expected digest
-  # Prefer the repository part from the current image's RepoDigest; fallback to GHCR repo
+  # Determine the registry repository that should be queried for the expected
+  # digest. Uses the repository portion of the actual running image when
+  # available; otherwise falls back to the GHCR repository for this app.
+  #
+  # @api private
+  # @return [String]
   def resolve_registry_repository
     repo_from_actual = begin
       actual = image_digest
@@ -188,8 +269,13 @@ class BuildInfo
     repo
   end
 
-  # Fetch the content-addressable digest for a given repo:tag from the container registry
-  # Returns a string like "sha256:..." or nil
+  # Fetch the content-addressable digest for a given repo:tag from the
+  # container registry. Currently supports GHCR.
+  #
+  # @api private
+  # @param repository [String] e.g., "ghcr.io/owner/name"
+  # @param tag [String]
+  # @return [String, nil] digest like "sha256:..." or nil
   def fetch_registry_digest(repository:, tag:)
     # Currently supports GHCR; extend as needed for other registries
     if repository.start_with?("ghcr.io/")
@@ -199,6 +285,12 @@ class BuildInfo
     end
   end
 
+  # Fetch a digest for a given repo:tag from GitHub Container Registry.
+  #
+  # @api private
+  # @param repository [String]
+  # @param tag [String]
+  # @return [String, nil]
   def fetch_ghcr_digest(repository:, tag:)
     # repository format: ghcr.io/owner/name
     host, path = repository.split("/", 2)
@@ -249,7 +341,12 @@ class BuildInfo
     nil
   end
 
-  # Helpers for parsing manifest responses
+  # Extract the per-platform digest from a manifest list response when
+  # available; otherwise fall back to the Docker-Content-Digest header.
+  #
+  # @api private
+  # @param response [Net::HTTPResponse]
+  # @return [String, nil]
   def extract_digest_from_manifest_response(response)
     headers = response.each_header.to_h
     body = response.body.to_s
@@ -265,7 +362,10 @@ class BuildInfo
     headers["docker-content-digest"].to_s.strip.presence
   end
 
-  # Determine current platform identifiers matching OCI manifest fields
+  # Determine current platform identifiers matching OCI manifest fields.
+  #
+  # @api private
+  # @return [Array<String>] two-element array [os, arch]
   def resolve_current_platform
     host_os = RbConfig::CONFIG["host_os"].to_s.downcase
     os = host_os.include?("linux") ? "linux" : (host_os.include?("darwin") ? "darwin" : "linux")
@@ -281,9 +381,13 @@ class BuildInfo
     [ os, arch ]
   end
 
-  # Public: Return the tag the container was started with, if available
+  # Return the tag the container was started with, if available.
   # - If the container was started with an @sha digest reference, returns nil
   # - If the container was started with a name without tag, returns "latest"
+  #
+  # @return [String, nil]
+  # @example
+  #   extract_tag_from_image_reference("ghcr.io/org/app:reproducible-v1") #=> "reproducible-v1"
   def image_tag
     return @image_tag if defined?(@image_tag)
 
@@ -318,7 +422,10 @@ class BuildInfo
     @image_tag = nil
   end
 
-  # Public: Return the exact image reference the container was started with (e.g., repo:tag or repo@sha)
+  # Return the exact image reference the container was started with
+  # (e.g., repo:tag or repo@sha). Memoized.
+  #
+  # @return [String, nil]
   def image_start_reference
     return @image_start_reference if defined?(@image_start_reference)
 
@@ -339,11 +446,14 @@ class BuildInfo
     @image_start_reference = nil
   end
 
-  # Extract the tag from a full docker image reference without pulling
-  # Examples:
-  #  - ghcr.io/org/app:reproducible-v1 -> reproducible-v1
-  #  - ghcr.io/org/app@sha256:abcd     -> nil
-  #  - ghcr.io/org/app                 -> latest
+  # Extract the tag from a full Docker image reference without pulling.
+  #
+  # @param reference [String]
+  # @return [String, nil] returns nil if reference is an @sha or empty
+  # @example
+  #   extract_tag_from_image_reference("ghcr.io/org/app:reproducible-v1") #=> "reproducible-v1"
+  #   extract_tag_from_image_reference("ghcr.io/org/app@sha256:abcd")     #=> nil
+  #   extract_tag_from_image_reference("ghcr.io/org/app")                 #=> "latest"
   def extract_tag_from_image_reference(reference)
     return nil if reference.to_s.empty?
     return nil if reference.include?("@")

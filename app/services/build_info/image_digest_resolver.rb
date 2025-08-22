@@ -7,16 +7,20 @@ require "socket"
 
 class BuildInfo
   # Internal: Resolves information about the currently running Docker image
-  # without mutating global state. Used by BuildInfo to fetch the actual image
+  # without mutating global state. Used by {BuildInfo} to fetch the actual image
   # digest as well as auxiliary data like the image tag/reference.
   class ImageDigestResolver
+    # @param docker_proxy_base_url [String] base URL to the Docker proxy
+    # @param logger [#debug,#warn,nil]
+    # @param env [#test?, nil]
     def initialize(docker_proxy_base_url:, logger: nil, env: nil)
       @docker_proxy_base_url = docker_proxy_base_url
       @logger = logger
       @env = env
     end
 
-    # Returns BuildInfo::ImageDigest or nil
+    # Resolve the running container's image digest via Docker Engine API.
+    # @return [BuildInfo::ImageDigest, nil]
     def resolve
       if test_env?
         debug("ImageDigestResolver.resolve: test environment detected, skipping Docker lookup")
@@ -55,6 +59,7 @@ class BuildInfo
     # Public: Return the tag the container was started with, if available
     # - If the container was started with an @sha digest reference, returns nil
     # - If the container was started with a name without tag, returns "latest"
+    # @return [String, nil]
     def image_tag
       return nil if test_env?
 
@@ -76,6 +81,7 @@ class BuildInfo
 
     # Public: Return the exact image reference the container was started with
     # (e.g., repo:tag or repo@sha)
+    # @return [String, nil]
     def image_start_reference
       return nil if test_env?
 
@@ -89,6 +95,9 @@ class BuildInfo
     end
 
     # Utility used by BuildInfo as a delegator for tests
+    # @api private
+    # @param path [String]
+    # @return [Hash, Array, nil]
     def docker_get_json(path)
       base = @docker_proxy_base_url
       uri = URI.join(base.end_with?("/") ? base : base + "/", path.sub(%r{^/}, ""))
@@ -109,6 +118,8 @@ class BuildInfo
     end
 
     # Utility used by BuildInfo as a delegator for tests
+    # @api private
+    # @return [String, nil]
     def docker_container_id
       Socket.gethostname.to_s.strip.presence
     rescue StandardError => e
@@ -116,6 +127,9 @@ class BuildInfo
       nil
     end
 
+    # Extract a tag from a Docker image reference.
+    # @param reference [String]
+    # @return [String, nil]
     def extract_tag_from_image_reference(reference)
       return nil if reference.to_s.empty?
       return nil if reference.include?("@")

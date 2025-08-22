@@ -8,8 +8,12 @@ require "rbconfig"
 class BuildInfo
   # Internal: Resolves the expected image digest from a container registry
   # given a repository and a set of candidate tags. Keeps all registry-specific
-  # logic here to keep BuildInfo small.
+  # logic here to keep {BuildInfo} small.
   class ExpectedImageDigestResolver
+    # @param repository [String] full repo (e.g., "ghcr.io/org/app")
+    # @param candidate_tags [Array<String>] ordered preference of tags
+    # @param logger [#debug,#warn,nil]
+    # @param env [#test?, nil]
     def initialize(repository:, candidate_tags:, logger: nil, env: nil)
       @repository = repository
       @candidate_tags = Array(candidate_tags).compact.uniq
@@ -17,7 +21,8 @@ class BuildInfo
       @env = env
     end
 
-    # Returns BuildInfo::ExpectedImageDigest or nil
+    # Resolve to the first available digest across the provided tags.
+    # @return [BuildInfo::ExpectedImageDigest, nil]
     def resolve
       if test_env?
         debug("ExpectedImageDigestResolver.resolve: test environment detected, skipping registry lookup")
@@ -42,6 +47,9 @@ class BuildInfo
     end
 
     # Public: Registry digest for repo:tag (e.g., 'sha256:abcd') or nil
+    # @param repository [String]
+    # @param tag [String]
+    # @return [String, nil]
     def fetch_registry_digest(repository:, tag:)
       if repository.start_with?("ghcr.io/")
         fetch_ghcr_digest(repository: repository, tag: tag)
@@ -50,6 +58,10 @@ class BuildInfo
       end
     end
 
+    # Resolve digest for a GHCR repository and tag.
+    # @param repository [String]
+    # @param tag [String]
+    # @return [String, nil]
     def fetch_ghcr_digest(repository:, tag:)
       host, path = repository.split("/", 2)
       return nil unless host == "ghcr.io" && path.to_s.present?
@@ -94,6 +106,10 @@ class BuildInfo
       nil
     end
 
+    # Extract digest from an HTTP response containing a manifest list or
+    # manifest. Prefer the per-platform entry matching the current host.
+    # @param response [Net::HTTPResponse]
+    # @return [String, nil]
     def extract_digest_from_manifest_response(response)
       headers = response.each_header.to_h
       body = response.body.to_s
@@ -109,6 +125,8 @@ class BuildInfo
       headers["docker-content-digest"].to_s.strip.presence
     end
 
+    # Determine current platform identifiers matching OCI manifest fields.
+    # @return [Array<String>] two-element array [os, arch]
     def resolve_current_platform
       host_os = RbConfig::CONFIG["host_os"].to_s.downcase
       os = host_os.include?("linux") ? "linux" : (host_os.include?("darwin") ? "darwin" : "linux")

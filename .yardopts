@@ -1,0 +1,6 @@
+--markup markdown
+--no-private
+--title "YourProject API"
+--exclude spec --exclude test --exclude vendor
+lib/**/*.rb app/**/*.rb -
+README.md CHANGELOG.md docs/**/*.md

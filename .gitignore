@@ -52,3 +52,7 @@ builds/*.tar.gz
 builds/*.tar.xz
 builds/verification/
 builds/attestations/*.json
+
+# Ignore YARD docs
+/doc
+.yardoc

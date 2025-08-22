@@ -363,6 +363,10 @@ GEM
       rubocop (>= 1.72)
       rubocop-performance (>= 1.24)
       rubocop-rails (>= 2.30)
+    rubocop-yard (1.0.0)
+      lint_roller
+      rubocop (~> 1.72)
+      yard
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
     rubyzip (3.0.1)
@@ -433,6 +437,7 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
+    yard (0.9.37)
     zeitwerk (2.7.3)
 
 PLATFORMS
@@ -472,6 +477,7 @@ DEPENDENCIES
   puma (>= 5.0)
   rails (~> 8.0.2)
   rubocop-rails-omakase
+  rubocop-yard (~> 1.0)
   selenium-webdriver
   solid_cable
   solid_cache
@@ -482,6 +488,7 @@ DEPENDENCIES
   turbo-rails
   tzinfo-data
   web-console
+  yard (~> 0.9.37)
 
 BUNDLED WITH
    2.7.0
