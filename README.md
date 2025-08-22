@@ -220,10 +220,8 @@ docker push docker.io/vpn9/vpn9-portal:$(git describe --tags --always)
 digest=$(docker inspect docker.io/vpn9/vpn9-portal:$(git describe --tags --always) --format='{{index .RepoDigests 0}}' | sed 's/.*@//')
 echo "Digest: $digest"
 
-# Deploy by immutable digest and inject it to the container as a file or env var
-# Example (docker run):
-docker run -e DOCKER_IMAGE_DIGEST="sha256:${digest#sha256:}" \
-  -p 3000:3000 docker.io/vpn9/vpn9-portal:$(git describe --tags --always)
+# Deploy behind a read-only Docker socket proxy and allow the app to resolve
+# its own image digest via the Docker Engine API (no docker.sock mount).
 ```
 
 Kubernetes example to pin by digest and surface it in the pod:
@@ -233,8 +231,8 @@ containers:
   - name: vpn9-portal
     image: docker.io/vpn9/vpn9-portal@sha256:<digest>
     env:
-      - name: DOCKER_IMAGE_DIGEST
-        value: sha256:<digest>
+      - name: DOCKER_PROXY_URL
+        value: http://127.0.0.1:2375
 ```
 
 ## Image Verification, SBOM, and Attestation
@@ -285,9 +283,9 @@ Note: In production and other non-development/test environments, the application
 
 ### Recommended user workflow
 
-1. Pull by digest and verify signature.
-2. Run the container with the digest injected as `DOCKER_IMAGE_DIGEST` (or a mounted file at `/run/image-digest`).
-3. Call `/api/v1/attestation` from inside your environment and confirm the reported digest matches what you deployed.
+1. Run a read-only Docker socket proxy on the host and expose it to the app.
+2. Do not mount `/var/run/docker.sock` into the app container.
+3. The app will query the Engine for its own image and expose the resolved `RepoDigests` in `/api/v1/attestation`.
 
 ### Manual Deployment
 

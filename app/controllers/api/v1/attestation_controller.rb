@@ -65,7 +65,7 @@ module Api
             build_version: ENV["BUILD_VERSION"],
             build_commit: ENV["BUILD_COMMIT"],
             build_timestamp: ENV["BUILD_TIMESTAMP"],
-            docker_image_digest: ENV["DOCKER_IMAGE_DIGEST"]
+            docker_image_digest: BuildInfo.current.image_digest
           }
         }
       end
