@@ -4,11 +4,7 @@ require "json"
 
 module Api
   module V1
-    class AttestationController < ActionController::Base
-      # Use base controller to avoid authentication
-      # This is public information - no auth needed
-      protect_from_forgery with: :null_session
-
+    class AttestationController < ActionController::API
       # GET /api/v1/attestation
       # Returns current runtime attestation information
       def show
