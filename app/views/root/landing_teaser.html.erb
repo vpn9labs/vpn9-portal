@@ -256,53 +256,101 @@
       </p>
     </div>
     
-    <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-      <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
+    <div class="mx-auto mt-16 max-w-4xl sm:mt-20 lg:mt-24">
+      <div class="grid gap-8 lg:gap-10">
         <!-- Feature 1 -->
-        <div class="flex flex-col">
-          <dt class="text-base font-semibold leading-7 text-gray-900">
-            <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
-              <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+        <div class="flex items-start gap-4">
+          <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-600 flex-shrink-0">
+            <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-lg font-semibold leading-7 text-gray-900 mb-2">Zero Connection Logs</h3>
+            <p class="text-base leading-7 text-gray-700 mb-4">
+              We don't just promise not to log — we've built it into our DNA. No connection timestamps, source IPs, DNS queries, or traffic metadata. Ever. Our distributed architecture makes it technically impossible because there's no central session to track.
+            </p>
+            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-indigo-600">
+              <p class="text-sm text-gray-700 mb-2">
+                <strong>Bottom line:</strong> There's literally nothing for anyone to correlate your activity with your identity.
+              </p>
+              <p class="text-sm text-gray-600">
+                Most VPNs still keep "diagnostic" metadata. We designed our entire system to make logging impossible.
+              </p>
             </div>
-            Zero Connection Logs
-          </dt>
-          <dd class="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
-            <p class="flex-auto">No timestamps, no IP addresses, no browsing activity. We're building a system that makes logging technically impossible.</p>
-          </dd>
+          </div>
         </div>
-        
+
         <!-- Feature 2 -->
-        <div class="flex flex-col">
-          <dt class="text-base font-semibold leading-7 text-gray-900">
-            <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
-              <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
-              </svg>
+        <div class="flex items-start gap-4">
+          <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-600 flex-shrink-0">
+            <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1721.75 8.25z" />
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-lg font-semibold leading-7 text-gray-900 mb-2">Anonymous Accounts</h3>
+            <p class="text-base leading-7 text-gray-700 mb-4">
+              Skip the forms. No email, phone number, or real name needed. Create your account with just a passphrase and optional recovery codes. We don't fingerprint your device or tie your usage patterns to any identity.
+            </p>
+            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-indigo-600">
+              <p class="text-sm text-gray-700 mb-2">
+                <strong>The result:</strong> Zero personal data means zero risk of it being leaked, sold, or subpoenaed.
+              </p>
+              <p class="text-sm text-gray-600">
+                Other providers ask for your details "for support." We built better support without needing any of it.
+              </p>
             </div>
-            Anonymous Accounts
-          </dt>
-          <dd class="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
-            <p class="flex-auto">No email, no phone, no personal information. Sign up with just a passphrase for complete anonymity.</p>
-          </dd>
+          </div>
         </div>
-        
+
         <!-- Feature 3 -->
-        <div class="flex flex-col">
-          <dt class="text-base font-semibold leading-7 text-gray-900">
-            <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
-              <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+        <div class="flex items-start gap-4">
+          <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-600 flex-shrink-0">
+            <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-lg font-semibold leading-7 text-gray-900 mb-2">Cryptocurrency Payments</h3>
+            <p class="text-base leading-7 text-gray-700 mb-4">
+              Pay your way with Bitcoin or Monero through our integrated Bitcart gateway. No credit cards creating paper trails, no third-party payment processors tracking you, and definitely no custodial wallets holding your funds.
+            </p>
+            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-indigo-600">
+              <p class="text-sm text-gray-700 mb-2">
+                <strong>Your advantage:</strong> Complete financial privacy with instant activation once your payment confirms.
+              </p>
+              <p class="text-sm text-gray-600">
+                The industry standard is KYC forms and credit card requirements. We chose a different path.
+              </p>
             </div>
-            Cryptocurrency Payments
-          </dt>
-          <dd class="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
-            <p class="flex-auto">Pay with Bitcoin, Monero, or other cryptocurrencies. No credit cards, no financial trail.</p>
-          </dd>
+          </div>
         </div>
-      </dl>
+
+        <!-- Feature 4 -->
+        <div class="flex items-start gap-4">
+          <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-600 flex-shrink-0">
+            <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-lg font-semibold leading-7 text-gray-900 mb-2">Open Source & Attestation</h3>
+            <p class="text-base leading-7 text-gray-700 mb-4">
+              Every line of code is AGPLv3 — inspect it, audit it, fork it. We publish reproducible Docker images with complete SBOMs and maintain a live attestation endpoint so you can verify exactly what's running on our servers.
+            </p>
+            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-indigo-600">
+              <p class="text-sm text-gray-700 mb-2">
+                <strong>Trust through transparency:</strong> Don't just take our word — verify that everything we deploy matches the public code.
+              </p>
+              <p class="text-sm text-gray-600">
+                Most VPN companies keep their code locked away. We believe privacy deserves complete transparency.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
