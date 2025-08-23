@@ -43,9 +43,26 @@
   </script>
 <% end %>
 
+<!-- Top Navigation Bar -->
+<header class="absolute inset-x-0 top-0 z-50 transition-all duration-300">
+  <nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
+    <div class="flex lg:flex-1">
+      <%= link_to root_path, class: "-m-1.5 p-1.5" do %>
+        <span class="text-2xl font-bold text-white">VPN9</span>
+      <% end %>
+    </div>
+    
+    <div class="flex lg:flex-1 lg:justify-end">
+      <a href="https://github.com/vpn9labs" target="_blank" class="text-sm font-semibold leading-6 text-white hover:text-gray-300">
+        GitHub <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
 <!-- Hero Section - Matching live landing page style -->
 <main role="main">
-<section class="relative isolate overflow-hidden bg-gray-900 min-h-screen flex items-center" aria-label="Coming Soon">
+<section class="relative isolate overflow-hidden bg-gray-900" aria-label="Coming Soon">
   <!-- Background pattern matching live site -->
   <svg class="absolute inset-0 -z-10 h-full w-full stroke-white/10 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]" aria-hidden="true">
     <defs>
@@ -64,38 +81,28 @@
     <div class="aspect-[1108/632] w-[69.25rem] bg-gradient-to-r from-[#80caff] to-[#4f46e5] opacity-20" style="clip-path: polygon(73.6% 51.7%, 91.7% 11.8%, 100% 46.4%, 97.4% 82.2%, 92.5% 84.9%, 75.7% 64%, 55.3% 47.5%, 46.5% 49.4%, 45% 62.9%, 50.3% 87.2%, 21.3% 64.1%, 0.1% 100%, 5.4% 51.1%, 21.4% 63.9%, 58.9% 0.2%, 73.6% 51.7%)"></div>
   </div>
   
-  <!-- Content Container -->
-  <div class="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
-    <div class="mx-auto max-w-2xl text-center">
+  <div class="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40">
+    <div class="mx-auto max-w-2xl flex-shrink-0 lg:mx-0 lg:max-w-xl lg:pt-2">
       <!-- Coming Soon Badge -->
       <div class="mb-8">
         <span class="inline-flex items-center rounded-full bg-indigo-400/10 px-3 py-1 text-sm font-medium text-indigo-400 ring-1 ring-inset ring-indigo-400/30">
           <span class="mr-2 inline-block h-2 w-2 rounded-full bg-indigo-400 animate-pulse"></span>
-          Launching Soon
+          Launching Q4 2025
         </span>
       </div>
       
-      <!-- Main Headline -->
       <h1 class="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-        VPN9<br>
-        <span class="text-indigo-400">True Privacy. Zero Logs. No Compromises.</span>
+        True Privacy.<br>
+        Zero Logs.<br>
+        <span class="text-indigo-400">No Compromises.</span>
       </h1>
       
       <p class="mt-6 text-lg leading-8 text-gray-300">
-        Privacy is a fundamental human right. It protects your life, identity, and data.<br>
-        Free from surveillance and censorship. Free from business models that sell your behavior.<br>
+        Privacy is a fundamental human right. It protects your life, identity, and data.
+        Free from surveillance and censorship. Free from business models that sell your behavior.
         Free from compromise.
       </p>
       
-      <!-- Countdown Timer -->
-      <div class="mt-10 flex items-center justify-center">
-        <div class="rounded-lg bg-white/5 px-6 py-3 backdrop-blur-sm ring-1 ring-white/10">
-          <p class="text-sm font-medium text-gray-400">Expected Launch</p>
-          <p class="mt-1 text-2xl font-bold text-white" id="countdown">Q4 2025</p>
-        </div>
-      </div>
-      
-      <!-- Email Signup Form -->
       <div class="mt-10" id="signup-section">
         <h2 class="text-xl font-semibold text-white mb-4">
           Join the Waitlist
@@ -104,64 +111,61 @@
           Your IP address is the clearest marker of you online. Hide it with a VPN you can trust.
         </p>
         
-        <%= form_with url: launch_notifications_path, local: false, html: { id: 'notification-form', class: 'mx-auto max-w-md' } do |f| %>
-          <div class="flex gap-x-4">
-            <%= f.email_field :email, 
-                placeholder: "Enter your email", 
-                required: true,
-                class: "min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6" %>
-            <%= f.submit "Notify Me", 
-                class: "flex-none rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" %>
-          </div>
-          <p class="mt-4 text-xs text-gray-500">
-            We respect your privacy. No spam, ever. Unsubscribe anytime.
-          </p>
+        <%= form_with url: launch_notifications_path, local: false, html: { id: 'notification-form', class: 'flex gap-x-4 mb-4' } do |f| %>
+          <%= f.email_field :email, 
+              placeholder: "Enter your email", 
+              required: true,
+              class: "min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6" %>
+          <%= f.submit "Notify Me", 
+              class: "flex-none rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" %>
         <% end %>
         
-        <!-- Success Message (Hidden by default) -->
-        <div id="success-message" class="hidden mt-6 rounded-md bg-green-900/50 p-4 ring-1 ring-green-600/50">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-              </svg>
-            </div>
-            <div class="ml-3">
-              <p class="text-sm font-medium text-green-400">
-                You're on the list! We'll notify you as soon as we launch.
-              </p>
-            </div>
-          </div>
+        <div class="flex items-center justify-between">
+          <p class="text-xs text-gray-500">
+            We respect your privacy. No spam, ever. Unsubscribe anytime.
+          </p>
         </div>
-        
-        <!-- Error Message (Hidden by default) -->
-        <div id="error-message" class="hidden mt-6 rounded-md bg-red-900/50 p-4 ring-1 ring-red-600/50">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-              </svg>
-            </div>
-            <div class="ml-3">
-              <p class="text-sm font-medium text-red-400" id="error-text">
-                Something went wrong. Please try again.
-              </p>
-            </div>
+      </div>
+      
+      <!-- Success Message (Hidden by default) -->
+      <div id="success-message" class="hidden mt-6 rounded-md bg-green-900/50 p-4 ring-1 ring-green-600/50">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm font-medium text-green-400">
+              You're on the list! We'll notify you as soon as we launch.
+            </p>
           </div>
         </div>
       </div>
       
-      <!-- Social Proof -->
-      <div class="mt-10 flex items-center justify-center gap-x-6">
-        <div class="flex -space-x-2">
-          <div class="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 ring-2 ring-gray-900"></div>
-          <div class="h-10 w-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 ring-2 ring-gray-900"></div>
-          <div class="h-10 w-10 rounded-full bg-gradient-to-br from-pink-500 to-red-600 ring-2 ring-gray-900"></div>
-          <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 ring-2 ring-gray-900"></div>
+      <!-- Error Message (Hidden by default) -->
+      <div id="error-message" class="hidden mt-6 rounded-md bg-red-900/50 p-4 ring-1 ring-red-600/50">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm font-medium text-red-400" id="error-text">
+              Something went wrong. Please try again.
+            </p>
+          </div>
         </div>
-        <p class="text-sm text-gray-400">
-          <span class="font-semibold text-white" id="signup-count">1,247</span> people waiting for launch
-        </p>
+      </div>
+      
+      <div class="mt-8">
+        <div class="inline-flex items-center text-sm text-gray-400">
+          <svg class="mr-2 h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          <span class="font-semibold text-white" id="signup-count">1,247</span> &nbsp; people already waiting
+        </div>
       </div>
     </div>
   </div>
