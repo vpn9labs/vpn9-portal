@@ -347,7 +347,8 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is open source and available under the [GNU Affero General Public License v3.0 (AGPLv3)](LICENSE).
+By using, modifying, or deploying this software as a network service, you agree to the terms of the AGPLv3. See the LICENSE file for details.
 
 ## Support
 
