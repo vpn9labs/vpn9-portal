@@ -1,7 +1,29 @@
 # EFF's Short Wordlist for Passphrases
+#
+# Module providing a compact, human‑memorable passphrase generator based on
+# the EFF short wordlist. Intended for generating privacy‑preserving login
+# identifiers that are easy to remember and type.
+#
 # Source: https://www.eff.org/dice
-# This is a curated list of 1296 short words (4-6 letters) for generating memorable passphrases
+#
+# Usage examples
+# @example Default 7‑word passphrase
+#   EffWordlist.generate_passphrase
+#   #=> "acid-acorn-acre-acts-afar-agent-algae"
+#
+# @example Custom word count
+#   EffWordlist.generate_passphrase(5)
+#   #=> "piper-fjord-iris-brim-gable"
+#
+# Notes
+# - Uses Ruby's PRNG for sampling; not suitable for cryptographic keys.
+# - Output is a single string of `word_count` words joined by hyphens.
+#
 module EffWordlist
+  # @!constant WORDS
+  #   The EFF short wordlist used for passphrase generation.
+  #   Kept in-memory and sampled uniformly at random.
+  #   @return [Array<String>]
   WORDS = %w[
     acid acorn acre acts afar agent alarm algae alien alike alive allow aloft
     alone amend angry apart apex apple apply arena argue arise armed armor army
@@ -213,6 +235,12 @@ module EffWordlist
     zip zone zoo zoom
   ].freeze
 
+  # Generate a hyphen‑separated passphrase using the EFF wordlist.
+  #
+  # @param word_count [Integer] number of words to include (default: 7)
+  # @return [String] passphrase, e.g. "acid-acorn-acre-acts-afar-agent"
+  # @example
+  #   EffWordlist.generate_passphrase(3) #=> "mint-robot-gleam"
   def self.generate_passphrase(word_count = 7)
     words = []
     word_count.times do

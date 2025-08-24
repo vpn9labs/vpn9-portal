@@ -1,3 +1,47 @@
+#
+# Device represents a user's WireGuard client that can access the VPN.
+#
+# Responsibilities
+# - Belongs to a User and holds the device's WireGuard public key
+# - Deterministically derives unique IPv4 and IPv6 addresses (no DB columns)
+# - Maintains an access `status` reflecting the user's subscription and plan
+# - Generates human-friendly device names on create
+# - Detects extremely rare IP collisions as a safety check
+#
+# Access Control
+# Device access is modeled via the `status` enum:
+# - `active`: device is allowed by the current subscription and within plan limits
+# - `inactive`: device has no access (no subscription, expired/cancelled, or over limit)
+#
+# Status is synchronized automatically:
+# - On device create and destroy
+# - On subscription create/update/destroy (via Subscription callback)
+#
+# Deterministic Networking
+# - IPv4 addresses are in 10.0.0.0/8, skipping 10.0.0.0/24
+# - IPv6 addresses are ULA under fd00:9::/64
+# - Both addresses are derived from SHA256 of stable inputs and are not stored
+#
+# @example Get addresses for client config
+#   device.wireguard_addresses #=> "10.x.y.z/32, fd00:9:0:0:abcd:.../128"
+#
+# @!attribute [rw] name
+#   User-facing, generated as adjective-noun-#### unless supplied.
+#   @return [String]
+# @!attribute [rw] public_key
+#   WireGuard public key of the device.
+#   @return [String]
+# @!attribute [r] user_id
+#   Owning user foreign key.
+#   @return [Integer]
+# @!attribute [r] status
+#   Access state for the device (`active` or `inactive`).
+#   @return [String] enum value
+# @!attribute [r] created_at
+#   @return [ActiveSupport::TimeWithZone]
+# @!attribute [r] updated_at
+#   @return [ActiveSupport::TimeWithZone]
+#
 class Device < ApplicationRecord
   belongs_to :user
 
@@ -7,83 +51,105 @@ class Device < ApplicationRecord
 
   before_validation :generate_device_name, on: :create
 
-  # Deterministic IP assignment using SHA256 hash
-  # Uses 10.0.0.0/8 subnet (16.7 million possible IPs)
-  # Avoids 10.0.0.0/24 for network equipment
+  # Device access state
+  enum :status, { inactive: 0, active: 1 }
+
+  # Ensure device statuses match subscription and plan limits whenever
+  # devices are created or removed for a user.
+  after_create_commit :sync_user_device_statuses
+  after_destroy_commit :sync_user_device_statuses
+
+  # Recompute which devices are active for a given user based on
+  # subscription state and the plan's device_limit.
+  #
+  # Idempotent: repeated calls yield the same end state.
+  # Priority: the oldest devices (by created_at) remain active first.
+  #
+  # @param user [User]
+  # @return [void]
+  def self.sync_statuses_for_user!(user)
+    return unless user
+
+    devices = user.devices.order(:created_at)
+
+    if user.has_active_subscription?
+      allowed = user.device_limit.to_i
+      active_ids = devices.limit(allowed).pluck(:id)
+
+      # Update in two batches to minimize queries
+      user.devices.where(id: active_ids).update_all(status: statuses[:active])
+      user.devices.where.not(id: active_ids).update_all(status: statuses[:inactive])
+    else
+      # No active subscription → no device has access
+      user.devices.update_all(status: statuses[:inactive])
+    end
+  end
+
+  # Deterministic IPv4 assignment using SHA256 hash.
+  # Uses 10.0.0.0/8 and avoids 10.0.0.0/24 for network equipment.
+  #
+  # @return [String] CIDR IPv4, e.g. "10.12.34.56/32"
   def wireguard_ip
     @wireguard_ip ||= calculate_wireguard_ip
   end
 
-  # IPv6 address using ULA (Unique Local Address) fd00::/8 prefix
-  # Format: fd00:9::/64 for VPN9's network
+  # Deterministic IPv6 using ULA fd00::/8, under fd00:9::/64 for VPN9.
+  #
+  # @return [String] CIDR IPv6, e.g. "fd00:9:0:0:abcd:.../128"
   def wireguard_ipv6
     @wireguard_ipv6 ||= calculate_wireguard_ipv6
   end
 
-  # Returns both IPv4 and IPv6 addresses for dual-stack configuration
+  # Both IPv4 and IPv6 for dual-stack configuration.
+  #
+  # @return [String] "<ipv4/32>, <ipv6/128>"
   def wireguard_addresses
     "#{wireguard_ip}, #{wireguard_ipv6}"
   end
 
-  # Returns just the IPv4 without CIDR notation
+  # IPv4 without CIDR notation.
+  # @return [String]
   def ipv4_address
     wireguard_ip.split("/").first
   end
 
-  # Returns just the IPv6 without CIDR notation
+  # IPv6 without CIDR notation.
+  # @return [String]
   def ipv6_address
     wireguard_ipv6.split("/").first
   end
 
-  # Load word lists from files with caching
-  # Format: adjective-noun-number (e.g., "swift-falcon-4823")
-
+  # Wordlist accessors (delegation to Wordlist model)
+  # Kept for backward compatibility with any callers/tests referencing
+  # Device.adjectives / Device.nouns / Device.reload_word_lists!
   class << self
+    # @deprecated Use Wordlist.adjectives
     def adjectives
-      @adjectives ||= load_word_list("db/english-adjectives.txt")
+      Wordlist.adjectives
     end
 
+    # @deprecated Use Wordlist.nouns
     def nouns
-      @nouns ||= load_word_list("db/english-nouns.txt")
+      Wordlist.nouns
     end
 
+    # @deprecated Use Wordlist.reload!
     def reload_word_lists!
-      @adjectives = nil
-      @nouns = nil
-      adjectives
-      nouns
-    end
-
-    private
-
-    def load_word_list(file_path)
-      full_path = Rails.root.join(file_path)
-
-      unless File.exist?(full_path)
-        Rails.logger.warn "Word list file not found: #{file_path}"
-        return []
-      end
-
-      words = File.readlines(full_path)
-                   .map(&:strip)
-                   .reject(&:empty?)
-                   .map { |word| word.gsub("-", "") } # Remove hyphens from compound words
-
-      if words.empty?
-        Rails.logger.warn "Word list file is empty: #{file_path}"
-        return []
-      end
-
-      Rails.logger.info "Loaded #{words.length} words from #{file_path}"
-      words
-    rescue StandardError => e
-      Rails.logger.error "Error loading word list from #{file_path}: #{e.message}"
-      []
+      Wordlist.reload!
     end
   end
 
   private
 
+  # Trigger device status sync for the owning user.
+  # @return [void]
+  def sync_user_device_statuses
+    self.class.sync_statuses_for_user!(user)
+  end
+
+  # Compute stable IPv4 in 10.0.0.0/8 avoiding reserved ranges.
+  # @api private
+  # @return [String]
   def calculate_wireguard_ip
     # Use SHA256 for good distribution across the IP space
     # Include created_at to ensure consistency even if ID/public_key somehow changes
@@ -99,6 +165,9 @@ class Device < ApplicationRecord
     "10.#{second_octet}.#{third_octet}.#{fourth_octet}/32"
   end
 
+  # Compute stable IPv6 under fd00:9::/64 using salted SHA256.
+  # @api private
+  # @return [String]
   def calculate_wireguard_ipv6
     # Use SHA256 hash with IPv6 salt for different distribution
     hash_input = "#{id}-#{public_key}-#{created_at&.to_i}-ipv6"
@@ -122,6 +191,9 @@ class Device < ApplicationRecord
     "fd00:9:0:0:#{group1.to_s(16)}:#{group2.to_s(16)}:#{group3.to_s(16)}:#{group4.to_s(16)}/128"
   end
 
+  # Safety check against extremely rare IPv4/IPv6 collisions.
+  # @api private
+  # @return [void]
   def ensure_unique_ip
     return unless persisted? || public_key.present?
 
@@ -146,6 +218,10 @@ class Device < ApplicationRecord
     end
   end
 
+  # Generate a unique, human-friendly device name.
+  # Format: adjective-noun-#### with retries, then hex fallback.
+  # @api private
+  # @return [void]
   def generate_device_name
     return if name.present?
 

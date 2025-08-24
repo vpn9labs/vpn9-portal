@@ -37,6 +37,9 @@ class Subscription < ApplicationRecord
     update!(status: :cancelled, cancelled_at: Time.current)
   end
 
+  # Keep device access in sync with subscription changes
+  after_commit :sync_user_device_statuses, on: [ :create, :update, :destroy ]
+
   private
 
   def expires_at_after_started_at
@@ -45,5 +48,11 @@ class Subscription < ApplicationRecord
     if expires_at <= started_at
       errors.add(:expires_at, "must be after the start date")
     end
+  end
+
+  def sync_user_device_statuses
+    return unless user
+    # Ensure devices reflect current subscription state and device limits
+    Device.sync_statuses_for_user!(user)
   end
 end
