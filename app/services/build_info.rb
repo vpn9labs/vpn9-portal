@@ -126,8 +126,8 @@ class BuildInfo
   end
 
   # Resolve the expected image digest for the running build by querying the
-  # container registry for a set of candidate tags. Prefers the reproducible
-  # tag, then the version, then the container start tag (if not "latest").
+  # container registry for a set of candidate tags. Uses the build version
+  # tag first, then the container start tag (if not "latest").
   # Memoized.
   #
   # @return [BuildInfo::ExpectedImageDigest, nil]
@@ -153,9 +153,8 @@ class BuildInfo
       return @expected_image_digest
     end
 
-    # Prefer reproducible tag, then version tag, then the container's start tag (unless it's 'latest')
+    # Try version tag first, then the container's start tag (unless it's 'latest')
     candidate_tags = []
-    candidate_tags << "reproducible-#{tag}"
     candidate_tags << tag
     begin
       start_tag = image_tag
@@ -400,7 +399,7 @@ class BuildInfo
   #
   # @return [String, nil]
   # @example
-  #   extract_tag_from_image_reference("ghcr.io/org/app:reproducible-v1") #=> "reproducible-v1"
+  #   extract_tag_from_image_reference("ghcr.io/org/app:v1") #=> "v1"
   def image_tag
     return @image_tag if defined?(@image_tag)
 
@@ -464,7 +463,7 @@ class BuildInfo
   # @param reference [String]
   # @return [String, nil] returns nil if reference is an @sha or empty
   # @example
-  #   extract_tag_from_image_reference("ghcr.io/org/app:reproducible-v1") #=> "reproducible-v1"
+  #   extract_tag_from_image_reference("ghcr.io/org/app:v1") #=> "v1"
   #   extract_tag_from_image_reference("ghcr.io/org/app@sha256:abcd")     #=> nil
   #   extract_tag_from_image_reference("ghcr.io/org/app")                 #=> "latest"
   def extract_tag_from_image_reference(reference)
