@@ -50,6 +50,7 @@ class Device < ApplicationRecord
   validate :ensure_unique_ip, if: :public_key_changed?
 
   before_validation :generate_device_name, on: :create
+  before_save :reset_address_cache, if: :will_save_change_to_public_key?
 
   # Device access state
   enum :status, { inactive: 0, active: 1 }
@@ -57,7 +58,9 @@ class Device < ApplicationRecord
   # Ensure device statuses match subscription and plan limits whenever
   # devices are created or removed for a user.
   after_create_commit :sync_user_device_statuses
-  after_destroy_commit :sync_user_device_statuses
+  after_create_commit :update_device_registry_record
+  after_update_commit :update_device_registry_record
+  after_destroy_commit :remove_from_registry_and_sync
 
   # Recompute which devices are active for a given user based on
   # subscription state and the plan's device_limit.
@@ -71,6 +74,7 @@ class Device < ApplicationRecord
     return unless user
 
     devices = user.devices.order(:created_at)
+    previous_active_ids = user.devices.where(status: :active).pluck(:id)
 
     if user.has_active_subscription?
       allowed = user.device_limit.to_i
@@ -79,9 +83,18 @@ class Device < ApplicationRecord
       # Update in two batches to minimize queries
       user.devices.where(id: active_ids).update_all(status: statuses[:active])
       user.devices.where.not(id: active_ids).update_all(status: statuses[:inactive])
+
+      # Update Redis registry
+      ids_to_activate = active_ids - previous_active_ids
+      ids_to_deactivate = previous_active_ids - active_ids
+      DeviceRegistry.add_active_devices(user.id, ids_to_activate)
+      DeviceRegistry.remove_active_devices(user.id, ids_to_deactivate)
     else
       # No active subscription → no device has access
       user.devices.update_all(status: statuses[:inactive])
+
+      # Remove any previously active devices from registry
+      DeviceRegistry.remove_active_devices(user.id, previous_active_ids)
     end
   end
 
@@ -145,6 +158,23 @@ class Device < ApplicationRecord
   # @return [void]
   def sync_user_device_statuses
     self.class.sync_statuses_for_user!(user)
+  end
+
+  # After destroy: ensure device id is removed from Redis registry then resync the rest
+  def remove_from_registry_and_sync
+    DeviceRegistry.remove_device_everywhere(id, user_id)
+    DeviceRegistry.delete_device(id)
+    self.class.sync_statuses_for_user!(user)
+  end
+
+  # Ensure per-device record is up to date in Redis after updates
+  def update_device_registry_record
+    DeviceRegistry.upsert_device(self)
+  end
+
+  def reset_address_cache
+    @wireguard_ip = nil
+    @wireguard_ipv6 = nil
   end
 
   # Compute stable IPv4 in 10.0.0.0/8 avoiding reserved ranges.

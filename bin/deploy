@@ -44,10 +44,10 @@ RESPONSE=$(curl -s https://vpn9.com/api/v1/attestation 2>/dev/null || echo "{}")
 if [ -n "$RESPONSE" ] && [ "$RESPONSE" != "{}" ]; then
   DEPLOYED_VERSION=$(echo "$RESPONSE" | jq -r '.deployment.build_version' 2>/dev/null || echo "unknown")
   DEPLOYED_COMMIT=$(echo "$RESPONSE" | jq -r '.deployment.build_commit' 2>/dev/null || echo "unknown")
-  
+
   echo "Deployed version: ${DEPLOYED_VERSION}"
   echo "Deployed commit: ${DEPLOYED_COMMIT:0:8}"
-  
+
   if [ "$DEPLOYED_VERSION" = "$BUILD_VERSION" ]; then
     echo ""
     echo "✅ Success! Build metadata verified."
@@ -61,3 +61,4 @@ fi
 
 echo ""
 echo "View at: https://vpn9.com/verify"
+
