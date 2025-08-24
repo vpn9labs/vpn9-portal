@@ -56,22 +56,25 @@ class SubscriptionExpirationTest < ActiveSupport::TestCase
     d1 = user.devices.create!(public_key: "exp1")
     d2 = user.devices.create!(public_key: "exp2")
 
-    # Active subscription that already expired by time
+    # Start with an active, non-expired subscription to activate devices
     sub = Subscription.create!(
       user: user,
       plan: plan,
       status: :active,
       started_at: 40.days.ago,
-      expires_at: 1.hour.ago
+      expires_at: 1.hour.from_now
     )
 
     # Pre-upsert device hashes (simulating create hook) and simulate activation then expiration sweep
     DeviceRegistry.upsert_device(d1)
     DeviceRegistry.upsert_device(d2)
 
-    # Before sweep, devices might be considered active if we sync
+    # Before sweep, activate devices based on current (non-expired) subscription
     Device.sync_statuses_for_user!(user)
     assert @store.set("vpn9:user:#{user.id}:devices:active").members.any?, "Expected active set to be non-empty before sweep"
+
+    # Simulate time passing by expiring the subscription without triggering callbacks
+    sub.update!(expires_at: 1.hour.ago)
 
     # Now sweep expirations
     Subscription.sync_expirations!
