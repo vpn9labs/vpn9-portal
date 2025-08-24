@@ -139,9 +139,9 @@ jobs:
             echo;
             echo "### Verification";
             echo "To verify this build is reproducible:";
-            echo '\n```bash';
-            echo "./scripts/verify-build.sh ${VERSION} --rebuild";
-            echo '```\n';
+            printf '\n```bash\n';
+            printf './scripts/verify-build.sh %s --rebuild\n' "${VERSION}";
+            printf '```\n\n';
             echo "### Build Parameters";
             echo "- Version: \`${VERSION}\`";
             echo "- Commit: \`${COMMIT}\`";
