@@ -90,7 +90,7 @@ class DeviceRegistryTest < ActiveSupport::TestCase
     user_set = @store.set("vpn9:user:#{user.id}:devices:active").members
     global_set = @store.set("vpn9:devices:active").members
     assert_equal 2, user_set.size
-    assert_equal user_set.sort, global_set.select { |id| [d1.id, d2.id, d3.id].map(&:to_s).include?(id) }.sort
+    assert_equal user_set.sort, global_set.select { |id| [ d1.id, d2.id, d3.id ].map(&:to_s).include?(id) }.sort
   end
 
   test "cancelling subscription removes devices from sets" do

@@ -1,0 +1,12 @@
+#
+# Cron jobs for vpn9-portal (loaded via deploy.yml)
+# The deploy process runs: (env && cat config/crontab) | crontab - && cron -f
+# So environment variables from the container are injected before these entries.
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/rails/bin
+
+# Run the subscription expiration sweeper each hour on the hour.
+# Ensures expired subscriptions are marked and user devices are deactivated.
+0 * * * * cd /rails && RAILS_ENV=${RAILS_ENV:-production} bin/rails subscriptions:expire >> log/cron.log 2>&1
+

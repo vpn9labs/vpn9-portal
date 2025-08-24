@@ -6,4 +6,3 @@ namespace :device_registry do
     puts "Device registry rebuild complete."
   end
 end
-
