@@ -56,6 +56,15 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Install system packages
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config unzip libpq-dev
@@ -87,7 +96,7 @@ jobs:
       - name: Run tests
         env:
           RAILS_ENV: test
-          # REDIS_URL: redis://localhost:6379/0
+          KREDIS_URL: redis://127.0.0.1:6379/2
           VPN9_POSTGRES_HOST: 127.0.0.1
           VPN9_POSTGRES_USERNAME: vpn9
           VPN9_POSTGRES_PASSWORD: vpn9
