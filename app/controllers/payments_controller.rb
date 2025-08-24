@@ -1,7 +1,4 @@
 class PaymentsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: :webhook
-  allow_unauthenticated_access only: :webhook
-
   before_action :set_plan, only: [ :new, :create ]
 
   def new
@@ -75,38 +72,7 @@ class PaymentsController < ApplicationController
     end
   end
 
-  def webhook
-    # Verify webhook authenticity if needed
-    # Payment processors send payment status updates here
-
-    payment_id = params[:external_id] || params[:order_id]
-    payment = Payment.find_by(id: payment_id)
-
-    # If payment does not exist, return 404
-    unless payment
-      Rails.logger.warn "Webhook received for unknown payment: #{payment_id}"
-      head :not_found
-      return
-    end
-
-    # Verify webhook authenticity when a secret is set
-    if payment.webhook_secret.present?
-      unless ActiveSupport::SecurityUtils.secure_compare(
-        params[:secret].to_s,
-        payment.webhook_secret.to_s
-      )
-        head :unauthorized
-        return
-      end
-    end
-
-    # Update payment status
-    payment.update_from_webhook!(params, request.remote_ip)
-    head :ok
-  rescue => e
-    Rails.logger.error "Webhook processing failed: #{e.message}"
-    head :internal_server_error
-  end
+  # Webhook moved to Payments::BitcartWebhookController (API variant)
 
   private
 

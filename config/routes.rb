@@ -141,7 +141,8 @@ Rails.application.routes.draw do
 
   resources :payments, only: [ :show ] do
     collection do
-      post :webhook
+      # Preserve helper webhook_payments_path while routing to API controller
+      post :webhook, to: "payments/bitcart_webhook#create"
     end
   end
 

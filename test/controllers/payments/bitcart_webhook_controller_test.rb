@@ -1,11 +1,8 @@
 require "test_helper"
 
-class PaymentsControllerWebhookTest < ActionDispatch::IntegrationTest
-  include ActiveJob::TestHelper
-
+class Payments::BitcartWebhookControllerTest < ActionDispatch::IntegrationTest
   def setup
     @user = User.create!(email_address: "test@example.com", password: "password")
-    @passphrase = @user.instance_variable_get(:@issued_passphrase)
     @plan = Plan.create!(
       name: "Test Plan",
       price: 9.99,
@@ -13,16 +10,9 @@ class PaymentsControllerWebhookTest < ActionDispatch::IntegrationTest
       duration_days: 30,
       active: true
     )
-
-    # Login the user with passphrase
-    sign_in_user
   end
 
-  def sign_in_user
-    post session_path, params: { passphrase: "#{@passphrase}:password" }
-  end
-
-  test "webhook should process payment update" do
+  test "processes payment update without secret" do
     payment = Payment.create!(
       user: @user,
       plan: @plan,
@@ -39,21 +29,20 @@ class PaymentsControllerWebhookTest < ActionDispatch::IntegrationTest
       transaction_id: "abc123"
     }
 
-    # No secret set should still work (legacy behavior)
     post webhook_payments_path, params: webhook_params
+    assert_response :success
 
     payment.reload
     assert_equal "paid", payment.status
     assert_equal "abc123", payment.transaction_id
-    assert_response :success
   end
 
-  test "webhook should ignore invalid payment id" do
+  test "returns 404 for invalid payment id" do
     post webhook_payments_path, params: { external_id: "invalid" }
     assert_response :not_found
   end
 
-  test "webhook should reject when secret mismatches" do
+  test "rejects when secret mismatches" do
     payment = Payment.create!(
       user: @user,
       plan: @plan,
@@ -72,11 +61,10 @@ class PaymentsControllerWebhookTest < ActionDispatch::IntegrationTest
     }
 
     assert_response :unauthorized
-    payment.reload
-    assert_equal "pending", payment.status
+    assert_equal "pending", payment.reload.status
   end
 
-  test "webhook should accept when secret matches" do
+  test "accepts when secret matches" do
     payment = Payment.create!(
       user: @user,
       plan: @plan,
@@ -101,7 +89,7 @@ class PaymentsControllerWebhookTest < ActionDispatch::IntegrationTest
     assert_equal "zxy987", payment.transaction_id
   end
 
-  test "successful payment should create subscription" do
+  test "successful payment creates subscription" do
     payment = Payment.create!(
       user: @user,
       plan: @plan,
