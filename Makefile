@@ -79,8 +79,7 @@ verify: $(SCRIPTS_DIR)/verify-build.sh
 push:
 	@echo "Pushing image $(IMAGE_NAME):$(BUILD_VERSION) to registry..."
 	@docker push $(IMAGE_NAME):$(BUILD_VERSION)
-	@docker push $(IMAGE_NAME):reproducible-$(BUILD_VERSION)
-	@echo "Images pushed successfully"
+	@echo "Image pushed successfully"
 
 # Build, verify, and push
 publish: build

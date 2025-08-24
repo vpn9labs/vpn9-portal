@@ -96,7 +96,6 @@ jobs:
           push: false
           tags: |
             vpn9-portal:${{ steps.vars.outputs.version }}
-            vpn9-portal:reproducible-${{ steps.vars.outputs.version }}
           build-args: |
             SOURCE_DATE_EPOCH=${{ steps.vars.outputs.source_date_epoch }}
             BUILD_VERSION=${{ steps.vars.outputs.version }}
@@ -114,9 +113,8 @@ jobs:
       - name: Load Docker image for SBOM generation
         run: |
           docker load < /tmp/vpn9-portal-${{ steps.vars.outputs.version }}.tar
-          # Retag images with full registry path
+          # Retag image with full registry path
           docker tag vpn9-portal:${{ steps.vars.outputs.version }} ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}
-          docker tag vpn9-portal:reproducible-${{ steps.vars.outputs.version }} ${{ steps.vars.outputs.image_name }}:reproducible-${{ steps.vars.outputs.version }}
 
       # Install cosign for keyless signing and later image signing
       - name: Install cosign (for signing)
@@ -128,42 +126,37 @@ jobs:
         run: |
           set -euo pipefail
           
-          # Sign both the main and reproducible images
-          for variant in "${{ steps.vars.outputs.version }}" "reproducible-${{ steps.vars.outputs.version }}"; do
-            IMAGE="${{ steps.vars.outputs.image_name }}:${variant}"
-            echo "Signing image: $IMAGE"
-            
-            # Extract original CMD before creating container
-            ORIGINAL_CMD=$(docker inspect "$IMAGE" --format='{{json .Config.Cmd}}')
-            ORIGINAL_ENTRYPOINT=$(docker inspect "$IMAGE" --format='{{json .Config.Entrypoint}}')
-            
-            CID=$(docker create "$IMAGE" /bin/true)
-            trap 'docker rm -f "$CID" >/dev/null 2>&1 || true' EXIT
-            docker cp "$CID":/usr/share/vpn9/build-info.json ./build-info.json
+          IMAGE="${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}"
+          echo "Signing image: $IMAGE"
+          
+          # Extract original CMD before creating container
+          ORIGINAL_CMD=$(docker inspect "$IMAGE" --format='{{json .Config.Cmd}}')
+          ORIGINAL_ENTRYPOINT=$(docker inspect "$IMAGE" --format='{{json .Config.Entrypoint}}')
+          
+          CID=$(docker create "$IMAGE" /bin/true)
+          trap 'docker rm -f "$CID" >/dev/null 2>&1 || true' EXIT
+          docker cp "$CID":/usr/share/vpn9/build-info.json ./build-info.json
 
-            # Sign with Sigstore keyless; emits signature and certificate (only once)
-            if [ ! -f build-info.sig ]; then
-              cosign sign-blob --yes \
-                --output-signature build-info.sig \
-                --output-certificate build-info.pem \
-                build-info.json
-              # Ensure files are world-readable for non-root runtime user inside image
-              chmod 0444 build-info.sig build-info.pem
-            fi
+          # Sign with Sigstore keyless
+          cosign sign-blob --yes \
+            --output-signature build-info.sig \
+            --output-certificate build-info.pem \
+            build-info.json
+          # Ensure files are world-readable for non-root runtime user inside image
+          chmod 0444 build-info.sig build-info.pem
 
-            # Copy signature, certificate, and cosign verifier into image, then commit with original CMD
-            docker cp build-info.sig "$CID":/usr/share/vpn9/build-info.sig
-            docker cp build-info.pem "$CID":/usr/share/vpn9/build-info.pem
-            docker cp "$(command -v cosign)" "$CID":/usr/local/bin/cosign
-            
-            # Commit while preserving original CMD and ENTRYPOINT
-            docker commit \
-              --change "CMD $ORIGINAL_CMD" \
-              --change "ENTRYPOINT $ORIGINAL_ENTRYPOINT" \
-              "$CID" "$IMAGE" >/dev/null
-            docker rm -f "$CID" >/dev/null
-            trap - EXIT
-          done
+          # Copy signature, certificate, and cosign verifier into image, then commit with original CMD
+          docker cp build-info.sig "$CID":/usr/share/vpn9/build-info.sig
+          docker cp build-info.pem "$CID":/usr/share/vpn9/build-info.pem
+          docker cp "$(command -v cosign)" "$CID":/usr/local/bin/cosign
+          
+          # Commit while preserving original CMD and ENTRYPOINT
+          docker commit \
+            --change "CMD $ORIGINAL_CMD" \
+            --change "ENTRYPOINT $ORIGINAL_ENTRYPOINT" \
+            "$CID" "$IMAGE" >/dev/null
+          docker rm -f "$CID" >/dev/null
+          trap - EXIT
       
       - name: Generate SBOM
         uses: anchore/sbom-action@v0
@@ -198,14 +191,12 @@ jobs:
           # Check if image exists, if not load and retag it
           if ! docker image inspect ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }} >/dev/null 2>&1; then
             docker load < /tmp/vpn9-portal-${{ steps.vars.outputs.version }}.tar
-            # Retag images with full registry path
+            # Retag image with full registry path
             docker tag vpn9-portal:${{ steps.vars.outputs.version }} ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}
-            docker tag vpn9-portal:reproducible-${{ steps.vars.outputs.version }} ${{ steps.vars.outputs.image_name }}:reproducible-${{ steps.vars.outputs.version }}
           fi
           
           # Push to GitHub Container Registry
           docker push ${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}
-          docker push ${{ steps.vars.outputs.image_name }}:reproducible-${{ steps.vars.outputs.version }}
           
           # Sign with cosign if available
           if command -v cosign >/dev/null 2>&1; then
@@ -261,10 +252,9 @@ jobs:
             
             This release was built using our reproducible build process.
             
-            ### Container Images
+            ### Container Image
             Available on GitHub Container Registry:
             - `${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}`
-            - `${{ steps.vars.outputs.image_name }}:reproducible-${{ steps.vars.outputs.version }}`
             
             ### Verification
             

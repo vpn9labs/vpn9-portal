@@ -248,7 +248,6 @@ main() {
     --build-arg BUILD_COMMIT="${BUILD_COMMIT}" \
     --build-arg BUILD_TIMESTAMP="${BUILD_TIMESTAMP}" \
     --tag "${IMAGE_NAME}:${IMAGE_TAG}" \
-    --tag "${IMAGE_NAME}:reproducible-${BUILD_VERSION}" \
     --file "${DOCKERFILE}" \
     --load \
     --progress=plain \
@@ -322,7 +321,6 @@ EOF
   echo ""
   echo "To push to registry:"
   echo "  docker push ${IMAGE_NAME}:${IMAGE_TAG}"
-  echo "  docker push ${IMAGE_NAME}:reproducible-${BUILD_VERSION}"
 }
 
 # Run main function
