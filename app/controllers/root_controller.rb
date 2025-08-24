@@ -11,6 +11,8 @@ class RootController < ApplicationController
     if authenticated?
       render :dashboard
     else
+      # Counts for teaser/live landing pages
+      @launch_notifications_count = LaunchNotification.count
       # Check for special landing page versions
       if params[:live].present? || params[:full].present?
         # Show the full/live landing page when explicitly requested
