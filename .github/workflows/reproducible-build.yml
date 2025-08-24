@@ -85,6 +85,35 @@ jobs:
           echo "image_name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
           echo "Repository: ${{ github.repository }}"
           echo "Image name: ${IMAGE_NAME}"
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.vars.outputs.version }}"
+          SDE="${{ steps.vars.outputs.source_date_epoch }}"
+          # Determine previous tag by creation date (second most recent tag)
+          PREV_TAG=$(git tag --sort=-creatordate | sed -n 2p || true)
+
+          HEADER="## ${VERSION} - $(date -u -d "@${SDE}" +%Y-%m-%d)"
+          echo "${HEADER}" > CHANGELOG-${VERSION}.md
+          echo "" >> CHANGELOG-${VERSION}.md
+          if [ -n "${PREV_TAG}" ]; then
+            echo "Changes since ${PREV_TAG}:" >> CHANGELOG-${VERSION}.md
+            RANGE="${PREV_TAG}..${VERSION}"
+          else
+            echo "Initial release changes:" >> CHANGELOG-${VERSION}.md
+            RANGE=""
+          fi
+          echo "" >> CHANGELOG-${VERSION}.md
+
+          if [ -n "${RANGE}" ]; then
+            git log --no-merges --pretty=format:'- %h %s (%an)' ${RANGE} >> CHANGELOG-${VERSION}.md
+          else
+            # Fallback: list recent commits if no previous tag
+            git log --no-merges --pretty=format:'- %h %s (%an)' -n 200 >> CHANGELOG-${VERSION}.md
+          fi
+          echo "changelog=CHANGELOG-${VERSION}.md" >> $GITHUB_OUTPUT
       
       - name: Build Docker image
         id: build
@@ -238,15 +267,18 @@ jobs:
             checksums-*.sha256
             checksums-*.sha512
             sbom-*.spdx
+            CHANGELOG-${{ steps.vars.outputs.version }}.md
       
       - name: Create release (for tags)
         if: github.event_name == 'push' && github.ref_type == 'tag'
         uses: softprops/action-gh-release@v2
         with:
+          body_path: ${{ steps.changelog.outputs.changelog }}
           files: |
             checksums-*.sha256
             checksums-*.sha512
             sbom-*.spdx
+            ${{ steps.changelog.outputs.changelog }}
           body: |
             ## Reproducible Build Release
             
