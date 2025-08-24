@@ -114,6 +114,51 @@ jobs:
             git log --no-merges --pretty=format:'- %h %s (%an)' -n 200 >> CHANGELOG-${VERSION}.md
           fi
           echo "changelog=CHANGELOG-${VERSION}.md" >> $GITHUB_OUTPUT
+
+      - name: Compose release notes
+        id: release_notes
+        if: github.event_name == 'push' && github.ref_type == 'tag'
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.vars.outputs.version }}"
+          IMAGE_NAME="${{ steps.vars.outputs.image_name }}"
+          COMMIT="${{ steps.vars.outputs.commit }}"
+          SDE="${{ steps.vars.outputs.source_date_epoch }}"
+          TS="${{ steps.vars.outputs.build_timestamp }}"
+          CHANGELOG_FILE="${{ steps.changelog.outputs.changelog }}"
+
+          BODY_FILE="RELEASE-${VERSION}.md"
+          {
+            echo "## Reproducible Build Release";
+            echo;
+            echo "This release was built using our reproducible build process.";
+            echo;
+            echo "### Container Image";
+            echo "Available on GitHub Container Registry:";
+            echo "- \`${IMAGE_NAME}:${VERSION}\`";
+            echo;
+            echo "### Verification";
+            echo "To verify this build is reproducible:";
+            echo '\n```bash';
+            echo "./scripts/verify-build.sh ${VERSION} --rebuild";
+            echo '```\n';
+            echo "### Build Parameters";
+            echo "- Version: \`${VERSION}\`";
+            echo "- Commit: \`${COMMIT}\`";
+            echo "- Source Date Epoch: \`${SDE}\`";
+            echo "- Timestamp: \`${TS}\`";
+            echo;
+            echo "### Artifacts";
+            echo "- \`checksums-*.sha256\` - SHA256 checksums of build artifacts";
+            echo "- \`checksums-*.sha512\` - SHA512 checksums of build artifacts";
+            echo "- \`sbom-*.spdx\` - Software Bill of Materials";
+            echo;
+            echo "### Changelog";
+            echo;
+            cat "${CHANGELOG_FILE}";
+          } > "${BODY_FILE}"
+
+          echo "body_path=${BODY_FILE}" >> $GITHUB_OUTPUT
       
       - name: Build Docker image
         id: build
@@ -273,38 +318,12 @@ jobs:
         if: github.event_name == 'push' && github.ref_type == 'tag'
         uses: softprops/action-gh-release@v2
         with:
-          body_path: ${{ steps.changelog.outputs.changelog }}
+          body_path: ${{ steps.release_notes.outputs.body_path }}
           files: |
             checksums-*.sha256
             checksums-*.sha512
             sbom-*.spdx
             ${{ steps.changelog.outputs.changelog }}
-          body: |
-            ## Reproducible Build Release
-            
-            This release was built using our reproducible build process.
-            
-            ### Container Image
-            Available on GitHub Container Registry:
-            - `${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.version }}`
-            
-            ### Verification
-            
-            To verify this build is reproducible:
-            ```bash
-            ./scripts/verify-build.sh ${{ steps.vars.outputs.version }} --rebuild
-            ```
-            
-            ### Build Parameters
-            - Version: `${{ steps.vars.outputs.version }}`
-            - Commit: `${{ steps.vars.outputs.commit }}`
-            - Source Date Epoch: `${{ steps.vars.outputs.source_date_epoch }}`
-            - Timestamp: `${{ steps.vars.outputs.build_timestamp }}`
-            
-            ### Artifacts
-            - `checksums-*.sha256` - SHA256 checksums of build artifacts
-            - `checksums-*.sha512` - SHA512 checksums of build artifacts
-            - `sbom-*.spdx` - Software Bill of Materials
   
   verify:
     name: Verify Reproducibility
