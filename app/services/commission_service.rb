@@ -78,9 +78,9 @@ class CommissionService
 
       Rails.logger.info "Commission created: $#{commission_amount} for affiliate #{affiliate.code} from payment #{payment.id}"
 
-      # Auto-approve small commissions (configurable threshold)
-      auto_approve_threshold = Rails.application.config.auto_approve_commission_threshold || 50.0
-      if commission_amount <= auto_approve_threshold
+      # Auto-approve small commissions when explicitly configured
+      auto_approve_threshold = Rails.application.config.auto_approve_commission_threshold
+      if auto_approve_threshold && commission_amount <= auto_approve_threshold
         commission.approve!("Auto-approved: Under $#{auto_approve_threshold} threshold")
       end
 
