@@ -20,14 +20,6 @@
   <meta name="twitter:description" content="Be the first to experience true privacy. Sign up for early access.">
 <% end %>
 
-<% 
-  # Always use VPN9 as the brand name for consistency
-  brand_name = "VPN9"
-  
-  # Domain for metadata/technical purposes
-  current_host = request.host_with_port.sub(/:\d+$/, '')
-  display_domain = Rails.env.production? ? "VPN9.com" : current_host
-%>
 
 <!-- Schema.org Structured Data -->
 <% content_for :head do %>
@@ -35,8 +27,8 @@
   {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "<%= brand_name %>",
-    "url": "https://<%= display_domain %>",
+    "name": "VPN9",
+    "url": "https://VPN9.com",
     "description": "Revolutionary privacy-focused VPN service launching soon. Be the first to experience true anonymity.",
     "sameAs": ["https://github.com/vpn9labs"]
   }
