@@ -3,7 +3,7 @@
     <h1 class="text-3xl font-bold text-gray-900">Referrals</h1>
   </div>
 
-  <!-- Statistics Cards -->
+  <%# Statistics Cards %>
   <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
     <div class="bg-white overflow-hidden shadow rounded-lg">
       <div class="p-5">
@@ -78,7 +78,7 @@
     </div>
   </div>
 
-  <!-- Referrals Table -->
+  <%# Referrals Table %>
   <div class="bg-white shadow overflow-hidden sm:rounded-md">
     <div class="bg-white px-4 py-5 border-b border-gray-200 sm:px-6">
       <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -144,7 +144,7 @@
         </table>
       </div>
       
-      <!-- Pagination -->
+      <%# Pagination %>
       <% if @referrals.respond_to?(:total_pages) %>
         <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
           <%= paginate @referrals %>

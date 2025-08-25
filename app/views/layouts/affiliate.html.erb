@@ -11,7 +11,7 @@
   </head>
 
   <body class="bg-gray-50">
-    <!-- Navigation -->
+    <%# Navigation %>
     <nav class="bg-white shadow">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -42,14 +42,14 @@
           
           <div class="hidden sm:ml-6 sm:flex sm:items-center">
             <% if @current_affiliate %>
-              <!-- Affiliate info and actions -->
+              <%# Affiliate info and actions %>
               <div class="flex items-center space-x-4">
                 <div class="text-sm text-gray-700">
                   <div class="font-medium"><%= @current_affiliate.name || @current_affiliate.email %></div>
                   <div class="text-xs text-gray-500">Code: <%= @current_affiliate.code %></div>
                 </div>
                 
-                <!-- Status badge -->
+                <%# Status badge %>
                 <% if @current_affiliate.pending? %>
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                     Pending
@@ -64,7 +64,7 @@
                   </span>
                 <% end %>
                 
-                <!-- Dropdown menu -->
+                <%# Dropdown menu %>
                 <div class="ml-3 relative">
                   <div>
                     <button type="button" class="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
@@ -89,7 +89,7 @@
             <% end %>
           </div>
           
-          <!-- Mobile menu button -->
+          <%# Mobile menu button %>
           <div class="-mr-2 flex items-center sm:hidden">
             <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" aria-controls="mobile-menu" aria-expanded="false">
               <span class="sr-only">Open main menu</span>
@@ -104,7 +104,7 @@
         </div>
       </div>
 
-      <!-- Mobile menu -->
+      <%# Mobile menu %>
       <div class="sm:hidden hidden" id="mobile-menu">
         <div class="pt-2 pb-3 space-y-1">
           <%= link_to "Dashboard", affiliates_dashboard_path, class: "#{request.path == affiliates_dashboard_path ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'} block pl-3 pr-4 py-2 border-l-4 text-base font-medium" %>
@@ -135,7 +135,7 @@
       </div>
     </nav>
 
-    <!-- Flash messages -->
+    <%# Flash messages %>
     <% if notice.present? || alert.present? %>
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
         <% if notice.present? %>
@@ -170,12 +170,12 @@
       </div>
     <% end %>
 
-    <!-- Main content -->
+    <%# Main content %>
     <main>
       <%= yield %>
     </main>
 
-    <!-- Footer -->
+    <%# Footer %>
     <footer class="bg-white mt-auto">
       <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center">

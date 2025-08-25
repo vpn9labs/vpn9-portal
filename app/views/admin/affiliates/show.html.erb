@@ -17,7 +17,7 @@
     </div>
   </div>
 
-  <!-- Fraud Indicators -->
+  <%# Fraud Indicators %>
   <% if @fraud_indicators.any? %>
     <div class="mt-6 bg-yellow-50 border-l-4 border-yellow-400 p-4">
       <div class="flex">
@@ -37,7 +37,7 @@
     </div>
   <% end %>
 
-  <!-- Performance Metrics -->
+  <%# Performance Metrics %>
   <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
     <div class="bg-white px-4 py-5 shadow rounded-lg">
       <dt class="text-sm font-medium text-gray-500">Total Clicks</dt>
@@ -71,9 +71,9 @@
     </div>
   </div>
 
-  <!-- Details Sections -->
+  <%# Details Sections %>
   <div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
-    <!-- Affiliate Details -->
+    <%# Affiliate Details %>
     <div class="bg-white shadow rounded-lg">
       <div class="px-4 py-5 sm:p-6">
         <h3 class="text-lg font-medium text-gray-900 mb-4">Affiliate Details</h3>
@@ -126,12 +126,12 @@
       </div>
     </div>
 
-    <!-- Recent Activity -->
+    <%# Recent Activity %>
     <div class="bg-white shadow rounded-lg">
       <div class="px-4 py-5 sm:p-6">
         <h3 class="text-lg font-medium text-gray-900 mb-4">Recent Activity</h3>
         
-        <!-- Recent Clicks -->
+        <%# Recent Clicks %>
         <div class="mb-6">
           <h4 class="text-sm font-medium text-gray-700 mb-2">Recent Clicks</h4>
           <div class="space-y-2">
@@ -147,7 +147,7 @@
           </div>
         </div>
         
-        <!-- Recent Referrals -->
+        <%# Recent Referrals %>
         <div class="mb-6">
           <h4 class="text-sm font-medium text-gray-700 mb-2">Recent Referrals</h4>
           <div class="space-y-2">
@@ -169,7 +169,7 @@
     </div>
   </div>
 
-  <!-- Commissions Table -->
+  <%# Commissions Table %>
   <div class="mt-8">
     <h3 class="text-lg font-medium text-gray-900 mb-4">Recent Commissions</h3>
     <div class="bg-white shadow overflow-hidden sm:rounded-lg">
@@ -222,7 +222,7 @@
     </div>
   </div>
 
-  <!-- Action Buttons -->
+  <%# Action Buttons %>
   <div class="mt-8 flex justify-between">
     <%= link_to "← Back to Affiliates", admin_affiliates_path, class: "text-sm text-gray-600 hover:text-gray-900" %>
     <div class="space-x-3">

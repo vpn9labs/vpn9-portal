@@ -12,7 +12,7 @@
     </div>
   </div>
 
-  <!-- Filters -->
+  <%# Filters %>
   <div class="mt-6 bg-white shadow rounded-lg p-4">
     <%= form_with url: admin_launch_notifications_path, method: :get, local: true, class: "space-y-4 sm:flex sm:space-y-0 sm:space-x-4" do |f| %>
       <div class="flex-1">
@@ -31,7 +31,7 @@
     <% end %>
   </div>
 
-  <!-- Table -->
+  <%# Table %>
   <div class="mt-8 flex flex-col">
     <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
       <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
@@ -96,7 +96,7 @@
     </div>
   </div>
 
-  <!-- Pagination -->
+  <%# Pagination %>
   <% if @launch_notifications.respond_to?(:total_pages) && @launch_notifications.total_pages > 1 %>
     <div class="mt-6">
       <%= paginate @launch_notifications %>

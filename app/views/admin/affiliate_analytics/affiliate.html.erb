@@ -1,5 +1,5 @@
 <div class="space-y-6">
-  <!-- Page Header -->
+  <%# Page Header %>
   <div class="flex justify-between items-center">
     <div>
       <h1 class="text-3xl font-bold text-gray-900">
@@ -20,7 +20,7 @@
     </div>
   </div>
 
-  <!-- Performance Stats -->
+  <%# Performance Stats %>
   <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
     <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
       <dt class="truncate text-sm font-medium text-gray-500">Total Clicks</dt>
@@ -67,7 +67,7 @@
     </div>
   </div>
 
-  <!-- Fraud Analysis Alert -->
+  <%# Fraud Analysis Alert %>
   <% if @fraud_analysis[:flagged] %>
     <div class="rounded-md bg-red-50 p-4">
       <div class="flex">
@@ -93,7 +93,7 @@
     </div>
   <% end %>
 
-  <!-- Performance Chart -->
+  <%# Performance Chart %>
   <div class="overflow-hidden rounded-lg bg-white shadow">
     <div class="px-4 py-5 sm:p-6">
       <h3 class="text-lg font-medium leading-6 text-gray-900">Daily Performance</h3>
@@ -103,9 +103,9 @@
     </div>
   </div>
 
-  <!-- Tables Row -->
+  <%# Tables Row %>
   <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
-    <!-- Top Landing Pages -->
+    <%# Top Landing Pages %>
     <div class="overflow-hidden rounded-lg bg-white shadow">
       <div class="px-4 py-5 sm:p-6">
         <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Top Landing Pages</h3>
@@ -139,7 +139,7 @@
       </div>
     </div>
 
-    <!-- Recent Referrals -->
+    <%# Recent Referrals %>
     <div class="overflow-hidden rounded-lg bg-white shadow">
       <div class="px-4 py-5 sm:p-6">
         <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Recent Referrals</h3>
@@ -169,7 +169,7 @@
     </div>
   </div>
 
-  <!-- Commission Details -->
+  <%# Commission Details %>
   <div class="overflow-hidden rounded-lg bg-white shadow">
     <div class="px-4 py-5 sm:p-6">
       <div class="flex justify-between items-center mb-4">

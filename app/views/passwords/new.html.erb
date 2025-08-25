@@ -33,7 +33,7 @@
         </div>
       <% end %>
 
-      <!-- Recovery Method Tabs -->
+      <%# Recovery Method Tabs %>
       <div class="mb-6">
         <nav class="flex space-x-4" aria-label="Recovery methods">
           <button type="button" onclick="showRecoveryMethod('email')" id="email-tab" class="recovery-tab active rounded-md px-3 py-2 text-sm font-medium text-white bg-indigo-600">
@@ -45,7 +45,7 @@
         </nav>
       </div>
 
-      <!-- Email Recovery Form -->
+      <%# Email Recovery Form %>
       <div id="email-recovery" class="recovery-form">
         <%= form_with url: passwords_path, class: "space-y-6" do |form| %>
           <div>
@@ -66,7 +66,7 @@
         <% end %>
       </div>
 
-      <!-- Recovery Code Form -->
+      <%# Recovery Code Form %>
       <div id="code-recovery" class="recovery-form hidden">
         <%= form_with url: passwords_path, class: "space-y-6" do |form| %>
           <div>

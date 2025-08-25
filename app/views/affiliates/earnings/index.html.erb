@@ -17,7 +17,7 @@
     </div>
   </div>
 
-  <!-- Earnings Summary -->
+  <%# Earnings Summary %>
   <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-6">
     <div class="bg-white px-4 py-5 shadow rounded-lg">
       <dt class="text-sm font-medium text-gray-500">Pending</dt>
@@ -62,18 +62,18 @@
     </div>
   </div>
 
-  <!-- Monthly Earnings Chart Placeholder -->
+  <%# Monthly Earnings Chart Placeholder %>
   <div class="mt-8 bg-white shadow rounded-lg p-6">
     <h2 class="text-lg font-medium text-gray-900 mb-4">Monthly Earnings</h2>
     <div class="text-gray-500">
-      <!-- Chart would go here - placeholder for now -->
+      <%# Chart would go here - placeholder for now %>
       <div class="h-64 bg-gray-100 rounded flex items-center justify-center">
         <p>Monthly earnings chart</p>
       </div>
     </div>
   </div>
 
-  <!-- Commissions List -->
+  <%# Commissions List %>
   <div class="mt-8">
     <h2 class="text-lg font-medium text-gray-900 mb-4">Commission History</h2>
     <div class="bg-white shadow overflow-hidden sm:rounded-lg">
@@ -150,7 +150,7 @@
       <% end %>
     </div>
     
-    <!-- Pagination -->
+    <%# Pagination %>
     <% if @commissions.respond_to?(:current_page) %>
       <div class="mt-4">
         <%= paginate @commissions %>

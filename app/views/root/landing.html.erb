@@ -6,7 +6,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="<%= request.original_url %>">
   
-  <!-- Open Graph / Facebook -->
+  <%# Open Graph / Facebook %>
   <meta property="og:type" content="website">
   <meta property="og:url" content="<%= request.original_url %>">
   <meta property="og:title" content="VPN9 - True Privacy VPN with Zero Logs">
@@ -14,7 +14,7 @@
   <meta property="og:image" content="<%= request.base_url %>/og-image.png">
   <meta property="og:site_name" content="VPN9">
   
-  <!-- Twitter -->
+  <%# Twitter %>
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="<%= request.original_url %>">
   <meta name="twitter:title" content="VPN9 - True Privacy VPN with Zero Logs">
@@ -118,7 +118,7 @@
   <%= render 'shared/landing_navigation' %>
 <% end %>
 
-<!-- Hero Section -->
+<%# Hero Section %>
 <main role="main">
 <section class="relative isolate overflow-hidden bg-gray-900" aria-label="Hero">
   <svg class="absolute inset-0 -z-10 h-full w-full stroke-white/10 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]" aria-hidden="true">
@@ -168,7 +168,7 @@
 
 <%= render "shared/dns_leak_test", intro_text: "Find out if your current VPN is actually protecting your DNS queries from being exposed to your ISP." %>
 
-<!-- Privacy Features Section -->
+<%# Privacy Features Section %>
 <section id="features" class="bg-white py-24 sm:py-32" aria-label="Features">
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
     <div class="mx-auto max-w-2xl text-center">
@@ -184,7 +184,7 @@
     
     <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
       <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
-        <!-- Zero Connection Logs -->
+        <%# Zero Connection Logs %>
         <div class="flex flex-col">
           <dt class="text-base font-semibold leading-7 text-gray-900">
             <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
@@ -207,7 +207,7 @@
           </dd>
         </div>
 
-        <!-- Anonymous Authentication -->
+        <%# Anonymous Authentication %>
         <div class="flex flex-col">
           <dt class="text-base font-semibold leading-7 text-gray-900">
             <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
@@ -230,7 +230,7 @@
           </dd>
         </div>
 
-        <!-- Stateless Architecture -->
+        <%# Stateless Architecture %>
         <div class="flex flex-col">
           <dt class="text-base font-semibold leading-7 text-gray-900">
             <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
@@ -257,7 +257,7 @@
   </div>
 </section>
 
-<!-- Code Transparency Section -->
+<%# Code Transparency Section %>
 <section id="privacy" class="bg-gray-50 py-16 sm:py-24" aria-label="Privacy Policy">
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
     <div class="mx-auto max-w-2xl lg:mx-0 lg:max-w-none">
@@ -332,7 +332,7 @@
   </div>
 </section>
 
-<!-- Pricing Section -->
+<%# Pricing Section %>
 <section id="pricing" class="bg-white py-24 sm:py-32" aria-label="Pricing" itemscope itemtype="https://schema.org/Product">
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
     <div class="mx-auto max-w-4xl text-center">
@@ -429,7 +429,7 @@
   </div>
 </section>
 
-<!-- Technical Features -->
+<%# Technical Features %>
 <section id="technical" class="bg-gray-900 py-24 sm:py-32" aria-label="Technical Features">
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
     <div class="mx-auto max-w-2xl lg:text-center">
@@ -493,7 +493,7 @@
   </div>
 </section>
 
-<!-- CTA Section -->
+<%# CTA Section %>
 <section class="bg-indigo-600 py-16" aria-label="Call to Action">
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
     <div class="mx-auto max-w-2xl text-center">
@@ -515,7 +515,7 @@
 </section>
 </main>
 
-<!-- Footer -->
+<%# Footer %>
 <footer class="bg-gray-900">
   <div class="mx-auto max-w-7xl px-6 py-12 lg:px-8">
     <div class="mt-8 border-t border-gray-800 pt-8 md:flex md:items-center md:justify-between">

@@ -6,7 +6,7 @@
     </div>
   </div>
 
-  <!-- Stats -->
+  <%# Stats %>
   <div class="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
     <div class="bg-white overflow-hidden shadow rounded-lg">
       <div class="px-4 py-5 sm:p-6">
@@ -42,7 +42,7 @@
     </div>
   </div>
 
-  <!-- Filters -->
+  <%# Filters %>
   <div class="mt-8 flex flex-wrap gap-2">
     <% %w[pending approved processing completed failed cancelled all].each do |status| %>
       <%= link_to status.humanize,
@@ -51,7 +51,7 @@
     <% end %>
   </div>
 
-  <!-- Payouts table -->
+  <%# Payouts table %>
   <div class="mt-8 overflow-hidden shadow border border-gray-200 md:rounded-lg">
     <%= form_with url: bulk_approve_admin_payout_requests_path, method: :post, local: true do |f| %>
       <table class="min-w-full divide-y divide-gray-200">

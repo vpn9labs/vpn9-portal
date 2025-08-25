@@ -1,20 +1,4 @@
-<%
-=begin
-%><!--
-▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚
-▚▚                                                                        ▚▚
-▚▚  VPN9 - Landing Page                                                   ▚▚
-▚▚  -------------------------                                             ▚▚
-▚▚  True Privacy. Zero Logs. No Compromises.                              ▚▚
-▚▚                                                                        ▚▚
-▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚
---><%
-=end
-%>
-
-<!-- Dynamic Domain Display -->
-
-<!-- Schema.org Structured Data -->
+<%# Schema.org Structured Data %>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -32,9 +16,9 @@
 }
 </script>
 
-<!-- Hero Section -->
+<%# Hero Section %>
 <section class="relative isolate overflow-hidden bg-gray-900" aria-label="Hero">
-  <!-- Background Pattern -->
+  <%# Background Pattern %>
   <svg class="absolute inset-0 -z-10 h-full w-full stroke-white/10 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]" aria-hidden="true">
     <defs>
       <pattern id="hero-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -44,12 +28,12 @@
     <rect width="100%" height="100%" stroke-width="0" fill="url(#hero-pattern)" />
   </svg>
   
-  <!-- Gradient Overlays -->
+  <%# Gradient Overlays %>
   <div class="absolute left-[calc(50%-4rem)] top-10 -z-10 transform-gpu blur-3xl sm:left-[calc(50%-18rem)] lg:left-48 lg:top-[calc(50%-30rem)] xl:left-[calc(50%-24rem)]" aria-hidden="true">
     <div class="aspect-[1108/632] w-[69.25rem] bg-gradient-to-r from-[#80caff] to-[#4f46e5] opacity-20" style="clip-path: polygon(73.6% 51.7%, 91.7% 11.8%, 100% 46.4%, 97.4% 82.2%, 92.5% 84.9%, 75.7% 64%, 55.3% 47.5%, 46.5% 49.4%, 45% 62.9%, 50.3% 87.2%, 21.3% 64.1%, 0.1% 100%, 5.4% 51.1%, 21.4% 63.9%, 58.9% 0.2%, 73.6% 51.7%)"></div>
   </div>
   
-  <!-- Navigation Header -->
+  <%# Navigation Header %>
   <header class="absolute inset-x-0 top-0 z-50">
     <nav class="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
       <div class="flex lg:flex-1">
@@ -66,7 +50,7 @@
         <%= link_to "Sign In", new_session_path, 
             class: "text-sm font-semibold leading-6 text-white hover:text-gray-300" %>
       </div>
-      <!-- Mobile menu button -->
+      <%# Mobile menu button %>
       <div class="flex lg:hidden">
         <button type="button" class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-400" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
           <span class="sr-only">Open main menu</span>
@@ -77,7 +61,7 @@
       </div>
     </nav>
     
-    <!-- Mobile menu -->
+    <%# Mobile menu %>
     <div id="mobile-menu" class="hidden lg:hidden" role="dialog" aria-modal="true">
       <div class="fixed inset-0 z-50"></div>
       <div class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-gray-900 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-white/10">
@@ -109,9 +93,9 @@
     </div>
   </header>
   
-  <!-- Hero Content -->
+  <%# Hero Content %>
   <div class="relative isolate px-6 pt-14 lg:px-8">
-    <!-- Domain-specific messaging -->
+    <%# Domain-specific messaging %>
     <% if current_host =~ /vpn(\d+)\.com/i %>
       <% vpn_number = $1 %>
       <div class="mx-auto max-w-2xl py-4">
@@ -132,7 +116,7 @@
         Zero Logs.<br>
         <span class="text-indigo-400">No Compromises.</span>
       </h1>
-      <!-- Urgency Element -->
+      <%# Urgency Element %>
       <div class="mt-4 inline-flex items-center text-sm text-yellow-300 bg-yellow-900/20 rounded-full px-3 py-1">
         <svg class="mr-1 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
           <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
@@ -156,7 +140,7 @@
           </svg>
           No email required • Pay with Bitcoin or Monero • Complete anonymity
         </div>
-        <!-- Social Proof -->
+        <%# Social Proof %>
         <div class="flex items-center space-x-4 text-sm">
           <div class="flex -space-x-2">
             <img class="inline-block h-8 w-8 rounded-full ring-2 ring-gray-900" src="https://i.pravatar.cc/150?img=1" alt="">
@@ -168,7 +152,7 @@
             <span class="font-semibold text-white">2,847+</span> privacy advocates trust VPN9
           </div>
         </div>
-        <!-- Live Visitors -->
+        <%# Live Visitors %>
         <div class="inline-flex items-center text-xs text-green-400 bg-green-900/20 rounded-full px-2 py-1">
           <span class="relative flex h-2 w-2 mr-2">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -181,7 +165,7 @@
   </div>
 </section>
 
-<!-- Privacy Features Section -->
+<%# Privacy Features Section %>
 <section id="features" class="bg-white py-24 sm:py-32" aria-label="Features">
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
     <div class="mx-auto max-w-2xl lg:text-center">
@@ -193,7 +177,7 @@
         Unlike other VPN providers who make empty promises, we've built our entire system 
         to make tracking impossible. We can't hand over data we don't have.
       </p>
-      <!-- Trust Badges -->
+      <%# Trust Badges %>
       <div class="mt-8 flex flex-wrap justify-center gap-4">
         <div class="trust-badge flex items-center space-x-2 bg-gray-50 rounded-lg px-4 py-2">
           <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
@@ -219,7 +203,7 @@
     
     <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
       <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
-        <!-- Zero Connection Logs -->
+        <%# Zero Connection Logs %>
         <div class="flex flex-col">
           <dt class="text-base font-semibold leading-7 text-gray-900">
             <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
@@ -234,7 +218,7 @@
           </dd>
         </div>
         
-        <!-- No IP Tracking -->
+        <%# No IP Tracking %>
         <div class="flex flex-col">
           <dt class="text-base font-semibold leading-7 text-gray-900">
             <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
@@ -249,7 +233,7 @@
           </dd>
         </div>
         
-        <!-- No Email Required -->
+        <%# No Email Required %>
         <div class="flex flex-col">
           <dt class="text-base font-semibold leading-7 text-gray-900">
             <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
@@ -268,7 +252,7 @@
   </div>
 </section>
 
-<!-- How It Works Section -->
+<%# How It Works Section %>
 <section id="how-it-works" class="bg-gray-50 py-24 sm:py-32" aria-label="How It Works">
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
     <div class="mx-auto max-w-2xl lg:text-center">
@@ -283,7 +267,7 @@
     
     <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
       <div class="grid grid-cols-1 gap-y-16 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-0">
-        <!-- Step 1 -->
+        <%# Step 1 %>
         <div class="relative pl-16">
           <dt class="text-base font-semibold leading-7 text-gray-900">
             <div class="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
@@ -296,7 +280,7 @@
           </dd>
         </div>
         
-        <!-- Step 2 -->
+        <%# Step 2 %>
         <div class="relative pl-16">
           <dt class="text-base font-semibold leading-7 text-gray-900">
             <div class="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
@@ -309,7 +293,7 @@
           </dd>
         </div>
         
-        <!-- Step 3 -->
+        <%# Step 3 %>
         <div class="relative pl-16">
           <dt class="text-base font-semibold leading-7 text-gray-900">
             <div class="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
@@ -326,7 +310,7 @@
   </div>
 </section>
 
-<!-- Testimonials Section -->
+<%# Testimonials Section %>
 <section class="bg-gray-50 py-16 sm:py-24" aria-label="Testimonials">
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
     <div class="mx-auto max-w-xl text-center">
@@ -337,7 +321,7 @@
     </div>
     <div class="mx-auto mt-16 flow-root max-w-2xl sm:mt-20 lg:mx-0 lg:max-w-none">
       <div class="-mt-8 sm:-mx-4 sm:columns-2 sm:text-[0] lg:columns-3">
-        <!-- Testimonial 1 -->
+        <%# Testimonial 1 %>
         <div class="pt-8 sm:inline-block sm:w-full sm:px-4">
           <figure class="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-gray-900/5">
             <blockquote class="text-gray-900">
@@ -354,7 +338,7 @@
             </figcaption>
           </figure>
         </div>
-        <!-- Testimonial 2 -->
+        <%# Testimonial 2 %>
         <div class="pt-8 sm:inline-block sm:w-full sm:px-4">
           <figure class="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-gray-900/5">
             <blockquote class="text-gray-900">
@@ -371,7 +355,7 @@
             </figcaption>
           </figure>
         </div>
-        <!-- Testimonial 3 -->
+        <%# Testimonial 3 %>
         <div class="pt-8 sm:inline-block sm:w-full sm:px-4">
           <figure class="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-gray-900/5">
             <blockquote class="text-gray-900">
@@ -388,7 +372,7 @@
             </figcaption>
           </figure>
         </div>
-        <!-- Testimonial 4 -->
+        <%# Testimonial 4 %>
         <div class="pt-8 sm:inline-block sm:w-full sm:px-4">
           <figure class="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-gray-900/5">
             <blockquote class="text-gray-900">
@@ -405,7 +389,7 @@
             </figcaption>
           </figure>
         </div>
-        <!-- Testimonial 5 -->
+        <%# Testimonial 5 %>
         <div class="pt-8 sm:inline-block sm:w-full sm:px-4">
           <figure class="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-gray-900/5">
             <blockquote class="text-gray-900">
@@ -422,7 +406,7 @@
             </figcaption>
           </figure>
         </div>
-        <!-- Testimonial 6 -->
+        <%# Testimonial 6 %>
         <div class="pt-8 sm:inline-block sm:w-full sm:px-4">
           <figure class="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-gray-900/5">
             <blockquote class="text-gray-900">
@@ -444,7 +428,7 @@
   </div>
 </section>
 
-<!-- Pricing Section -->
+<%# Pricing Section %>
 <section id="pricing" class="bg-white py-24 sm:py-32" aria-label="Pricing" itemscope itemtype="https://schema.org/Product">
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
     <div class="mx-auto max-w-4xl text-center">
@@ -478,7 +462,7 @@
             <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
             </svg>
-            WireGuard & OpenVPN
+            WireGuard
           </li>
           <li class="flex gap-x-3">
             <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
@@ -490,7 +474,7 @@
             <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
             </svg>
-            10 simultaneous connections
+            5 simultaneous connections
           </li>
           <li class="flex gap-x-3">
             <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
@@ -535,7 +519,7 @@
               <span class="relative z-10">Get Instant Access</span>
               <span class="absolute inset-0 bg-indigo-700 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
             <% end %>
-            <!-- Money Back Guarantee -->
+            <%# Money Back Guarantee %>
             <div class="mt-4 flex items-center justify-center text-sm text-gray-600">
               <svg class="mr-2 h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -567,7 +551,7 @@
       </div>
     </div>
     
-    <!-- Trust Indicators -->
+    <%# Trust Indicators %>
     <div class="mx-auto mt-16 max-w-7xl">
       <div class="mx-auto max-w-2xl lg:max-w-none">
         <dl class="grid grid-cols-1 gap-0.5 overflow-hidden rounded-2xl text-center sm:grid-cols-2 lg:grid-cols-4">
@@ -593,7 +577,7 @@
   </div>
 </section>
 
-<!-- CTA Section -->
+<%# CTA Section %>
 <section class="bg-indigo-600 py-16" aria-label="Call to Action">
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
     <div class="mx-auto max-w-2xl text-center">
@@ -604,7 +588,7 @@
         Join <span class="font-bold text-white">2,847+ users</span> who have chosen true privacy over empty promises. 
         Pay with Bitcoin or Monero. No email required. No personal data. Just privacy.
       </p>
-      <!-- Final Urgency -->
+      <%# Final Urgency %>
       <div class="mt-6 inline-flex items-center text-sm text-yellow-300 bg-yellow-900/20 rounded-full px-4 py-2">
         <svg class="mr-2 h-4 w-4 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
           <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd" />

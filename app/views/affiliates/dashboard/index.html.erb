@@ -1,5 +1,5 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Welcome Message -->
+    <%# Welcome Message %>
     <div class="mb-8">
       <h2 class="text-2xl font-bold text-gray-900">Welcome back, <%= @current_affiliate.name || @current_affiliate.email %>!</h2>
       <p class="mt-1 text-sm text-gray-600">
@@ -16,7 +16,7 @@
       </p>
     </div>
 
-    <!-- Stats Overview -->
+    <%# Stats Overview %>
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
       <div class="bg-white overflow-hidden shadow rounded-lg">
         <div class="p-5">
@@ -84,7 +84,7 @@
       </div>
     </div>
 
-    <!-- Referral Links -->
+    <%# Referral Links %>
     <div class="mt-8 bg-white shadow rounded-lg">
       <div class="px-4 py-5 sm:p-6">
         <h3 class="text-lg leading-6 font-medium text-gray-900">Your Referral Links</h3>
@@ -104,7 +104,7 @@
       </div>
     </div>
 
-    <!-- Performance Chart -->
+    <%# Performance Chart %>
     <div class="mt-8 bg-white shadow rounded-lg">
       <div class="px-4 py-5 sm:p-6">
         <h3 class="text-lg leading-6 font-medium text-gray-900">Performance (Last 30 Days)</h3>
@@ -114,9 +114,9 @@
       </div>
     </div>
 
-    <!-- Recent Activity Tables -->
+    <%# Recent Activity Tables %>
     <div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
-      <!-- Recent Clicks -->
+      <%# Recent Clicks %>
       <div class="bg-white shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
           <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Recent Clicks</h3>
@@ -145,7 +145,7 @@
         </div>
       </div>
 
-      <!-- Recent Referrals -->
+      <%# Recent Referrals %>
       <div class="bg-white shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
           <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Recent Referrals</h3>
@@ -179,7 +179,7 @@
       </div>
     </div>
 
-    <!-- Earnings Summary -->
+    <%# Earnings Summary %>
     <div class="mt-8 bg-white shadow rounded-lg">
       <div class="px-4 py-5 sm:p-6">
         <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Earnings Summary</h3>

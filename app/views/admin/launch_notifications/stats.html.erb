@@ -11,7 +11,7 @@
     </div>
   </div>
 
-  <!-- Stats Grid -->
+  <%# Stats Grid %>
   <div class="mt-8">
     <dl class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
       <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
@@ -44,7 +44,7 @@
     </dl>
   </div>
 
-  <!-- Daily Signups Chart -->
+  <%# Daily Signups Chart %>
   <div class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
     <div class="px-4 py-5 sm:px-6">
       <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -54,7 +54,7 @@
     <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
       <% if @daily_signups.any? %>
         <div class="h-64" id="daily-signups-chart">
-          <!-- Simple text-based chart for now -->
+          <%# Simple text-based chart for now %>
           <div class="flex items-end justify-between h-full">
             <% max_value = @daily_signups.values.max.to_f %>
             <% @daily_signups.each do |date, count| %>
@@ -81,7 +81,7 @@
     </div>
   </div>
 
-  <!-- Top Sources -->
+  <%# Top Sources %>
   <div class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
     <div class="px-4 py-5 sm:px-6">
       <h3 class="text-lg leading-6 font-medium text-gray-900">

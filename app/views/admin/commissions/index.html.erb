@@ -6,7 +6,7 @@
     </div>
   </div>
 
-  <!-- Filters -->
+  <%# Filters %>
   <div class="mt-6 bg-gray-50 p-4 rounded-lg">
     <%= form_with(url: admin_commissions_path, method: :get, local: true, class: "space-y-4 sm:space-y-0 sm:flex sm:items-end sm:space-x-4") do |f| %>
       <div>
@@ -38,7 +38,7 @@
     <% end %>
   </div>
 
-  <!-- Stats Cards -->
+  <%# Stats Cards %>
   <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
     <div class="bg-white px-4 py-5 shadow rounded-lg">
       <dt class="text-sm font-medium text-gray-500">Pending</dt>
@@ -69,7 +69,7 @@
     </div>
   </div>
 
-  <!-- Commissions Table -->
+  <%# Commissions Table %>
   <%= form_with(url: bulk_approve_admin_commissions_path, method: :post, local: true) do |form| %>
     <div class="mt-8 flow-root">
       <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -158,7 +158,7 @@
       </div>
     </div>
 
-    <!-- Bulk Actions -->
+    <%# Bulk Actions %>
     <div class="mt-4 flex items-center space-x-3">
       <%= submit_tag "Bulk Approve Selected", 
           formaction: bulk_approve_admin_commissions_path,

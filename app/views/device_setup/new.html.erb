@@ -12,7 +12,7 @@
                         "action": "submit->wireguard-setup#submitForm"
                       } do |form| %>
           
-          <!-- Step 1: Key Generation -->
+          <%# Step 1: Key Generation %>
           <div class="space-y-6">
             <div>
               <h4 class="text-base font-medium text-gray-900">Step 1: WireGuard Keys</h4>
@@ -41,7 +41,7 @@
                 </div>
               </div>
               
-              <!-- Generate Section -->
+              <%# Generate Section %>
               <div data-wireguard-setup-target="generateSection" class="mt-4">
                 <button type="button" 
                         data-action="click->wireguard-setup#generateKeypair"
@@ -103,7 +103,7 @@
                 </div>
               </div>
               
-              <!-- Manual Section -->
+              <%# Manual Section %>
               <div data-wireguard-setup-target="manualSection" class="hidden mt-4 space-y-3">
                 <div>
                   <label for="manual_private_key" class="block text-sm font-medium text-gray-700">Private Key</label>
@@ -124,11 +124,11 @@
                 </div>
               </div>
               
-              <!-- Hidden field for public key when generated -->
+              <%# Hidden field for public key when generated %>
               <input type="hidden" name="device[public_key]" data-wireguard-setup-target="publicKeyInput">
             </div>
             
-            <!-- Step 2: Location Selection -->
+            <%# Step 2: Location Selection %>
             <div class="border-t border-gray-200 pt-6">
               <h4 class="text-base font-medium text-gray-900">Step 2: Select Exit Location</h4>
               <p class="mt-1 text-sm text-gray-500">
@@ -159,7 +159,7 @@
                 </div>
               </div>
               
-              <!-- Server Info -->
+              <%# Server Info %>
               <div id="server-info" class="hidden mt-4 bg-blue-50 border border-blue-200 rounded-md p-4">
                 <div class="flex">
                   <div class="flex-shrink-0">
@@ -177,7 +177,7 @@
               </div>
             </div>
             
-            <!-- Step 3: Download Config -->
+            <%# Step 3: Download Config %>
             <div class="border-t border-gray-200 pt-6">
               <h4 class="text-base font-medium text-gray-900">Step 3: Download Configuration</h4>
               <p class="mt-1 text-sm text-gray-500">

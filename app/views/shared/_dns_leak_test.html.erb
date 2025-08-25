@@ -1,7 +1,7 @@
 <%# Shared DNS Leak Test section %>
 <% intro = local_assigns.fetch(:intro_text, "Find out if your VPN is actually protecting your DNS queries from being exposed to your ISP.") %>
 
-<!-- DNS Leak Test Section -->
+<%# DNS Leak Test Section %>
 <section class="bg-gray-50 py-24 sm:py-32" aria-label="DNS Leak Test">
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
     <div class="mx-auto max-w-2xl text-center">
@@ -17,7 +17,7 @@
     <div class="mx-auto mt-16 max-w-2xl">
       <div class="rounded-lg bg-white p-8 shadow-sm ring-1 ring-gray-200">
         <div id="dns-test-container">
-          <!-- Initial State -->
+          <%# Initial State %>
           <div id="dns-test-initial" class="text-center">
             <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-lg bg-indigo-600 mx-auto">
               <svg class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -33,7 +33,7 @@
             </button>
           </div>
           
-          <!-- Testing State -->
+          <%# Testing State %>
           <div id="dns-test-running" class="text-center hidden">
             <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-lg bg-yellow-500 mx-auto">
               <svg class="h-8 w-8 text-white animate-spin" fill="none" viewBox="0 0 24 24">
@@ -50,10 +50,10 @@
             </div>
           </div>
           
-          <!-- Results State -->
+          <%# Results State %>
           <div id="dns-test-results" class="hidden">
             <div id="dns-results-content">
-              <!-- Results will be inserted here -->
+              <%# Results will be inserted here %>
             </div>
             <div class="mt-6 text-center">
               <button id="restart-dns-test" class="rounded-md bg-gray-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500">
@@ -64,7 +64,7 @@
         </div>
       </div>
       
-      <!-- Information about DNS leaks -->
+      <%# Information about DNS leaks %>
       <div class="mt-8 rounded-lg bg-blue-50 p-6">
         <h4 class="text-lg font-semibold text-blue-900 mb-3">What is a DNS leak?</h4>
         <p class="text-blue-800 text-sm leading-6">
@@ -76,4 +76,3 @@
     </div>
   </div>
 </section>
-
