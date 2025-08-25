@@ -21,12 +21,18 @@ class SubscriptionExpirationTest < ActiveSupport::TestCase
     def initialize
       @data = {}
     end
-    def update(h)
-      @data.merge!(h.transform_keys(&:to_s))
+    # Support both kwargs and positional hash
+    def update(*args, **kwargs)
+      if kwargs.any?
+        @data.merge!(kwargs.transform_keys(&:to_s))
+      elsif args.first.is_a?(Hash)
+        @data.merge!(args.first.transform_keys(&:to_s))
+      end
     end
     def clear
       @data.clear
     end
+    alias remove clear
     def to_h
       @data.dup
     end
@@ -64,10 +70,6 @@ class SubscriptionExpirationTest < ActiveSupport::TestCase
       started_at: 40.days.ago,
       expires_at: 1.hour.from_now
     )
-
-    # Pre-upsert device hashes (simulating create hook) and simulate activation then expiration sweep
-    DeviceRegistry.upsert_device(d1)
-    DeviceRegistry.upsert_device(d2)
 
     # Before sweep, activate devices based on current (non-expired) subscription
     Device.sync_statuses_for_user!(user)

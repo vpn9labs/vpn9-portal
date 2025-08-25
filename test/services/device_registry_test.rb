@@ -21,12 +21,18 @@ class DeviceRegistryTest < ActiveSupport::TestCase
     def initialize
       @data = {}
     end
-    def update(h)
-      @data.merge!(h.transform_keys(&:to_s))
+    # Support both Kredis-style kwargs and positional hash
+    def update(*args, **kwargs)
+      if kwargs.any?
+        @data.merge!(kwargs.transform_keys(&:to_s))
+      elsif args.first.is_a?(Hash)
+        @data.merge!(args.first.transform_keys(&:to_s))
+      end
     end
     def clear
       @data.clear
     end
+    alias remove clear
     def to_h
       @data.dup
     end
@@ -50,10 +56,11 @@ class DeviceRegistryTest < ActiveSupport::TestCase
     DeviceRegistry.kredis = @store
   end
 
-  test "upsert_device writes per-device fields" do
+  test "activate_device! writes per-device fields" do
     user = users(:john)
     device = user.devices.create!(public_key: "pub1")
-    DeviceRegistry.upsert_device(device)
+    device.update!(status: :active)
+    DeviceRegistry.activate_device!(device)
     data = @store.hash("vpn9:device:#{device.id}").to_h
 
     assert_equal device.id.to_s, data["id"]
@@ -65,13 +72,12 @@ class DeviceRegistryTest < ActiveSupport::TestCase
     assert_equal device.wireguard_addresses, data["allowed_ips"]
   end
 
-  test "device create populates hash but not active set without subscription" do
+  test "inactive devices are not stored in Redis" do
     user = users(:john)
     device = user.devices.create!(public_key: "pub2")
-    # Simulate after_commit callback
-    DeviceRegistry.upsert_device(device)
+    # No subscription => inactive => no hash stored
     data = @store.hash("vpn9:device:#{device.id}").to_h
-    assert_equal device.public_key, data["public_key"]
+    assert_empty data
     assert_empty @store.set("global").members
     assert_empty @store.set("user:#{user.id}").members
   end
@@ -104,16 +110,20 @@ class DeviceRegistryTest < ActiveSupport::TestCase
     sub.cancel!
     Device.sync_statuses_for_user!(user)
     assert_empty @store.set("vpn9:user:#{user.id}:devices:active").members
+    # Hashes removed for deactivated devices
+    assert_empty @store.hash("vpn9:device:#{d1.id}").to_h
+    assert_empty @store.hash("vpn9:device:#{d2.id}").to_h
   end
 
-  test "updating public_key updates allowed_ips in device hash" do
+  test "updating public_key updates allowed_ips in device hash for active device" do
     user = users(:john)
     device = user.devices.create!(public_key: "pub_old")
-    DeviceRegistry.upsert_device(device)
+    device.update!(status: :active)
+    DeviceRegistry.activate_device!(device)
     old_allowed = @store.hash("vpn9:device:#{device.id}").to_h["allowed_ips"]
 
     device.update!(public_key: "pub_new")
-    DeviceRegistry.upsert_device(device)
+    DeviceRegistry.activate_device!(device)
     new_allowed = @store.hash("vpn9:device:#{device.id}").to_h["allowed_ips"]
     refute_equal old_allowed, new_allowed
   end
@@ -127,9 +137,6 @@ class DeviceRegistryTest < ActiveSupport::TestCase
 
     assert_includes @store.set("vpn9:user:#{user.id}:devices:active").members, d.id.to_s
     d.destroy
-    # Simulate after_destroy_commit behavior
-    DeviceRegistry.remove_device_everywhere(d.id, user.id)
-    DeviceRegistry.delete_device(d.id)
     Device.sync_statuses_for_user!(user)
     refute_includes @store.set("vpn9:user:#{user.id}:devices:active").members, d.id.to_s
     assert_empty @store.hash("vpn9:device:#{d.id}").to_h
@@ -150,10 +157,10 @@ class DeviceRegistryTest < ActiveSupport::TestCase
 
     DeviceRegistry.rebuild!
 
-    # Hashes exist for all devices
-    [ d1, d2, d3 ].each do |dev|
-      assert_equal dev.public_key, @store.hash("vpn9:device:#{dev.id}").to_h["public_key"]
-    end
+    # Hashes exist only for active devices (u1's within plan limit)
+    assert_equal d1.public_key, @store.hash("vpn9:device:#{d1.id}").to_h["public_key"]
+    assert_equal d2.public_key, @store.hash("vpn9:device:#{d2.id}").to_h["public_key"]
+    assert_empty @store.hash("vpn9:device:#{d3.id}").to_h
 
     # Active sets reflect DB status
     assert_includes @store.set("vpn9:user:#{u1.id}:devices:active").members, d1.id.to_s

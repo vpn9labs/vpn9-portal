@@ -114,7 +114,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_not_includes Subscription.current, pending_sub
   end
 
-  test "should destroy associated payments" do
+  test "should nullify associated payments on destroy" do
     @subscription.save!
     payment = Payment.create!(
       user: @user,
@@ -124,8 +124,10 @@ class SubscriptionTest < ActiveSupport::TestCase
       currency: @plan.currency
     )
 
-    assert_difference "Payment.count", -1 do
+    assert_no_difference "Payment.count" do
       @subscription.destroy
     end
+
+    assert_nil payment.reload.subscription_id
   end
 end

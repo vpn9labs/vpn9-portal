@@ -38,7 +38,7 @@
 class Subscription < ApplicationRecord
   belongs_to :user
   belongs_to :plan
-  has_many :payments, dependent: :destroy
+  has_many :payments, dependent: :nullify
 
   # Only include subscriptions from non-deleted users by default
   default_scope { joins(:user).merge(User.all) }
@@ -59,6 +59,12 @@ class Subscription < ApplicationRecord
   scope :current, -> { active.where("expires_at > ?", Time.current) }
   # Subscriptions that have expired or will expire within 24 hours
   scope :expired_or_expiring, -> { where("expires_at <= ?", Time.current + 1.day) }
+
+  # Keep device access in sync with subscription changes
+  # - Always sync on create/destroy
+  # - On update, sync only when fields affecting access/limits change
+  after_commit :sync_user_device_statuses, on: [ :create, :destroy ]
+  after_commit :sync_user_device_statuses_if_relevant, on: :update
 
   # Whether this subscription currently grants access.
   # @return [Boolean]
@@ -84,12 +90,6 @@ class Subscription < ApplicationRecord
   def cancel!
     update!(status: :cancelled, cancelled_at: Time.current)
   end
-
-  # Keep device access in sync with subscription changes
-  # - Always sync on create/destroy
-  # - On update, sync only when fields affecting access/limits change
-  after_commit :sync_user_device_statuses, on: [ :create, :destroy ]
-  after_commit :sync_user_device_statuses_if_relevant, on: :update
 
   # Mark all `active` subscriptions that have reached `expires_at` as `expired`
   # and deactivate devices for those users.

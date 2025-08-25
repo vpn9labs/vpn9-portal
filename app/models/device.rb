@@ -84,17 +84,17 @@ class Device < ApplicationRecord
       user.devices.where(id: active_ids).update_all(status: statuses[:active])
       user.devices.where.not(id: active_ids).update_all(status: statuses[:inactive])
 
-      # Update Redis registry
+      # Update Redis registry via high-level API (active-only metadata)
       ids_to_activate = active_ids - previous_active_ids
       ids_to_deactivate = previous_active_ids - active_ids
-      DeviceRegistry.add_active_devices(user.id, ids_to_activate)
-      DeviceRegistry.remove_active_devices(user.id, ids_to_deactivate)
+      DeviceRegistry.activate_devices!(user.id, ids_to_activate)
+      DeviceRegistry.deactivate_devices!(user.id, ids_to_deactivate)
     else
       # No active subscription → no device has access
       user.devices.update_all(status: statuses[:inactive])
 
-      # Remove any previously active devices from registry
-      DeviceRegistry.remove_active_devices(user.id, previous_active_ids)
+      # Remove any previously active devices from registry (and their hashes)
+      DeviceRegistry.deactivate_devices!(user.id, previous_active_ids)
     end
   end
 
@@ -162,14 +162,17 @@ class Device < ApplicationRecord
 
   # After destroy: ensure device id is removed from Redis registry then resync the rest
   def remove_from_registry_and_sync
-    DeviceRegistry.remove_device_everywhere(id, user_id)
-    DeviceRegistry.delete_device(id)
+    DeviceRegistry.deactivate_device!(user_id, id)
     self.class.sync_statuses_for_user!(user)
   end
 
   # Ensure per-device record is up to date in Redis after updates
   def update_device_registry_record
-    DeviceRegistry.upsert_device(self)
+    if active?
+      DeviceRegistry.activate_device!(self)
+    else
+      DeviceRegistry.deactivate_device!(user_id, id)
+    end
   end
 
   def reset_address_cache
