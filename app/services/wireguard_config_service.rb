@@ -1,14 +1,51 @@
 require "ostruct"
 
+#
+# WireguardConfigService generates client and server‑side WireGuard
+# configuration for a given device and relay. It aims to be deterministic,
+# privacy‑preserving, and simple to consume from controllers.
+#
+# Responsibilities
+# - Build end‑user client configs (optionally embedding the provided private key)
+# - Emit server peer stanzas referencing device addresses/keys
+# - Produce a full server config for a relay with multiple peers
+# - Provide QR generation and human‑readable setup instructions
+#
+# Inputs
+# - `device` must respond to: `name`, `public_key`, `wireguard_addresses`,
+#   `wireguard_ip`, `wireguard_ipv6`, and `user` (for display only).
+# - `relay` responds to: `public_key`, `port`, `interface`, and optionally
+#   `ipv4_address` and `location`. If absent, a default stub is used.
+#
+# Usage
+#   svc = WireguardConfigService.new(device: device, relay: relay)
+#   client_conf = svc.generate_client_config(include_private_key: true, private_key: pk)
+#   peer_conf   = svc.generate_server_peer_config
+#   server_conf = WireguardConfigService.generate_server_config(relay: relay, devices: [device])
+#
 class WireguardConfigService
+  # @return [Device] device for which configs are generated
+  # @return [Relay] relay used in configuration (or a default stub)
   attr_reader :device, :relay
 
+  # Initialize the service with a device and optional relay.
+  # When relay is nil, a default stub is used (suitable for offline generation).
+  #
+  # @param device [Object] see Inputs
+  # @param relay [Object, nil]
   def initialize(device:, relay: nil)
     @device = device
     @relay = relay || default_relay
   end
 
   # Generate client configuration file content
+  #
+  # If include_private_key is true and private_key is provided, embeds the
+  # private key into the [Interface] section; otherwise uses a placeholder.
+  #
+  # @param include_private_key [Boolean]
+  # @param private_key [String, nil]
+  # @return [String] full WireGuard client configuration text
   def generate_client_config(include_private_key: false, private_key: nil)
     private_key_line = if include_private_key && private_key
                          private_key
@@ -36,6 +73,11 @@ class WireguardConfigService
   end
 
   # Generate QR code for mobile clients
+  #
+  # Converts the client configuration (without comments) into a QR code.
+  # Returns nil if the `rqrcode` gem is not available.
+  #
+  # @return [RQRCode::QRCode, nil]
   def generate_qr_code
     require "rqrcode" if defined?(RQRCode)
 
@@ -50,6 +92,7 @@ class WireguardConfigService
   end
 
   # Generate server-side peer configuration for this device
+  # @return [String] peer stanza suitable for inclusion in wg0.conf
   def generate_server_peer_config
     <<~CONFIG
 
@@ -62,6 +105,12 @@ class WireguardConfigService
   end
 
   # Class method to generate complete server configuration
+  #
+  # Builds a complete wg server config for the given relay and list of devices.
+  #
+  # @param relay [Object] relay providing keys, listen port, interface, location
+  # @param devices [Array<Object>] list of devices to include as peers
+  # @return [String]
   def self.generate_server_config(relay:, devices: [])
     new_service = new(device: devices.first, relay: relay) if devices.any?
 
@@ -95,6 +144,7 @@ class WireguardConfigService
   end
 
   # Generate setup instructions for the user
+  # @return [Hash] keys: :desktop, :mobile, :config
   def generate_setup_instructions
     {
       desktop: desktop_instructions,
@@ -114,6 +164,8 @@ class WireguardConfigService
     end
   end
 
+  # Create a minimal relay stub for offline config generation.
+  # @return [OpenStruct]
   def create_default_relay_stub
     OpenStruct.new(
       name: "Default",
@@ -124,15 +176,21 @@ class WireguardConfigService
     )
   end
 
+  # Relay's public key, with a readable placeholder if missing.
+  # @return [String]
   def relay_public_key
     relay&.public_key || "RELAY_PUBLIC_KEY_NOT_SET"
   end
 
+  # Compose endpoint "host:port" choosing an available address/hostname.
+  # @return [String]
   def relay_endpoint
     address = relay&.respond_to?(:ipv4_address) ? relay.ipv4_address : (relay&.ip_address || "vpn.example.com")
     "#{address}:#{relay&.port || 51820}"
   end
 
+  # Human‑friendly relay location name for comments.
+  # @return [String]
   def relay_location_name
     if relay&.respond_to?(:location)
       location = relay.location
@@ -142,11 +200,15 @@ class WireguardConfigService
     end
   end
 
+  # List of DNS servers (IPv4 and IPv6) for the client config.
+  # @return [String]
   def dns_servers
     # Cloudflare DNS with IPv6 support
     "1.1.1.1, 1.0.0.1, 2606:4700:4700::1111, 2606:4700:4700::1001"
   end
 
+  # Desktop setup instructions string.
+  # @return [String]
   def desktop_instructions
     <<~INSTRUCTIONS
       Desktop Setup Instructions:
@@ -170,6 +232,8 @@ class WireguardConfigService
     INSTRUCTIONS
   end
 
+  # Mobile setup instructions string.
+  # @return [String]
   def mobile_instructions
     <<~INSTRUCTIONS
       Mobile Setup Instructions:

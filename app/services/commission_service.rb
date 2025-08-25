@@ -1,5 +1,42 @@
+#
+# CommissionService handles affiliate commission lifecycle: creation, approval,
+# payout grouping, and cancellation related to referrals.
+#
+# Responsibilities
+# - Create a commission after a successful payment that is attributable to a
+#   pending referral within the attribution window and for an active affiliate.
+# - Auto‑approve small commissions under a configurable threshold.
+# - Approve commissions manually (with optional notes).
+# - Group payable commissions into a payout and mark them as paid.
+# - Cancel a referral and its associated pending commissions.
+#
+# Configuration (Rails.application.config)
+# - auto_approve_commission_threshold: Float (default: 50.0)
+# - minimum_payout_amount: Float (default: 100.0)
+#
+# Domain model expectations
+# - Referral#pending?, #within_attribution_window?, #convert!, #reject!
+# - Affiliate#active?, #commission_rate, #payout_currency, #commissions
+# - Commission scopes and transitions: .exists?, .payable, #approve!, #mark_as_paid!
+# - Payment#successful?, #amount, #currency, #user
+#
 class CommissionService
   class << self
+    # Process an incoming successful payment into a commission when applicable.
+    #
+    # Preconditions:
+    # - Payment must be successful.
+    # - User must have a pending referral within its attribution window.
+    # - Affiliate must be active.
+    # - No prior commission must exist for the same payment.
+    #
+    # Side effects:
+    # - Marks referral converted on user's first successful payment.
+    # - Creates a pending commission with computed amount and rate.
+    # - Auto‑approves commission when amount <= auto_approve_commission_threshold.
+    #
+    # @param payment [Payment]
+    # @return [Commission, nil] the created commission, or nil when not applicable or on error
     def process_payment(payment)
       return unless payment.successful?
 
@@ -54,6 +91,11 @@ class CommissionService
       nil
     end
 
+    # Calculate monetary commission for a payment given an affiliate's rate.
+    #
+    # @param payment [Payment]
+    # @param affiliate [Affiliate]
+    # @return [Float] amount rounded to 2 decimal places
     def calculate_commission(payment, affiliate)
       base_amount = payment.amount.to_f
       commission_rate = affiliate.commission_rate.to_f / 100.0
@@ -65,6 +107,11 @@ class CommissionService
       commission.round(2)
     end
 
+    # Approve a pending commission.
+    #
+    # @param commission [Commission]
+    # @param notes [String, nil] optional approval notes (e.g., reason)
+    # @return [Boolean] true if approved, false when commission is not pending
     def approve_commission(commission, notes = nil)
       return false unless commission.pending?
 
@@ -78,6 +125,14 @@ class CommissionService
       true
     end
 
+    # Process a payout for an affiliate by marking payable commissions as paid.
+    #
+    # Filters commissions to the provided list if commission_ids is given.
+    # Enforces a minimum payout amount via configuration to avoid micro‑payouts.
+    #
+    # @param affiliate [Affiliate]
+    # @param commission_ids [Array<Integer>, nil]
+    # @return [Hash, nil] summary hash { affiliate:, amount:, commission_count:, transaction_id:, currency: } or nil when nothing to payout / below threshold
     def process_payout(affiliate, commission_ids = nil)
       commissions = affiliate.commissions.payable
       commissions = commissions.where(id: commission_ids) if commission_ids.present?
@@ -115,6 +170,11 @@ class CommissionService
       nil
     end
 
+    # Cancel a referral and its associated pending commissions.
+    #
+    # @param referral [Referral]
+    # @param reason [String, nil]
+    # @return [void]
     def cancel_referral_commissions(referral, reason = nil)
       return unless referral
 

@@ -1,6 +1,23 @@
+#
+# AffiliateFraudDetector evaluates affiliate activity for fraud risk.
+#
+# It inspects click/sign‑up velocity, conversion rates, IP concentration,
+# timing/pattern anomalies, and commission reversal history to compute a
+# bounded risk score and flags with recommendations.
+#
+# Usage
+#   detector = AffiliateFraudDetector.new(affiliate, 24.hours)
+#   detector.check_all #=> { risk_score:, flags:, recommendations:, metrics: }
+#   detector.suspicious?
+#   detector.high_risk?
+#
 class AffiliateFraudDetector
+  # @return [Affiliate] affiliate being evaluated
+  # @return [ActiveSupport::Duration] lookback window for certain metrics
   attr_reader :affiliate, :period
 
+  # Thresholds controlling anomaly detection.
+  # @return [Hash]
   THRESHOLDS = {
     max_clicks_per_hour: 50,
     max_clicks_per_day: 500,
@@ -17,11 +34,15 @@ class AffiliateFraudDetector
     ]
   }.freeze
 
+  # @param affiliate [Affiliate]
+  # @param period [ActiveSupport::Duration] lookback period for selected metrics (default: 24 hours)
   def initialize(affiliate, period = 24.hours)
     @affiliate = affiliate
     @period = period
   end
 
+  # Run a full evaluation and return score, flags, recommendations, and raw metrics.
+  # @return [Hash] keys: :risk_score (Integer 0..100), :flags (Array<Hash>), :recommendations (Array<String>), :metrics (Hash)
   def check_all
     {
       risk_score: calculate_risk_score,
@@ -31,16 +52,22 @@ class AffiliateFraudDetector
     }
   end
 
+  # Whether risk score exceeds the suspicious threshold (> 50).
+  # @return [Boolean]
   def suspicious?
     calculate_risk_score > 50
   end
 
+  # Whether risk score exceeds the high‑risk threshold (> 75).
+  # @return [Boolean]
   def high_risk?
     calculate_risk_score > 75
   end
 
   private
 
+  # Compute bounded risk score (0..100) across multiple signals.
+  # @api private
   def calculate_risk_score
     score = 0
 
@@ -82,6 +109,8 @@ class AffiliateFraudDetector
     [ score, 100 ].min # Cap at 100
   end
 
+  # Collect human‑readable flags for detected anomalies with severities.
+  # @return [Array<Hash>] each with :type, :severity, :message
   def collect_flags
     flags = []
 
@@ -164,6 +193,8 @@ class AffiliateFraudDetector
     flags
   end
 
+  # Generate action recommendations based on score and flags.
+  # @return [Array<String>]
   def generate_recommendations
     recommendations = []
     risk_score = calculate_risk_score
@@ -195,6 +226,8 @@ class AffiliateFraudDetector
     recommendations
   end
 
+  # Gather raw metrics used by the detector.
+  # @return [Hash]
   def collect_metrics
     {
       clicks_last_hour: recent_clicks(1.hour).count,
@@ -208,14 +241,20 @@ class AffiliateFraudDetector
     }
   end
 
+  # Recent clicks scoped to a time duration.
+  # @api private
   def recent_clicks(duration)
     affiliate.affiliate_clicks.where(created_at: duration.ago..)
   end
 
+  # Recent referrals scoped to a time duration.
+  # @api private
   def recent_referrals(duration)
     affiliate.referrals.where(created_at: duration.ago..)
   end
 
+  # Fraction of clicks from the single most common IP over @period.
+  # @return [Float] 0.0..1.0
   def calculate_ip_concentration
     clicks = recent_clicks(@period)
     return 0 if clicks.empty?
@@ -226,6 +265,8 @@ class AffiliateFraudDetector
     max_from_single_ip.to_f / clicks.count
   end
 
+  # Detect repeated, bot‑like click intervals in the last hour.
+  # @return [Boolean]
   def has_suspicious_click_patterns?
     # Check for rapid-fire clicking
     clicks = recent_clicks(1.hour).order(:created_at)
@@ -244,6 +285,8 @@ class AffiliateFraudDetector
     max_same_interval > intervals.size * 0.3 # More than 30% with same interval
   end
 
+  # Detect narrow timing windows of activity over the last 7 days.
+  # @return [Boolean]
   def has_suspicious_timing_patterns?
     # Check if all activity happens in specific time windows (bot-like)
     clicks = recent_clicks(7.days)
@@ -273,6 +316,8 @@ class AffiliateFraudDetector
     times.sum / times.size
   end
 
+  # Percentage of cancelled commissions among all commissions.
+  # @return [Float] percentage 0..100 with 2 decimals
   def calculate_reversal_rate
     total = affiliate.commissions.count
     return 0 if total.zero?

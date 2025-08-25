@@ -4,16 +4,38 @@ require "json"
 require "net/http"
 require "uri"
 
-# Service for fetching and processing GitHub releases for transparency log
+#
+# GithubReleasesService fetches and normalizes recent GitHub releases
+# to power the Transparency Log. It minimizes external calls, caches
+# responses, and provides a robust fallback when offline.
+#
+# Results
+# - Returns an Array of Hashes with the following keys:
+#   - :version          [String]  release tag/name (e.g., "v1.2.3")
+#   - :commit           [String]  7–40 char SHA, if found
+#   - :timestamp        [String]  ISO8601 timestamp from published/created
+#   - :status           [String]  "active" for current build, otherwise "published"
+#   - :attestation_url  [String]  URL to attestation asset or release page
+#
 class GithubReleasesService
+  # Fetch recent builds as normalized entries.
+  #
+  # In test, never performs network calls and returns a small fallback list.
+  # In other environments, caches for 5 minutes.
+  #
+  # @return [Array<Hash>] see Results
   def self.fetch_builds
     new.fetch_builds
   end
 
+  # Initialize with current BuildInfo (for determining active version).
+  # @return [void]
   def initialize
     @build_info = BuildInfo.current
   end
 
+  # Fetch builds from GitHub with caching and fallback behavior.
+  # @return [Array<Hash>] see Results
   def fetch_builds
     # Avoid external API calls in test environment
     return fallback_builds if Rails.env.test?
@@ -29,6 +51,8 @@ class GithubReleasesService
 
   attr_reader :build_info
 
+  # Perform raw GitHub API call and normalize response into releases list.
+  # @return [Array<Hash>]
   def fetch_from_github
     uri = URI.parse("https://api.github.com/repos/vpn9labs/vpn9-portal/releases?per_page=10")
     response = Net::HTTP.get_response(uri)
@@ -70,6 +94,9 @@ class GithubReleasesService
     end.reverse
   end
 
+  # Fallback when offline or errors occur.
+  # Provides a minimal list containing the current build as active.
+  # @return [Array<Hash>]
   def fallback_builds
     [
       {
@@ -82,6 +109,8 @@ class GithubReleasesService
     ]
   end
 
+  # Resolve git HEAD SHA, except in test where an empty string is returned.
+  # @return [String, nil]
   def git_commit
     return "" if Rails.env.test? # Return empty string for test
     `git rev-parse HEAD 2>/dev/null`.strip.presence

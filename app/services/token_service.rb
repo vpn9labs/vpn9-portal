@@ -1,13 +1,42 @@
 require "jwt"
 
-# JWT token service - NO tracking, NO logging, NO storage
-# Tokens are self-contained and verified cryptographically
+#
+# TokenService provides minimal, privacy‑preserving JWT handling.
+#
+# Principles
+# - No tracking, no logging of user activity, no server‑side token storage.
+# - Tokens are self‑contained and signed using RS256 (RSA SHA‑256).
+# - Only the minimum payload is embedded: subject (user id), expiry/issued‑at,
+#   and the user's subscription expiry timestamp for relay‑side checks.
+#
+# Keys
+# - Public/private key material is supplied via `JWT_PUBLIC_KEY`/`JWT_PRIVATE_KEY`
+#   environment variables (Base64‑encoded PEM). In development/test, keys are
+#   generated on the fly and written under `config/` for convenience.
+#
+# Usage
+#   token = TokenService.generate_token(user)
+#   data  = TokenService.verify_token(token)
+#   user  = TokenService.authenticate_token(token)
+#
+# Payload schema (JSON):
+# - sub: String           # user id
+# - exp: Integer          # expiration (unix epoch seconds)
+# - iat: Integer          # issued at (unix epoch seconds)
+# - subscription_expires: Integer | nil  # user's subscription expiry
+#
 class TokenService
   # Token expiration times
+  # @return [ActiveSupport::Duration]
   ACCESS_TOKEN_EXPIRY = 24.hours  # Valid for 24 hours
 
   class << self
-    # Generate a token for a user with active subscription
+    # Generate a signed JWT for a user with an active subscription.
+    #
+    # @param user [User]
+    # @return [String, nil] RS256‑signed JWT string, or nil when user has no active subscription
+    # @example
+    #   token = TokenService.generate_token(current_user)
     def generate_token(user)
       # Only issue tokens for users with active subscriptions
       return nil unless user.has_active_subscription?
@@ -23,7 +52,19 @@ class TokenService
       JWT.encode(payload, private_key, "RS256")
     end
 
-    # Verify and decode a token
+    # Verify and decode a JWT.
+    #
+    # Verifies signature and expiration using the RS256 public key.
+    # Returns a minimal, typed hash for app consumption. Does not consult
+    # the database; callers decide what to do with the decoded data.
+    #
+    # @param token [String]
+    # @return [Hash, nil] with keys: :user_id (Integer), :expires_at (Time), :subscription_expires (Time|nil)
+    # @example
+    #   data = TokenService.verify_token(token)
+    #   if data && Time.current < data[:expires_at]
+    #     # token structure valid
+    #   end
     def verify_token(token)
       payload = JWT.decode(token, public_key, true, { algorithm: "RS256" })
 
@@ -40,7 +81,13 @@ class TokenService
       nil # Invalid token
     end
 
-    # Get user from token (for API authentication)
+    # Authenticate by token and return the User record.
+    #
+    # This resolves the user id from the token and fetches the user from the DB.
+    # It does not check subscription state; callers can enforce that policy.
+    #
+    # @param token [String]
+    # @return [User, nil]
     def authenticate_token(token)
       token_data = verify_token(token)
       return nil unless token_data
@@ -52,6 +99,13 @@ class TokenService
 
     private
 
+    # Load or generate the RSA private key.
+    #
+    # In production, requires `JWT_PRIVATE_KEY` (Base64‑encoded PEM).
+    # In development/test, generates a throwaway key if absent and writes
+    # it to `config/jwt_private_key.pem`/`config/jwt_public_key.pem`.
+    #
+    # @return [OpenSSL::PKey::RSA]
     def private_key
       @private_key ||= begin
         key_content = if ENV["JWT_PRIVATE_KEY"].present?
@@ -63,6 +117,9 @@ class TokenService
       end
     end
 
+    # Load the RSA public key used for verification.
+    #
+    # @return [OpenSSL::PKey::RSA]
     def public_key
       @public_key ||= begin
         key_content = if ENV["JWT_PUBLIC_KEY"].present?
@@ -74,6 +131,10 @@ class TokenService
       end
     end
 
+    # Generate throwaway keys for development/test environments.
+    #
+    # @return [String] PEM‑encoded private key
+    # @raise [RuntimeError] when keys are missing in production
     def generate_keys_if_missing
       if Rails.env.development? || Rails.env.test?
         key = OpenSSL::PKey::RSA.generate(2048)
