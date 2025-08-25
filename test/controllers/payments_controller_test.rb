@@ -6,13 +6,7 @@ class PaymentsControllerTest < ActionDispatch::IntegrationTest
   def setup
     @user = User.create!(email_address: "test@example.com", password: "password")
     @passphrase = @user.instance_variable_get(:@issued_passphrase)
-    @plan = Plan.create!(
-      name: "Test Plan",
-      price: 9.99,
-      currency: "USD",
-      duration_days: 30,
-      active: true
-    )
+    @plan = plans(:monthly)
 
     # Login the user with passphrase
     sign_in_user
@@ -82,7 +76,7 @@ class PaymentsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should only show own payments" do
-    other_user = User.create!(email_address: "other@example.com", password: "password")
+    other_user = users(:two)
 
     # Make sure we're using other_user's association to create the payment
     payment = Payment.create!(

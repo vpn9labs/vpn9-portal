@@ -12,13 +12,7 @@ class AffiliateTrackingTest < ActionDispatch::IntegrationTest
     )
 
     # Create a plan
-    @plan = Plan.create!(
-      name: "Premium Plan",
-      price: 20.00,
-      currency: "USD",
-      duration_days: 30,
-      device_limit: 10
-    )
+    @plan = plans(:premium_20)
   end
 
   test "complete affiliate tracking flow from click to commission" do

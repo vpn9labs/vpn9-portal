@@ -6,11 +6,7 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     @user = User.create!(email_address: "test@example.com", password: "password")
     @passphrase = @user.regenerate_passphrase!
 
-    @plan = Plan.create!(
-      name: "Test Plan",
-      price: 9.99,
-      duration_days: 30
-    )
+    @plan = plans(:monthly)
     @subscription = Subscription.create!(
       user: @user,
       plan: @plan,
@@ -85,7 +81,7 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should only show own subscriptions" do
-    other_user = User.create!(email_address: "other@example.com", password: "password")
+    other_user = users(:two)
     other_subscription = Subscription.create!(
       user: other_user,
       plan: @plan,

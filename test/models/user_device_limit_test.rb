@@ -6,29 +6,11 @@ class UserDeviceLimitTest < ActiveSupport::TestCase
     # Clear any existing devices from fixtures
     @user.devices.destroy_all
 
-    @plan_basic = Plan.create!(
-      name: "Basic Plan",
-      price: 5.00,
-      currency: "USD",
-      duration_days: 30,
-      device_limit: 3
-    )
+    @plan_basic = plans(:basic_3)
 
-    @plan_pro = Plan.create!(
-      name: "Pro Plan",
-      price: 10.00,
-      currency: "USD",
-      duration_days: 30,
-      device_limit: 10
-    )
+    @plan_pro = plans(:pro_10)
 
-    @plan_unlimited = Plan.create!(
-      name: "Unlimited Plan",
-      price: 20.00,
-      currency: "USD",
-      duration_days: 30,
-      device_limit: 100
-    )
+    @plan_unlimited = plans(:unlimited_100)
   end
 
   # Device Limit Method Tests

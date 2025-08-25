@@ -9,13 +9,7 @@ class Api::V1::AuthControllerTest < ActionDispatch::IntegrationTest
     @passphrase = @user.instance_variable_get(:@issued_passphrase)
 
     # Create an active subscription for the user
-    plan = Plan.create!(
-      name: "Test Plan",
-      price: 9.99,
-      currency: "USD",
-      duration_days: 30,
-      active: true
-    )
+    plan = plans(:monthly)
 
     @subscription = Subscription.create!(
       user: @user,

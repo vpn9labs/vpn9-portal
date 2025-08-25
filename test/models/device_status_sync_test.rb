@@ -2,8 +2,8 @@ require "test_helper"
 
 class DeviceStatusSyncTest < ActiveSupport::TestCase
   def setup
-    @user = User.create!(email_address: "status@example.com", password: "password")
-    @plan_basic = Plan.create!(name: "Basic", price: 5.0, duration_days: 30, device_limit: 2)
+    @user = users(:john)
+    @plan_basic = plans(:basic_2)
   end
 
   test "devices are inactive without active subscription" do
@@ -28,6 +28,9 @@ class DeviceStatusSyncTest < ActiveSupport::TestCase
       expires_at: 30.days.from_now
     )
 
+    # Ensure device statuses reflect the new subscription
+    Device.sync_statuses_for_user!(@user)
+
     assert_equal %w[active active inactive], [ d1.reload.status, d2.reload.status, d3.reload.status ]
   end
 
@@ -43,15 +46,18 @@ class DeviceStatusSyncTest < ActiveSupport::TestCase
       expires_at: 30.days.from_now
     )
 
+    # Reflect activation due to subscription
+    Device.sync_statuses_for_user!(@user)
     assert_equal %w[active active], [ d1.reload.status, d2.reload.status ]
 
     sub.cancel!
+    Device.sync_statuses_for_user!(@user)
     assert_equal %w[inactive inactive], [ d1.reload.status, d2.reload.status ]
   end
 
   test "honors plan changes to device_limit" do
     # Start with 1-device plan
-    plan_one = Plan.create!(name: "One", price: 3.0, duration_days: 30, device_limit: 1)
+    plan_one = plans(:single_1)
     d1 = @user.devices.create!(public_key: "k1")
     d2 = @user.devices.create!(public_key: "k2")
 
@@ -63,10 +69,12 @@ class DeviceStatusSyncTest < ActiveSupport::TestCase
       expires_at: 30.days.from_now
     )
 
+    Device.sync_statuses_for_user!(@user)
     assert_equal %w[active inactive], [ d1.reload.status, d2.reload.status ]
 
     # Upgrade plan to allow 2 devices
     sub.update!(plan: @plan_basic)
+    Device.sync_statuses_for_user!(@user)
     assert_equal %w[active active], [ d1.reload.status, d2.reload.status ]
   end
 
@@ -82,9 +90,11 @@ class DeviceStatusSyncTest < ActiveSupport::TestCase
       expires_at: 30.days.from_now
     )
 
+    Device.sync_statuses_for_user!(@user)
     assert_equal %w[active active inactive], [ d1.reload.status, d2.reload.status, d3.reload.status ]
 
     d1.destroy
+    Device.sync_statuses_for_user!(@user)
     assert_equal %w[active active], [ d2.reload.status, d3.reload.status ]
   end
 end

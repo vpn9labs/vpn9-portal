@@ -134,12 +134,13 @@ class CommissionService
     # @param commission_ids [Array<Integer>, nil]
     # @return [Hash, nil] summary hash { affiliate:, amount:, commission_count:, transaction_id:, currency: } or nil when nothing to payout / below threshold
     def process_payout(affiliate, commission_ids = nil)
-      commissions = affiliate.commissions.payable
-      commissions = commissions.where(id: commission_ids) if commission_ids.present?
+      scope = affiliate.commissions.payable
+      scope = scope.where(id: commission_ids) if commission_ids.present?
 
+      commissions = scope.to_a
       return nil if commissions.empty?
 
-      total_amount = commissions.sum(:amount)
+      total_amount = commissions.sum { |c| c.amount.to_f }
 
       # Check minimum payout threshold
       minimum_payout = Rails.application.config.minimum_payout_amount || 100.0
@@ -156,12 +157,12 @@ class CommissionService
         commission.mark_as_paid!(transaction_id)
       end
 
-      Rails.logger.info "Processed payout of $#{total_amount} for affiliate #{affiliate.code} (#{commissions.count} commissions)"
+      Rails.logger.info "Processed payout of $#{total_amount} for affiliate #{affiliate.code} (#{commissions.size} commissions)"
 
       {
         affiliate: affiliate,
         amount: total_amount,
-        commission_count: commissions.count,
+        commission_count: commissions.size,
         transaction_id: transaction_id,
         currency: affiliate.payout_currency
       }

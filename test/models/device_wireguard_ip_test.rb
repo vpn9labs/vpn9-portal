@@ -2,11 +2,7 @@ require "test_helper"
 
 class DeviceWireguardIpTest < ActiveSupport::TestCase
   def setup
-    @user = User.create!(
-      email_address: "test@example.com",
-      password: "password123",
-      password_confirmation: "password123"
-    )
+    @user = users(:one)
   end
 
   test "generates consistent wireguard IP for same device" do

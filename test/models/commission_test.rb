@@ -12,14 +12,8 @@ class CommissionTest < ActiveSupport::TestCase
       payout_address: "bc1qtest123"
     )
 
-    @user = User.create!(email_address: "user@example.com")
-    @plan = Plan.create!(
-      name: "Basic Plan",
-      price: 100,
-      currency: "USD",
-      duration_days: 30,
-      device_limit: 5
-    )
+    @user = users(:one)
+    @plan = plans(:pro_5)
 
     @payment = Payment.create!(
       user: @user,

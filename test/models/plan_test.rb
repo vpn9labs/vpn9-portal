@@ -78,7 +78,7 @@ class PlanTest < ActiveSupport::TestCase
 
   test "should destroy associated subscriptions" do
     @plan.save!
-    user = User.create!(email_address: "test@example.com", password: "password")
+    user = users(:one)
     subscription = @plan.subscriptions.create!(
       user: user,
       started_at: Time.current,
@@ -92,7 +92,7 @@ class PlanTest < ActiveSupport::TestCase
 
   test "should destroy associated payments" do
     @plan.save!
-    user = User.create!(email_address: "test@example.com", password: "password")
+    user = users(:one)
     payment = @plan.payments.create!(
       user: user,
       amount: @plan.price,

@@ -51,8 +51,8 @@ class SubscriptionExpirationTest < ActiveSupport::TestCase
   end
 
   test "sync_expirations! marks subscriptions expired and deactivates devices + Redis sets" do
-    user = User.create!(email_address: "exp@example.com", password: "password")
-    plan = Plan.create!(name: "Basic", price: 5.0, duration_days: 30, device_limit: 3)
+    user = users(:one)
+    plan = plans(:monthly)
     d1 = user.devices.create!(public_key: "exp1")
     d2 = user.devices.create!(public_key: "exp2")
 

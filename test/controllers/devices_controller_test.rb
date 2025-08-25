@@ -7,21 +7,9 @@ class DevicesControllerTest < ActionDispatch::IntegrationTest
     @passphrase = @user.regenerate_passphrase!
 
     # Create test plans
-    @basic_plan = Plan.create!(
-      name: "Basic",
-      price: 5.00,
-      currency: "USD",
-      duration_days: 30,
-      device_limit: 2
-    )
+    @basic_plan = plans(:basic_2)
 
-    @pro_plan = Plan.create!(
-      name: "Pro",
-      price: 10.00,
-      currency: "USD",
-      duration_days: 30,
-      device_limit: 5
-    )
+    @pro_plan = plans(:pro_5)
 
     # Sign in the user with passphrase
     post session_path, params: {
@@ -212,7 +200,7 @@ class DevicesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should not destroy device of another user" do
-    other_user = User.create!(email_address: "other@example.com", password: "password")
+    other_user = users(:two)
     other_device = other_user.devices.create!(public_key: "other_user_device_key")
 
     # Try to delete other user's device - should get 404 or redirect

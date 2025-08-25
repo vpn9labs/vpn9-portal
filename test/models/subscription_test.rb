@@ -2,12 +2,8 @@ require "test_helper"
 
 class SubscriptionTest < ActiveSupport::TestCase
   def setup
-    @user = User.create!(email_address: "test@example.com", password: "password")
-    @plan = Plan.create!(
-      name: "Test Plan",
-      price: 9.99,
-      duration_days: 30
-    )
+    @user = users(:one)
+    @plan = plans(:monthly)
     @subscription = Subscription.new(
       user: @user,
       plan: @plan,

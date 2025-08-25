@@ -66,7 +66,7 @@ class AccountDeletionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should handle account deletion when user has payments" do
-    plan = Plan.create!(name: "Test Plan", price: 10, currency: "USD", duration_days: 30)
+    plan = plans(:monthly)
     payment = @user.payments.create!(
       plan: plan,
       amount: 10,
@@ -92,7 +92,7 @@ class AccountDeletionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should handle account deletion when user has subscriptions" do
-    plan = Plan.create!(name: "Test Plan", price: 10, currency: "USD", duration_days: 30)
+    plan = plans(:monthly)
     subscription = @user.subscriptions.create!(
       plan: plan,
       status: :active,

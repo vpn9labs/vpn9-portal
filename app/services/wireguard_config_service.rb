@@ -94,9 +94,10 @@ class WireguardConfigService
   # Generate server-side peer configuration for this device
   # @return [String] peer stanza suitable for inclusion in wg0.conf
   def generate_server_peer_config
+    user_label = safe_user_label
     <<~CONFIG
 
-      # Peer: #{device.name} (User: #{device.user.email_address || 'Anonymous'})
+      # Peer: #{device.name} (User: #{user_label})
       [Peer]
       PublicKey = #{device.public_key}
       AllowedIPs = #{device.wireguard_addresses}
@@ -205,6 +206,17 @@ class WireguardConfigService
   def dns_servers
     # Cloudflare DNS with IPv6 support
     "1.1.1.1, 1.0.0.1, 2606:4700:4700::1111, 2606:4700:4700::1001"
+  end
+
+  # Derive a safe label for the user in comments, tolerating encryption errors.
+  # @return [String]
+  def safe_user_label
+    begin
+      email = device.user&.email_address
+      email.present? ? email : "Anonymous"
+    rescue ActiveRecord::Encryption::Errors::Decryption
+      "Anonymous"
+    end
   end
 
   # Desktop setup instructions string.

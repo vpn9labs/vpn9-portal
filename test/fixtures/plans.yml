@@ -7,10 +7,11 @@ monthly:
   currency: USD
   duration_days: 30
   active: true
+  device_limit: 5
   features:
-    unlimited_bandwidth: true
-    all_locations: true
-    max_devices: 5
+    - Unlimited bandwidth
+    - All locations
+    - Max devices: 5
 
 yearly:
   name: Yearly Plan
@@ -19,11 +20,12 @@ yearly:
   currency: USD
   duration_days: 365
   active: true
+  device_limit: 10
   features:
-    unlimited_bandwidth: true
-    all_locations: true
-    max_devices: 10
-    priority_support: true
+    - Unlimited bandwidth
+    - All locations
+    - Max devices: 10
+    - Priority support
 
 trial:
   name: Trial Plan
@@ -32,7 +34,97 @@ trial:
   currency: USD
   duration_days: 7
   active: true
+  device_limit: 1
   features:
-    unlimited_bandwidth: false
-    all_locations: false
-    max_devices: 1
+    - Limited bandwidth
+    - Limited locations
+    - Max devices: 1
+
+# Additional plans for tests
+basic_2:
+  name: Basic
+  price: 5.00
+  currency: USD
+  duration_days: 30
+  active: true
+  device_limit: 2
+
+basic_3:
+  name: Basic
+  price: 5.00
+  currency: USD
+  duration_days: 30
+  active: true
+  device_limit: 3
+
+pro_5:
+  name: Pro
+  price: 10.00
+  currency: USD
+  duration_days: 30
+  active: true
+  device_limit: 5
+
+pro_10:
+  name: Pro
+  price: 10.00
+  currency: USD
+  duration_days: 30
+  active: true
+  device_limit: 10
+
+single_1:
+  name: Single Device
+  price: 9.00
+  currency: USD
+  duration_days: 30
+  active: true
+  device_limit: 1
+
+unlimited_100:
+  name: Unlimited
+  price: 20.00
+  currency: USD
+  duration_days: 30
+  active: true
+  device_limit: 100
+
+inactive_plan:
+  name: Inactive Plan
+  price: 19.99
+  currency: USD
+  duration_days: 60
+  active: false
+  device_limit: 5
+
+weekly:
+  name: Weekly Plan
+  price: 2.99
+  currency: USD
+  duration_days: 7
+  active: true
+  device_limit: 3
+
+quarterly:
+  name: Quarterly Plan
+  price: 24.99
+  currency: USD
+  duration_days: 90
+  active: true
+  device_limit: 5
+
+premium_20:
+  name: Premium Plan
+  price: 20.00
+  currency: USD
+  duration_days: 30
+  active: true
+  device_limit: 10
+
+free_1:
+  name: Free Plan
+  price: 0.00
+  currency: USD
+  duration_days: 30
+  active: true
+  device_limit: 1

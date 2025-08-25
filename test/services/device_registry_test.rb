@@ -51,7 +51,7 @@ class DeviceRegistryTest < ActiveSupport::TestCase
   end
 
   test "upsert_device writes per-device fields" do
-    user = User.create!(email_address: "dreg1@example.com", password: "password")
+    user = users(:john)
     device = user.devices.create!(public_key: "pub1")
     DeviceRegistry.upsert_device(device)
     data = @store.hash("vpn9:device:#{device.id}").to_h
@@ -66,7 +66,7 @@ class DeviceRegistryTest < ActiveSupport::TestCase
   end
 
   test "device create populates hash but not active set without subscription" do
-    user = User.create!(email_address: "dreg2@example.com", password: "password")
+    user = users(:john)
     device = user.devices.create!(public_key: "pub2")
     # Simulate after_commit callback
     DeviceRegistry.upsert_device(device)
@@ -77,8 +77,8 @@ class DeviceRegistryTest < ActiveSupport::TestCase
   end
 
   test "subscription activates devices up to plan limit and updates sets" do
-    user = User.create!(email_address: "dreg3@example.com", password: "password")
-    plan = Plan.create!(name: "Basic", price: 5.0, duration_days: 30, device_limit: 2)
+    user = users(:john)
+    plan = plans(:basic_2)
     d1 = user.devices.create!(public_key: "pub_a")
     d2 = user.devices.create!(public_key: "pub_b")
     d3 = user.devices.create!(public_key: "pub_c")
@@ -94,8 +94,8 @@ class DeviceRegistryTest < ActiveSupport::TestCase
   end
 
   test "cancelling subscription removes devices from sets" do
-    user = User.create!(email_address: "dreg4@example.com", password: "password")
-    plan = Plan.create!(name: "Basic", price: 5.0, duration_days: 30, device_limit: 2)
+    user = users(:john)
+    plan = plans(:basic_2)
     d1 = user.devices.create!(public_key: "pub_a1")
     d2 = user.devices.create!(public_key: "pub_b1")
     sub = Subscription.create!(user: user, plan: plan, status: :active, started_at: Time.current, expires_at: 30.days.from_now)
@@ -107,7 +107,7 @@ class DeviceRegistryTest < ActiveSupport::TestCase
   end
 
   test "updating public_key updates allowed_ips in device hash" do
-    user = User.create!(email_address: "dreg5@example.com", password: "password")
+    user = users(:john)
     device = user.devices.create!(public_key: "pub_old")
     DeviceRegistry.upsert_device(device)
     old_allowed = @store.hash("vpn9:device:#{device.id}").to_h["allowed_ips"]
@@ -119,8 +119,8 @@ class DeviceRegistryTest < ActiveSupport::TestCase
   end
 
   test "destroy device removes from sets and deletes hash" do
-    user = User.create!(email_address: "dreg6@example.com", password: "password")
-    plan = Plan.create!(name: "Pro", price: 9.0, duration_days: 30, device_limit: 1)
+    user = users(:john)
+    plan = plans(:single_1)
     d = user.devices.create!(public_key: "pub_z")
     Subscription.create!(user: user, plan: plan, status: :active, started_at: Time.current, expires_at: 30.days.from_now)
     Device.sync_statuses_for_user!(user)
@@ -136,9 +136,9 @@ class DeviceRegistryTest < ActiveSupport::TestCase
   end
 
   test "rebuild repopulates hashes and sets from DB state" do
-    u1 = User.create!(email_address: "rebuild1@example.com", password: "password")
-    u2 = User.create!(email_address: "rebuild2@example.com", password: "password")
-    plan = Plan.create!(name: "Pro2", price: 9.0, duration_days: 30, device_limit: 2)
+    u1 = users(:john)
+    u2 = users(:jane)
+    plan = plans(:basic_2)
     d1 = u1.devices.create!(public_key: "pub_r1")
     d2 = u1.devices.create!(public_key: "pub_r2")
     d3 = u2.devices.create!(public_key: "pub_r3")

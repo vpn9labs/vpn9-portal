@@ -124,7 +124,8 @@ class PaymentProcessor
     # Selected processor symbol (e.g., :bitcart)
     # @return [Symbol]
     def processor_type
-      @processor_type ||= (ENV["PAYMENT_PROCESSOR"] || "bitcart").to_sym
+      # Read from ENV each time to honor runtime/test changes
+      (ENV["PAYMENT_PROCESSOR"] || "bitcart").to_sym
     end
 
     # Public host for webhook callback URLs

@@ -7,37 +7,13 @@ class DeviceLimitWorkflowTest < ActionDispatch::IntegrationTest
     @passphrase = @user.regenerate_passphrase!
 
     # Create test plans
-    @free_plan = Plan.create!(
-      name: "Free",
-      price: 0.00,
-      currency: "USD",
-      duration_days: 30,
-      device_limit: 1
-    )
+    @free_plan = plans(:free_1)
 
-    @basic_plan = Plan.create!(
-      name: "Basic",
-      price: 5.00,
-      currency: "USD",
-      duration_days: 30,
-      device_limit: 3
-    )
+    @basic_plan = plans(:basic_3)
 
-    @pro_plan = Plan.create!(
-      name: "Pro",
-      price: 10.00,
-      currency: "USD",
-      duration_days: 30,
-      device_limit: 10
-    )
+    @pro_plan = plans(:pro_10)
 
-    @unlimited_plan = Plan.create!(
-      name: "Unlimited",
-      price: 20.00,
-      currency: "USD",
-      duration_days: 30,
-      device_limit: 100
-    )
+    @unlimited_plan = plans(:unlimited_100)
   end
 
   test "complete device management workflow with plan upgrades" do

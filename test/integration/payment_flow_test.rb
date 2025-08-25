@@ -4,15 +4,7 @@ class PaymentFlowTest < ActionDispatch::IntegrationTest
   def setup
     @user = User.create!(email_address: "test@example.com", password: "password")
     @passphrase = @user.instance_variable_get(:@issued_passphrase)
-    @plan = Plan.create!(
-      name: "Monthly Plan",
-      description: "30 days of VPN access",
-      price: 9.99,
-      currency: "USD",
-      duration_days: 30,
-      active: true,
-      features: [ "Unlimited bandwidth", "All servers" ]
-    )
+    @plan = plans(:monthly)
 
     # Mock payment processor responses
     @mock_cryptos = {

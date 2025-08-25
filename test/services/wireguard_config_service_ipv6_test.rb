@@ -2,11 +2,7 @@ require "test_helper"
 
 class WireguardConfigServiceIpv6Test < ActiveSupport::TestCase
   def setup
-    @user = User.create!(
-      email_address: "test@example.com",
-      password: "password123",
-      password_confirmation: "password123"
-    )
+    @user = users(:one)
 
     @device = Device.create!(
       user: @user,

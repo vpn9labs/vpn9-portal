@@ -86,7 +86,10 @@ class Subscription < ApplicationRecord
   end
 
   # Keep device access in sync with subscription changes
-  after_commit :sync_user_device_statuses, on: [ :create, :update, :destroy ]
+  # - Always sync on create/destroy
+  # - On update, sync only when fields affecting access/limits change
+  after_commit :sync_user_device_statuses, on: [ :create, :destroy ]
+  after_commit :sync_user_device_statuses_if_relevant, on: :update
 
   # Mark all `active` subscriptions that have reached `expires_at` as `expired`
   # and deactivate devices for those users.
@@ -127,6 +130,15 @@ class Subscription < ApplicationRecord
   def sync_user_device_statuses
     return unless user
     # Ensure devices reflect current subscription state and device limits
+    Device.sync_statuses_for_user!(user)
+  end
+
+  # Only sync when relevant attributes change (status, plan, or expiry)
+  def sync_user_device_statuses_if_relevant
+    return unless user
+    changes = previous_changes || {}
+    relevant = changes.key?("status") || changes.key?("plan_id") || changes.key?("expires_at")
+    return unless relevant
     Device.sync_statuses_for_user!(user)
   end
 end

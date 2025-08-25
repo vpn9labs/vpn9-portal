@@ -2,14 +2,8 @@ require "test_helper"
 
 class Payments::BitcartWebhookControllerTest < ActionDispatch::IntegrationTest
   def setup
-    @user = User.create!(email_address: "test@example.com", password: "password")
-    @plan = Plan.create!(
-      name: "Test Plan",
-      price: 9.99,
-      currency: "USD",
-      duration_days: 30,
-      active: true
-    )
+    @user = users(:one)
+    @plan = plans(:monthly)
   end
 
   test "processes payment update without secret" do
