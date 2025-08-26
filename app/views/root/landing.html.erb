@@ -23,93 +23,12 @@
 <% end %>
 
 <% content_for :head do %>
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "Organization",
-          "@id": "<%= request.base_url %>/#organization",
-          "name": "VPN9",
-          "url": "<%= request.base_url %>",
-          "logo": "<%= request.base_url %>/logo.png",
-          "description": "Privacy-focused VPN service with true no-logs policy and anonymous cryptocurrency payments",
-          "sameAs": ["https://github.com/vpn9labs"]
-        },
-        {
-          "@type": "WebSite",
-          "@id": "<%= request.base_url %>/#website",
-          "url": "<%= request.base_url %>",
-          "name": "VPN9",
-          "description": "True privacy VPN with zero logs and anonymous accounts",
-          "publisher": {"@id": "<%= request.base_url %>/#organization"}
-        },
-        {
-          "@type": "SoftwareApplication",
-          "name": "VPN9",
-          "applicationCategory": "SecurityApplication",
-          "operatingSystem": ["Windows", "macOS", "Linux", "iOS", "Android"],
-          "offers": {
-            "@type": "Offer",
-            "price": "9.00",
-            "priceCurrency": "USD",
-            "availability": "https://schema.org/InStock",
-            "priceValidUntil": "2025-12-31",
-            "acceptedPaymentMethod": [
-              {"@type": "PaymentMethod", "name": "Bitcoin"},
-              {"@type": "PaymentMethod", "name": "Monero"}
-            ]
-          },
-          "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.9",
-            "reviewCount": "2847"
-          },
-          "description": "True privacy VPN service with zero logs, anonymous accounts, and cryptocurrency payments",
-          "featureList": [
-            "Zero connection logs",
-            "Anonymous account creation",
-            "Bitcoin and Monero payments accepted",
-            "WireGuard protocol",
-            "Military-grade encryption",
-            "No email required",
-            "5 simultaneous device connections",
-            "Global server network",
-            "Open source transparency"
-          ]
-        },
-        {
-          "@type": "FAQPage",
-          "mainEntity": [
-            {
-              "@type": "Question",
-              "name": "Does VPN9 really keep no logs?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Yes, VPN9 has been architected from the ground up to make logging impossible. We don't store connection times, IP addresses, bandwidth usage, or any activity data."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "Can I pay with cryptocurrency?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Yes, we accept Bitcoin, Monero, and other major cryptocurrencies for complete payment anonymity. No credit card or bank information required."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "Do I need to provide an email address?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "No, VPN9 allows completely anonymous account creation. You can sign up without providing any personal information - just create a secure passphrase."
-              }
-            }
-          ]
-        }
-      ]
-    }
-  </script>
+  <%= render_structured_data \
+        structured_data_for_organization, \
+        structured_data_for_website, \
+        structured_data_for_vpn_service, \
+        structured_data_for_faq, \
+        graph: true %>
 <% end %>
 
 <% if defined?(Current) && Current.user %>

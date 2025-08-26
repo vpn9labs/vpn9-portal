@@ -1,20 +1,7 @@
 <%# Schema.org Structured Data %>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "VPN9",
-  "url": "https://VPN9.com",
-  "logo": "https://VPN9.com/logo.png",
-  "description": "True anonymous VPN service with zero logs, no email required, cryptocurrency payments only",
-  "sameAs": [],
-  "contactPoint": {
-    "@type": "ContactPoint",
-    "contactType": "customer service",
-    "availableLanguage": ["en"]
-  }
-}
-</script>
+<% content_for :head do %>
+  <%= render_structured_data structured_data_for_organization %>
+<% end %>
 
 <%# Hero Section %>
 <section class="relative isolate overflow-hidden bg-gray-900" aria-label="Hero">

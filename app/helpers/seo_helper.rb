@@ -1,4 +1,29 @@
 module SeoHelper
+  # Renders one or more JSON-LD schema objects as <script type="application/ld+json"> tags.
+  # If graph: true, combines provided schemas into a single @graph payload.
+  def render_structured_data(*schemas, graph: false)
+    schemas = schemas.flatten
+
+    if graph
+      payloads = [
+        {
+          "@context" => "https://schema.org",
+          "@graph" => schemas
+        }
+      ]
+    else
+      payloads = schemas
+    end
+
+    safe_join(
+      payloads.map do |data|
+        # Pretty-generate JSON and mark as HTML-safe so it's not escaped inside the script tag
+        json = JSON.pretty_generate(data).html_safe
+        tag.script(json, type: "application/ld+json")
+      end,
+      "\n".html_safe
+    )
+  end
   def default_meta_tags
     # Always use primary domain for canonical URLs to avoid duplicate content
     canonical_url = request.original_url.gsub(/https?:\/\/[^\/]+/, "https://vpn9.com")
@@ -63,7 +88,12 @@ module SeoHelper
         "@type": "Offer",
         "price": "9.00",
         "priceCurrency": "USD",
-        "availability": "https://schema.org/InStock"
+        "availability": "https://schema.org/InStock",
+        "priceValidUntil": "2025-12-31",
+        "acceptedPaymentMethod": [
+          { "@type": "PaymentMethod", "name": "Bitcoin" },
+          { "@type": "PaymentMethod", "name": "Monero" }
+        ]
       },
       "aggregateRating": {
         "@type": "AggregateRating",
@@ -75,12 +105,13 @@ module SeoHelper
       "featureList": [
         "Zero connection logs",
         "Anonymous account creation",
-        "Bitcoin and Monero payments",
+        "Bitcoin and Monero payments accepted",
         "WireGuard protocol",
         "Military-grade encryption",
         "No email required",
-        "5 simultaneous connections",
-        "Global server network"
+        "5 simultaneous device connections",
+        "Global server network",
+        "Open source transparency"
       ],
       "creator": {
         "@type": "Organization",
@@ -96,7 +127,7 @@ module SeoHelper
       "@type": "Organization",
       "name": "VPN9",
       "url": request.base_url,
-      "logo": "#{request.base_url}/logo.png",
+      "logo": "#{request.base_url}/icon.png",
       "description": "Privacy-focused VPN service with true no-logs policy",
       "sameAs": [
         "https://github.com/vpn9labs"
@@ -147,6 +178,16 @@ module SeoHelper
           }
         }
       ]
+    }
+  end
+
+  def structured_data_for_website
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "url": request.base_url,
+      "name": "VPN9",
+      "description": "True privacy VPN with zero logs and anonymous accounts"
     }
   end
 

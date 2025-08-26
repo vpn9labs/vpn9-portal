@@ -23,16 +23,7 @@
 
 <%# Schema.org Structured Data %>
 <% content_for :head do %>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "VPN9",
-    "url": "https://VPN9.com",
-    "description": "Revolutionary privacy-focused VPN service launching soon. Be the first to experience true anonymity.",
-    "sameAs": ["https://github.com/vpn9labs"]
-  }
-  </script>
+  <%= render_structured_data structured_data_for_organization %>
 <% end %>
 
 <%# Top Navigation Bar %>
