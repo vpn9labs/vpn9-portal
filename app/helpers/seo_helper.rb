@@ -126,11 +126,13 @@ module SeoHelper
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "VPN9",
+      "alternateName": "VPN9 Labs",
       "url": request.base_url,
       "logo": "#{request.base_url}/icon.png",
       "description": "Privacy-focused VPN service with true no-logs policy",
       "sameAs": [
-        "https://github.com/vpn9labs"
+        "https://github.com/vpn9labs",
+        "https://x.com/vpn9com"
       ],
       "contactPoint": {
         "@type": "ContactPoint",
