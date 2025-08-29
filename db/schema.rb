@@ -10,28 +10,30 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_29_101000) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_29_152000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pgcrypto"
 
-  create_table "admin_sessions", force: :cascade do |t|
-    t.bigint "admin_id", null: false
+  create_table "admin_sessions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "user_agent"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "admin_id"
     t.index ["admin_id"], name: "index_admin_sessions_on_admin_id"
+    t.index ["id"], name: "index_admin_sessions_on_id", unique: true
   end
 
-  create_table "admins", force: :cascade do |t|
+  create_table "admins", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "email", null: false
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_admins_on_email", unique: true
+    t.index ["id"], name: "index_admins_on_id", unique: true
   end
 
-  create_table "affiliate_clicks", force: :cascade do |t|
-    t.bigint "affiliate_id", null: false
+  create_table "affiliate_clicks", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "ip_hash"
     t.string "user_agent_hash"
     t.string "landing_page"
@@ -39,12 +41,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_101000) do
     t.boolean "converted", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "affiliate_id"
     t.index ["affiliate_id", "created_at"], name: "index_affiliate_clicks_on_affiliate_id_and_created_at"
     t.index ["affiliate_id"], name: "index_affiliate_clicks_on_affiliate_id"
+    t.index ["id"], name: "index_affiliate_clicks_on_id", unique: true
     t.index ["ip_hash", "created_at"], name: "index_affiliate_clicks_on_ip_hash_and_created_at"
   end
 
-  create_table "affiliates", force: :cascade do |t|
+  create_table "affiliates", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "code", null: false
     t.string "name"
     t.string "email"
@@ -77,13 +81,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_101000) do
     t.boolean "terms_accepted", default: false
     t.index ["code"], name: "index_affiliates_on_code", unique: true
     t.index ["email"], name: "index_affiliates_on_email"
+    t.index ["id"], name: "index_affiliates_on_id", unique: true
     t.index ["status"], name: "index_affiliates_on_status"
   end
 
   create_table "commissions", force: :cascade do |t|
-    t.bigint "affiliate_id", null: false
     t.uuid "payment_id", null: false
-    t.bigint "referral_id", null: false
     t.decimal "amount", precision: 10, scale: 2, null: false
     t.string "currency", default: "USD"
     t.decimal "commission_rate", precision: 5, scale: 2
@@ -94,8 +97,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_101000) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "payout_id"
-    t.index ["affiliate_id", "status"], name: "index_commissions_on_affiliate_id_and_status"
+    t.uuid "affiliate_id"
+    t.uuid "referral_id"
+    t.uuid "payout_id"
     t.index ["affiliate_id"], name: "index_commissions_on_affiliate_id"
     t.index ["payment_id"], name: "index_commissions_on_payment_id"
     t.index ["payment_id"], name: "index_commissions_on_payment_id_unique", unique: true
@@ -103,13 +107,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_101000) do
     t.index ["referral_id"], name: "index_commissions_on_referral_id"
   end
 
-  create_table "devices", force: :cascade do |t|
-    t.bigint "user_id", null: false
+  create_table "devices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", null: false
     t.text "public_key", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "status", default: 0, null: false
+    t.uuid "user_id"
+    t.index ["id"], name: "index_devices_on_id", unique: true
     t.index ["name"], name: "index_devices_on_name", unique: true
     t.index ["public_key"], name: "index_devices_on_public_key", unique: true
     t.index ["status"], name: "index_devices_on_status"
@@ -117,7 +122,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_101000) do
     t.index ["user_id"], name: "index_devices_on_user_id"
   end
 
-  create_table "launch_notifications", force: :cascade do |t|
+  create_table "launch_notifications", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "email", null: false
     t.string "user_agent"
     t.string "referrer"
@@ -128,22 +133,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_101000) do
     t.datetime "updated_at", null: false
     t.index ["created_at"], name: "index_launch_notifications_on_created_at"
     t.index ["email"], name: "index_launch_notifications_on_email", unique: true
+    t.index ["id"], name: "index_launch_notifications_on_id", unique: true
     t.index ["notified"], name: "index_launch_notifications_on_notified"
   end
 
-  create_table "locations", force: :cascade do |t|
+  create_table "locations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "country_code", limit: 2
     t.string "city"
     t.decimal "latitude"
     t.decimal "longitude"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["id"], name: "index_locations_on_id", unique: true
   end
 
   create_table "payments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.bigint "plan_id", null: false
-    t.bigint "subscription_id"
     t.decimal "amount", precision: 10, scale: 2, null: false
     t.string "currency", null: false
     t.integer "status", default: 0, null: false
@@ -158,6 +162,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_101000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "webhook_secret"
+    t.uuid "user_id"
+    t.uuid "plan_id"
+    t.uuid "subscription_id"
     t.index ["id"], name: "index_payments_on_id", unique: true
     t.index ["paid_at"], name: "index_payments_on_paid_at"
     t.index ["plan_id"], name: "index_payments_on_plan_id"
@@ -167,8 +174,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_101000) do
     t.index ["user_id"], name: "index_payments_on_user_id"
   end
 
-  create_table "payouts", force: :cascade do |t|
-    t.bigint "affiliate_id", null: false
+  create_table "payouts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.decimal "amount", precision: 10, scale: 2, null: false
     t.string "currency", default: "USD", null: false
     t.integer "status", default: 0, null: false
@@ -184,13 +190,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_101000) do
     t.text "failure_reason"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "affiliate_id"
     t.index ["affiliate_id", "status"], name: "index_payouts_on_affiliate_id_and_status"
     t.index ["affiliate_id"], name: "index_payouts_on_affiliate_id"
+    t.index ["id"], name: "index_payouts_on_id", unique: true
     t.index ["status"], name: "index_payouts_on_status"
     t.index ["transaction_id"], name: "index_payouts_on_transaction_id"
   end
 
-  create_table "plans", force: :cascade do |t|
+  create_table "plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", null: false
     t.text "description"
     t.decimal "price", precision: 10, scale: 2, null: false
@@ -203,11 +211,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_101000) do
     t.integer "device_limit", default: 5, null: false
     t.boolean "lifetime", default: false, null: false
     t.index ["active"], name: "index_plans_on_active"
+    t.index ["id"], name: "index_plans_on_id", unique: true
   end
 
-  create_table "referrals", force: :cascade do |t|
-    t.bigint "affiliate_id", null: false
-    t.bigint "user_id", null: false
+  create_table "referrals", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "referral_code"
     t.string "landing_page"
     t.string "ip_hash"
@@ -216,14 +223,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_101000) do
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "affiliate_id"
+    t.uuid "user_id"
     t.index ["affiliate_id", "status"], name: "index_referrals_on_affiliate_id_and_status"
     t.index ["affiliate_id"], name: "index_referrals_on_affiliate_id"
-    t.index ["user_id"], name: "index_referrals_on_user_id"
+    t.index ["id"], name: "index_referrals_on_id", unique: true
     t.index ["user_id"], name: "index_referrals_on_user_id_unique", unique: true
   end
 
-  create_table "relay_bandwidth_stats", force: :cascade do |t|
-    t.bigint "relay_id", null: false
+  create_table "relay_bandwidth_stats", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.date "date", null: false
     t.bigint "bandwidth_in", default: 0, null: false
     t.bigint "bandwidth_out", default: 0, null: false
@@ -234,13 +242,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_101000) do
     t.float "uptime_percentage", default: 100.0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "relay_id"
     t.index ["date"], name: "index_relay_bandwidth_stats_on_date"
+    t.index ["id"], name: "index_relay_bandwidth_stats_on_id", unique: true
     t.index ["relay_id", "date"], name: "index_relay_bandwidth_stats_on_relay_id_and_date", unique: true
     t.index ["relay_id"], name: "index_relay_bandwidth_stats_on_relay_id"
   end
 
-  create_table "relay_monthly_summaries", force: :cascade do |t|
-    t.bigint "relay_id", null: false
+  create_table "relay_monthly_summaries", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.integer "year", null: false
     t.integer "month", null: false
     t.bigint "total_bandwidth_in", default: 0, null: false
@@ -252,12 +261,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_101000) do
     t.integer "days_active", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "relay_id"
+    t.index ["id"], name: "index_relay_monthly_summaries_on_id", unique: true
     t.index ["relay_id", "year", "month"], name: "index_relay_monthly_summaries_on_relay_id_and_year_and_month", unique: true
     t.index ["relay_id"], name: "index_relay_monthly_summaries_on_relay_id"
     t.index ["year", "month"], name: "index_relay_monthly_summaries_on_year_and_month"
   end
 
-  create_table "relays", force: :cascade do |t|
+  create_table "relays", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name"
     t.string "hostname"
     t.string "ipv4_address"
@@ -265,36 +276,39 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_101000) do
     t.string "public_key"
     t.integer "port"
     t.integer "status"
-    t.bigint "location_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "location_id"
+    t.index ["id"], name: "index_relays_on_id", unique: true
     t.index ["location_id"], name: "index_relays_on_location_id"
   end
 
-  create_table "sessions", force: :cascade do |t|
-    t.bigint "user_id", null: false
+  create_table "sessions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "user_agent"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "user_id"
+    t.index ["id"], name: "index_sessions_on_id", unique: true
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
-  create_table "subscriptions", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.bigint "plan_id", null: false
+  create_table "subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.integer "status", default: 0, null: false
     t.datetime "started_at", null: false
     t.datetime "expires_at", null: false
     t.datetime "cancelled_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "user_id"
+    t.uuid "plan_id"
     t.index ["expires_at"], name: "index_subscriptions_on_expires_at"
+    t.index ["id"], name: "index_subscriptions_on_id", unique: true
     t.index ["plan_id"], name: "index_subscriptions_on_plan_id"
     t.index ["status"], name: "index_subscriptions_on_status"
     t.index ["user_id"], name: "index_subscriptions_on_user_id"
   end
 
-  create_table "users", force: :cascade do |t|
+  create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.integer "status", limit: 2, default: 0
     t.binary "recovery_code"
     t.string "email_address"
@@ -306,9 +320,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_101000) do
     t.text "deletion_reason"
     t.index ["deleted_at"], name: "index_users_on_deleted_at"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true, where: "(email_address IS NOT NULL)"
+    t.index ["id"], name: "index_users_on_id", unique: true
   end
 
-  create_table "webhook_logs", force: :cascade do |t|
+  create_table "webhook_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "webhookable_type", null: false
     t.string "ip_address", null: false
     t.string "status"
@@ -316,6 +331,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_101000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.uuid "webhookable_id", null: false
+    t.index ["id"], name: "index_webhook_logs_on_id", unique: true
     t.index ["webhookable_type", "webhookable_id"], name: "index_webhook_logs_on_webhookable"
   end
 
