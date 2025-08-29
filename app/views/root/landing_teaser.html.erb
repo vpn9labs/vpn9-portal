@@ -27,141 +27,132 @@
   <%= render_structured_data structured_data_for_organization %>
 <% end %>
 
+<div class="min-h-screen bg-background">
 <%# Top Navigation Bar %>
-<header class="absolute inset-x-0 top-0 z-50 transition-all duration-300">
-  <nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
+<header class="sticky top-0 z-50 w-full border-b border-gray-300 bg-background/95 backdrop-blur-sm supports-[backdrop-filter]:bg-background/60">
+  <nav class="mx-auto flex max-w-7xl items-center justify-between h-16 lg:px-8" aria-label="Global">
     <div class="flex lg:flex-1">
-      <%= link_to root_path, class: "-m-1.5 p-1.5" do %>
-        <span class="text-2xl font-bold text-white">VPN9</span>
+      <%= link_to root_path, class: "-m-1.5" do %>
+      <div class="flex items-center space-x-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield h-8 w-8 text-primary"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path></svg>
+        <span class="text-xl font-semibold">VPN9</span>
+        </div>
       <% end %>
     </div>
     
     <div class="flex lg:flex-1 lg:justify-end">
-      <a href="https://github.com/vpn9labs" target="_blank" class="text-sm font-semibold leading-6 text-white hover:text-gray-300">
+      <a href="https://github.com/vpn9labs" target="_blank" class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-600">
         Open-source code on GitHub (vpn9labs)
       </a>
     </div>
   </nav>
 </header>
 
-<%# Hero Section - Matching live landing page style %>
+<%# Hero Section %>
 <main role="main">
-<section class="relative isolate overflow-hidden bg-gray-900" aria-label="Coming Soon">
-  <%# Background pattern matching live site %>
-  <svg class="absolute inset-0 -z-10 h-full w-full stroke-white/10 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]" aria-hidden="true">
-    <defs>
-      <pattern id="hero-pattern" width="200" height="200" x="50%" y="-1" patternUnits="userSpaceOnUse">
-        <path d="M.5 200V.5H200" fill="none" />
-      </pattern>
-    </defs>
-    <svg x="50%" y="-1" class="overflow-visible fill-gray-800/20">
-      <path d="M-200 0h201v201h-201Z M600 0h201v201h-201Z M-400 600h201v201h-201Z M200 800h201v201h-201Z" stroke-width="0" />
-    </svg>
-    <rect width="100%" height="100%" stroke-width="0" fill="url(#hero-pattern)" />
-  </svg>
-  
-  <%# Gradient overlay matching live site %>
-  <div class="absolute left-[calc(50%-4rem)] top-10 -z-10 transform-gpu blur-3xl sm:left-[calc(50%-18rem)] lg:left-48 lg:top-[calc(50%-30rem)] xl:left-[calc(50%-24rem)]" aria-hidden="true">
-    <div class="aspect-[1108/632] w-[69.25rem] bg-gradient-to-r from-[#80caff] to-[#4f46e5] opacity-20" style="clip-path: polygon(73.6% 51.7%, 91.7% 11.8%, 100% 46.4%, 97.4% 82.2%, 92.5% 84.9%, 75.7% 64%, 55.3% 47.5%, 46.5% 49.4%, 45% 62.9%, 50.3% 87.2%, 21.3% 64.1%, 0.1% 100%, 5.4% 51.1%, 21.4% 63.9%, 58.9% 0.2%, 73.6% 51.7%)"></div>
-  </div>
-  
-  <div class="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40">
+<section class="relative isolate overflow-hidden bg-white" aria-label="Coming Soon">
+  <div class="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:items-start lg:gap-x-16 lg:px-8 lg:py-40">
     <div class="mx-auto max-w-2xl flex-shrink-0 lg:mx-0 lg:max-w-xl lg:pt-2">
       <%# Coming Soon Badge %>
       <div class="mb-8">
-        <span class="inline-flex items-center rounded-full bg-indigo-400/10 px-3 py-1 text-sm font-medium text-indigo-400 ring-1 ring-inset ring-indigo-400/30">
-          <span class="mr-2 inline-block h-2 w-2 rounded-full bg-indigo-400 animate-pulse"></span>
+        <span class="inline-flex items-center rounded-full bg-black/10 px-3 py-1 text-sm font-medium text-black ring-1 ring-inset ring-black/20">
+          <span class="mr-2 inline-block h-2 w-2 rounded-full bg-black animate-pulse"></span>
           Launching <span id="countdown" class="ml-1">Q4 2025</span>
         </span>
       </div>
       
-      <h1 class="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-        True Privacy.<br>
-        Zero Logs.<br>
-        <span class="text-indigo-400">No Compromises.</span>
-      </h1>
-      
-      <p class="mt-6 text-lg leading-8 text-gray-300">
-        Privacy is a fundamental human right. It protects your life, identity, and data.
-        Free from surveillance and censorship. Free from business models that sell your behavior.
-        Free from compromise.
-      </p>
-      
-      <div class="mt-10" id="signup-section">
-        <h2 class="text-xl font-semibold text-white mb-4">
-          Join the Waitlist
-        </h2>
-        <p class="text-gray-400 mb-6">
-          Your IP address is the clearest marker of you online. Hide it with a VPN you can trust.
+      <div class="space-y-4">
+        <h1 class="text-4xl tracking-tight text-gray-900 sm:text-6xl">
+          True Privacy.<br>
+          Zero Logs.<br>
+          <span class="text-black">No Compromises.</span>
+        </h1>
+        
+        <p class="mt-6 text-lg leading-8 text-gray-600">
+          VPN9 is the only fully open-source, attestable VPN service that truly keeps no logs. We don't track your connections, we don't store your data, and we don't even require an email address.
         </p>
-        
-        <%= form_with url: launch_notifications_path, local: false, html: { id: 'notification-form', class: 'flex gap-x-4 mb-4' } do |f| %>
-          <%= f.email_field :email, 
-              placeholder: "Enter your email", 
-              required: true,
-              class: "min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6" %>
-          <%= f.submit "Notify Me", 
-              class: "flex-none rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" %>
-        <% end %>
-        
-        <div class="flex items-center justify-between">
-          <p class="text-xs text-gray-500">
-            We respect your privacy. No spam, ever. Unsubscribe anytime.
-          </p>
-        </div>
+
+        <a href="https://github.com/vpn9labs" target="_blank" class="inline-flex rounded-md bg-black px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black">
+          View Source Code
+        </a>
       </div>
       
+    </div>
+
+    <div class="mx-auto mt-12 pt-14 w-full max-w-2xl lg:mt-0 lg:max-w-md" id="signup-section">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">
+        Join the Waitlist
+      </h2>
+      <p class="text-gray-600 mb-6">
+        Your IP address is the clearest marker of you online. Hide it with a VPN you can trust.
+      </p>
+
+      <%= form_with url: launch_notifications_path, local: false, html: { id: 'notification-form', class: 'flex gap-x-4 mb-4' } do |f| %>
+        <%= f.email_field :email, 
+            placeholder: "Enter your email", 
+            required: true,
+            class: "min-w-0 flex-auto rounded-md border-0 bg-white px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6" %>
+        <%= f.submit "Notify Me", 
+            class: "flex-none rounded-md bg-black px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black" %>
+      <% end %>
+
+      <div class="flex items-center justify-between">
+        <p class="text-xs text-gray-500">
+          We respect your privacy. No spam, ever. Unsubscribe anytime.
+        </p>
+      </div>
+
       <%# Success Message (Hidden by default) %>
-      <div id="success-message" class="hidden mt-6 rounded-md bg-green-900/50 p-4 ring-1 ring-green-600/50">
+      <div id="success-message" class="hidden mt-6 rounded-md bg-green-50 p-4 ring-1 ring-green-200">
         <div class="flex">
           <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+            <svg class="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
             </svg>
           </div>
           <div class="ml-3">
-            <p class="text-sm font-medium text-green-400">
+            <p class="text-sm font-medium text-green-800">
               You're on the list! We'll notify you as soon as we launch.
             </p>
           </div>
         </div>
       </div>
-      
+
       <%# Error Message (Hidden by default) %>
-      <div id="error-message" class="hidden mt-6 rounded-md bg-red-900/50 p-4 ring-1 ring-red-600/50">
+      <div id="error-message" class="hidden mt-6 rounded-md bg-red-50 p-4 ring-1 ring-red-200">
         <div class="flex">
           <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+            <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
             </svg>
           </div>
           <div class="ml-3">
-            <p class="text-sm font-medium text-red-400" id="error-text">
+            <p class="text-sm font-medium text-red-800" id="error-text">
               Something went wrong. Please try again.
             </p>
           </div>
         </div>
       </div>
-      
+
       <div class="mt-8">
-        <div class="inline-flex items-center text-sm text-gray-400">
-          <svg class="mr-2 h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+        <div class="inline-flex items-center text-sm text-gray-600">
+          <svg class="mr-2 h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
           </svg>
-          <span class="font-semibold text-white" id="signup-count"><%= number_with_delimiter(@launch_notifications_count.to_i) %></span>&nbsp; people waiting
+          <span class="font-semibold text-gray-900" id="signup-count"><%= number_with_delimiter(@launch_notifications_count.to_i) %></span>&nbsp; people waiting
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<%= render "shared/dns_leak_test", intro_text: "Find out if your VPN is actually protecting your DNS queries from being exposed to your ISP." %>
+<%= render "shared/dns_leak_test", intro_text: "Find out if your VPN is actually protecting your DNS queries from being exposed to your ISP.", accent: :black %>
 
 <%# Features Preview Section %>
 <section class="bg-white py-24 sm:py-32" aria-label="Features Preview">
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
     <div class="mx-auto max-w-2xl text-center">
-      <h2 class="text-base font-semibold leading-7 text-indigo-600">Coming Features</h2>
+      <h2 class="text-base font-semibold leading-7 text-black">Coming Features</h2>
       <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
         What We're Building
       </p>
@@ -174,7 +165,7 @@
       <div class="grid gap-8 lg:gap-10">
         <%# Feature 1 %>
         <div class="flex items-start gap-4">
-          <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-600 flex-shrink-0">
+          <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-black flex-shrink-0">
             <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -184,7 +175,7 @@
             <p class="text-base leading-7 text-gray-700 mb-4">
               We don't just promise not to log — we've built it into our DNA. No connection timestamps, source IPs, DNS queries, or traffic metadata. Ever. Our distributed architecture makes it technically impossible because there's no central session to track.
             </p>
-            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-indigo-600">
+            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-black">
               <p class="text-sm text-gray-700 mb-2">
                 <strong>Bottom line:</strong> There's literally nothing for anyone to correlate your activity with your identity.
               </p>
@@ -197,7 +188,7 @@
 
         <%# Feature 2 %>
         <div class="flex items-start gap-4">
-          <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-600 flex-shrink-0">
+          <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-black flex-shrink-0">
             <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1721.75 8.25z" />
             </svg>
@@ -207,7 +198,7 @@
             <p class="text-base leading-7 text-gray-700 mb-4">
               Skip the forms. No email, phone number, or real name needed. Create your account with just a passphrase and optional recovery codes. We don't fingerprint your device or tie your usage patterns to any identity.
             </p>
-            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-indigo-600">
+            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-black">
               <p class="text-sm text-gray-700 mb-2">
                 <strong>The result:</strong> Zero personal data means zero risk of it being leaked, sold, or subpoenaed.
               </p>
@@ -220,7 +211,7 @@
 
         <%# Feature 3 %>
         <div class="flex items-start gap-4">
-          <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-600 flex-shrink-0">
+          <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-black flex-shrink-0">
             <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -230,7 +221,7 @@
             <p class="text-base leading-7 text-gray-700 mb-4">
               Pay your way with Bitcoin or Monero through our integrated Bitcart gateway. No credit cards creating paper trails, no third-party payment processors tracking you, and definitely no custodial wallets holding your funds.
             </p>
-            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-indigo-600">
+            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-black">
               <p class="text-sm text-gray-700 mb-2">
                 <strong>Your advantage:</strong> Complete financial privacy with instant activation once your payment confirms.
               </p>
@@ -243,7 +234,7 @@
 
         <%# Feature 4 %>
         <div class="flex items-start gap-4">
-          <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-600 flex-shrink-0">
+          <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-black flex-shrink-0">
             <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4" />
               <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -254,7 +245,7 @@
             <p class="text-base leading-7 text-gray-700 mb-4">
               Every line of code is AGPLv3 — inspect it, audit it, fork it. We publish reproducible Docker images with complete SBOMs and maintain a live attestation endpoint so you can verify exactly what's running on our servers.
             </p>
-            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-indigo-600">
+            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-black">
               <p class="text-sm text-gray-700 mb-2">
                 <strong>Trust through transparency:</strong> Don't just take our word — verify that everything we deploy matches the public code.
               </p>
@@ -270,21 +261,21 @@
 </section>
 
 <%# CTA Section %>
-<section class="bg-gray-900" aria-label="Final CTA">
+<section class="bg-gray-50" aria-label="Final CTA">
   <div class="px-6 py-24 sm:px-6 sm:py-32 lg:px-8">
     <div class="mx-auto max-w-2xl text-center">
-      <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+      <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
         This is why you should use VPN9
       </h2>
-      <p class="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-300">
+      <p class="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-600">
         Your IP links your traffic, location, and identity. It lets others assemble a record of your life.<br>
         VPN9 keeps zero logs. No compromises.
       </p>
       <div class="mt-10 flex items-center justify-center gap-x-6">
-        <a href="#signup-section" class="rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400">
+        <a href="#signup-section" class="rounded-md bg-black px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black">
           Get Early Access
         </a>
-        <a href="https://github.com/vpn9labs" target="_blank" class="text-sm font-semibold leading-6 text-white hover:text-gray-300">
+        <a href="https://github.com/vpn9labs" target="_blank" class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-600">
           View on GitHub <span aria-hidden="true">→</span>
         </a>
       </div>
@@ -347,3 +338,5 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
+
+</div>
