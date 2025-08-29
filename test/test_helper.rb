@@ -43,5 +43,11 @@ module ActiveSupport
     fixtures :all
 
     # Add more helper methods to be used by all tests here...
+
+    # Ensure global commission config doesn't leak across tests and cause flakes
+    setup do
+      Rails.application.config.auto_approve_commission_threshold = nil
+      Rails.application.config.minimum_payout_amount = 100.0
+    end
   end
 end
