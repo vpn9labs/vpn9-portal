@@ -59,7 +59,7 @@ class TokenService
     # the database; callers decide what to do with the decoded data.
     #
     # @param token [String]
-    # @return [Hash, nil] with keys: :user_id (Integer), :expires_at (Time), :subscription_expires (Time|nil)
+    # @return [Hash, nil] with keys: :user_id (String), :expires_at (Time), :subscription_expires (Time|nil)
     # @example
     #   data = TokenService.verify_token(token)
     #   if data && Time.current < data[:expires_at]
@@ -71,7 +71,7 @@ class TokenService
       # Return token data without checking subscription
       # Let the controller decide how to handle subscription status
       {
-        user_id: payload[0]["sub"].to_i,
+        user_id: payload[0]["sub"].to_s,
         expires_at: Time.at(payload[0]["exp"]),
         subscription_expires: payload[0]["subscription_expires"] ? Time.at(payload[0]["subscription_expires"]) : nil
       }
