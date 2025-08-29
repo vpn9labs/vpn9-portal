@@ -271,8 +271,8 @@ class Device < ApplicationRecord
     while attempt < max_attempts
       # Generate a 4-digit random number for even more combinations
       # Total combinations: adjectives × nouns × 9000 numbers
-      adjective = self.class.adjectives.sample
-      noun = self.class.nouns.sample
+      adjective = self.class.adjectives.sample.to_s.downcase
+      noun = self.class.nouns.sample.to_s.downcase
       number = rand(1000..9999)
       candidate_name = "#{adjective}-#{noun}-#{number}"
 

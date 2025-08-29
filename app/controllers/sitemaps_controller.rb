@@ -20,7 +20,7 @@ class SitemapsController < ApplicationController
         lastmod: Time.current
       },
       {
-        url: "#{@base_url}/plans",
+        url: "#{@base_url}/session/new",
         changefreq: "weekly",
         priority: 0.8,
         lastmod: Time.current

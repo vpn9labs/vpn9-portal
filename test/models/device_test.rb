@@ -98,6 +98,23 @@ class DeviceTest < ActiveSupport::TestCase
     assert parts[2].to_i.between?(1000, 9999)
   end
 
+  test "generated name uses lowercase adjective and noun" do
+    device = @user.devices.create!(public_key: "lowercase_key_1")
+    parts = device.name.split("-")
+    assert_equal 3, parts.length
+    assert_match /\A[a-z]+\z/, parts[0]
+    assert_match /\A[a-z]+\z/, parts[1]
+    assert_equal parts[0], parts[0].downcase
+    assert_equal parts[1], parts[1].downcase
+  end
+
+  test "word lists are sanitized to lowercase letters" do
+    adjectives = Device.adjectives
+    nouns = Device.nouns
+    assert adjectives.all? { |w| w.match?(/\A[a-z]+\z/) }, "Adjectives should be lowercase and alphabetic"
+    assert nouns.all? { |w| w.match?(/\A[a-z]+\z/) }, "Nouns should be lowercase and alphabetic"
+  end
+
   test "should generate unique names" do
     names = []
     10.times do |i|

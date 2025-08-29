@@ -16,6 +16,76 @@ class PaymentTest < ActiveSupport::TestCase
     assert @payment.valid?
   end
 
+  # Lifetime plan processing
+  test "process_completion! should create lifetime subscription for lifetime plan" do
+    lifetime_plan = Plan.create!(
+      name: "Lifetime",
+      price: 199.0,
+      currency: "USD",
+      lifetime: true,
+      duration_days: nil,
+      device_limit: 5,
+      active: true
+    )
+
+    payment = Payment.create!(
+      user: @user,
+      plan: lifetime_plan,
+      amount: lifetime_plan.price,
+      currency: "USD",
+      status: :paid
+    )
+
+    assert_nil @user.subscriptions.current.first
+
+    assert_difference "Subscription.count", 1 do
+      payment.process_completion!
+    end
+
+    sub = @user.subscriptions.current.first
+    assert_not_nil sub
+    assert_equal lifetime_plan, sub.plan
+    assert_equal "active", sub.status
+    assert sub.expires_at > 95.years.from_now, "Lifetime subscription should expire far in the future"
+  end
+
+  test "process_completion! should upgrade existing subscription to lifetime" do
+    # Existing active subscription on a monthly plan
+    existing_sub = Subscription.create!(
+      user: @user,
+      plan: @plan,
+      status: :active,
+      started_at: 1.day.ago,
+      expires_at: 29.days.from_now
+    )
+
+    lifetime_plan = Plan.create!(
+      name: "Lifetime",
+      price: 199.0,
+      currency: "USD",
+      lifetime: true,
+      duration_days: nil,
+      device_limit: 10,
+      active: true
+    )
+
+    payment = Payment.create!(
+      user: @user,
+      plan: lifetime_plan,
+      amount: lifetime_plan.price,
+      currency: "USD",
+      status: :paid
+    )
+
+    assert_no_difference "Subscription.count" do
+      payment.process_completion!
+    end
+
+    existing_sub.reload
+    assert_equal lifetime_plan, existing_sub.plan
+    assert existing_sub.expires_at > 95.years.from_now, "Upgraded lifetime subscription should expire far in the future"
+  end
+
   test "should require user" do
     @payment.user = nil
     assert_not @payment.valid?

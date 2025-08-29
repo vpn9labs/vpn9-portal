@@ -23,7 +23,11 @@
               <%= plan.currency == 'USD' ? '$' : plan.currency %><%= plan.price.to_i %>
             </span>
             <span class="text-base font-medium text-gray-500">
-              / <%= plan.duration_days %> days
+              <% if plan.lifetime? %>
+                • One-time payment for lifetime access
+              <% else %>
+                / <%= plan.display_duration %>
+              <% end %>
             </span>
           </p>
 

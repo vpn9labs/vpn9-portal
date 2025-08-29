@@ -21,7 +21,10 @@
         <div class="sm:col-span-1">
           <dt class="text-sm font-medium text-gray-500">Duration</dt>
           <dd class="mt-1 text-sm text-gray-900">
-            <%= @plan.duration_days %> days
+            <%= @plan.display_duration %>
+            <% if @plan.lifetime? %>
+              <span class="ml-1 text-gray-500">(one-time payment)</span>
+            <% end %>
           </dd>
         </div>
         

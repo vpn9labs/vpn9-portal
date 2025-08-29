@@ -5,7 +5,8 @@ class Plan < ApplicationRecord
   validates :name, presence: true
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :currency, presence: true
-  validates :duration_days, presence: true, numericality: { greater_than: 0 }
+  # Allow lifetime plans without duration_days
+  validates :duration_days, presence: true, numericality: { greater_than: 0 }, unless: :lifetime?
   validates :device_limit, presence: true, numericality: { greater_than: 0, less_than_or_equal_to: 100 }
 
   scope :active, -> { where(active: true) }
@@ -23,11 +24,11 @@ class Plan < ApplicationRecord
   end
 
   def monthly?
-    duration_days == 30 || duration_days == 31
+    !lifetime? && (duration_days == 30 || duration_days == 31)
   end
 
   def yearly?
-    duration_days == 365 || duration_days == 366
+    !lifetime? && (duration_days == 365 || duration_days == 366)
   end
 
   def display_device_limit
@@ -35,17 +36,13 @@ class Plan < ApplicationRecord
   end
 
   def display_duration
+    return "Lifetime" if lifetime?
     case duration_days
-    when 30, 31
-      "Monthly"
-    when 365, 366
-      "Yearly"
-    when 7
-      "Weekly"
-    when 90
-      "Quarterly"
-    else
-      "#{duration_days} days"
+    when 30, 31 then "Monthly"
+    when 365, 366 then "Yearly"
+    when 7 then "Weekly"
+    when 90 then "Quarterly"
+    else "#{duration_days} days"
     end
   end
 

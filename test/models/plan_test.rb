@@ -142,4 +142,31 @@ class PlanTest < ActiveSupport::TestCase
     @plan.device_limit = 100
     assert_equal "Unlimited", @plan.display_device_limit
   end
+
+  # Lifetime plan tests
+  test "lifetime plan allows null duration_days" do
+    plan = Plan.new(
+      name: "Lifetime Plan",
+      price: 199.0,
+      currency: "USD",
+      duration_days: nil,
+      lifetime: true,
+      device_limit: 5,
+      active: true
+    )
+    assert plan.valid?, "Lifetime plans should be valid without duration_days"
+  end
+
+  test "display_duration returns 'Lifetime' for lifetime plan" do
+    plan = Plan.create!(
+      name: "Lifetime",
+      price: 199.0,
+      currency: "USD",
+      lifetime: true,
+      duration_days: nil,
+      device_limit: 5,
+      active: true
+    )
+    assert_equal "Lifetime", plan.display_duration
+  end
 end

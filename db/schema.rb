@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_24_103000) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_29_101000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -195,12 +195,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_24_103000) do
     t.text "description"
     t.decimal "price", precision: 10, scale: 2, null: false
     t.string "currency", default: "USD", null: false
-    t.integer "duration_days", null: false
+    t.integer "duration_days"
     t.boolean "active", default: true, null: false
     t.jsonb "features", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "device_limit", default: 5, null: false
+    t.boolean "lifetime", default: false, null: false
     t.index ["active"], name: "index_plans_on_active"
   end
 

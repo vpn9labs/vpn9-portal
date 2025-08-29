@@ -7,8 +7,9 @@
 # - db/english-adjectives.txt
 # - db/english-nouns.txt
 #
-# The lists are sanitized by trimming whitespace, removing empties, and
-# removing hyphens from compound words for nicer device names.
+# The lists are sanitized by trimming whitespace, removing empties,
+# downcasing, filtering to letters a–z, and removing hyphens from
+# compound words for consistent, test‑friendly device names.
 #
 class Wordlist
   class << self
@@ -52,6 +53,8 @@ class Wordlist
                    .map(&:strip)
                    .reject(&:empty?)
                    .map { |word| word.gsub("-", "") }
+                   .map(&:downcase)
+                   .select { |w| w.match?(/\A[a-z]+\z/) }
 
       if words.empty?
         Rails.logger.warn "Word list file is empty: #{file_path}"

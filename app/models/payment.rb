@@ -39,10 +39,17 @@ class Payment < ApplicationRecord
 
       if subscription.new_record?
         subscription.started_at = Time.current
-        subscription.expires_at = Time.current + plan.duration_days.days
+        subscription.expires_at = plan.lifetime? ? (Time.current + 100.years) : (Time.current + plan.duration_days.days)
       else
-        # Extend existing subscription
-        subscription.expires_at += plan.duration_days.days
+        # Extend existing subscription (upgrade to lifetime if applicable)
+        # If purchasing a different plan, move the subscription to that plan
+        subscription.plan = plan if subscription.plan_id != plan.id
+
+        if plan.lifetime?
+          subscription.expires_at = Time.current + 100.years
+        else
+          subscription.expires_at += plan.duration_days.days
+        end
       end
 
       subscription.status = :active

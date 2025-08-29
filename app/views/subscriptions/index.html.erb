@@ -38,15 +38,21 @@
           <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt class="text-sm font-medium text-gray-500">Expires</dt>
             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              <%= @current_subscription.expires_at.strftime("%B %d, %Y") %>
-              <span class="text-gray-500">(<%= @current_subscription.days_remaining %> days remaining)</span>
+              <% if @current_subscription.plan.lifetime? %>
+                Never <span class="text-gray-500">(lifetime access)</span>
+              <% else %>
+                <%= @current_subscription.expires_at.strftime("%B %d, %Y") %>
+                <span class="text-gray-500">(<%= @current_subscription.days_remaining %> days remaining)</span>
+              <% end %>
             </dd>
           </div>
         </dl>
       </div>
       <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-        <%= link_to "Extend Subscription", plans_path, 
-            class: "w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm" %>
+        <% unless @current_subscription.plan.lifetime? %>
+          <%= link_to "Extend Subscription", plans_path, 
+              class: "w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm" %>
+        <% end %>
         <% if @current_subscription.active? %>
           <%= button_to "Cancel Subscription", cancel_subscription_path(@current_subscription),
               method: :post,

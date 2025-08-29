@@ -25,7 +25,12 @@
         </div>
         <div>
           <dt class="text-sm font-medium text-gray-500">Duration</dt>
-          <dd class="text-lg"><%= @plan.display_duration %> (<%= @plan.duration_days %> days)</dd>
+          <dd class="text-lg">
+            <%= @plan.display_duration %>
+            <% unless @plan.lifetime? %>
+              (<%= @plan.duration_days %> days)
+            <% end %>
+          </dd>
         </div>
         <div>
           <dt class="text-sm font-medium text-gray-500">Device Limit</dt>

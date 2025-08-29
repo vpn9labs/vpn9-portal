@@ -5,7 +5,7 @@
         Subscription Details
       </h3>
       <p class="mt-1 max-w-2xl text-sm text-gray-500">
-        <%= @subscription.plan.name %> - <%= @subscription.plan.duration_days %> days
+        <%= @subscription.plan.name %> - <%= @subscription.plan.lifetime? ? 'Lifetime' : @subscription.plan.display_duration %>
       </p>
     </div>
     <div class="border-t border-gray-200">
@@ -27,9 +27,13 @@
         <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500">Expires</dt>
           <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-            <%= @subscription.expires_at.strftime("%B %d, %Y") %>
-            <% if @subscription.active? %>
-              <span class="text-gray-500">(<%= @subscription.days_remaining %> days remaining)</span>
+            <% if @subscription.plan.lifetime? %>
+              Never <span class="text-gray-500">(lifetime access)</span>
+            <% else %>
+              <%= @subscription.expires_at.strftime("%B %d, %Y") %>
+              <% if @subscription.active? %>
+                <span class="text-gray-500">(<%= @subscription.days_remaining %> days remaining)</span>
+              <% end %>
             <% end %>
           </dd>
         </div>
