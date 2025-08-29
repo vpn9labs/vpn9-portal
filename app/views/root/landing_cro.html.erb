@@ -1,3 +1,28 @@
+<%# CRO Optimized Landing Page %>
+<% content_for :title, "VPN9 - True Privacy VPN with Zero Logs | Anonymous Bitcoin & Monero Payments" %>
+<% content_for :meta_tags do %>
+  <meta name="description" content="The only VPN that truly keeps no logs. Create anonymous accounts without email. Pay with Bitcoin or Monero. Military-grade encryption with WireGuard protocol.">
+  <meta name="keywords" content="VPN, privacy, no logs, anonymous VPN, Bitcoin VPN, Monero VPN, WireGuard, zero logs VPN, private VPN, secure VPN, cryptocurrency VPN">
+  <meta name="author" content="VPN9">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://vpn9.com/">
+  
+  <%# Open Graph / Facebook %>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://vpn9.com/">
+  <meta property="og:title" content="VPN9 - True Privacy VPN with Zero Logs">
+  <meta property="og:description" content="The only VPN service that truly keeps no logs. Create anonymous accounts without email. Pay with cryptocurrency for complete privacy.">
+  <meta property="og:image" content="<%= request.base_url %>/og-image.png">
+  <meta property="og:site_name" content="VPN9">
+  
+  <%# Twitter %>
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://vpn9.com/">
+  <meta name="twitter:title" content="VPN9 - True Privacy VPN with Zero Logs">
+  <meta name="twitter:description" content="The only VPN that truly keeps no logs. Anonymous accounts, no email required. Pay with Bitcoin or Monero.">
+  <meta name="twitter:image" content="<%= request.base_url %>/twitter-card.png">
+<% end %>
+
 <%# Schema.org Structured Data %>
 <% content_for :head do %>
   <%= render_structured_data structured_data_for_organization %>

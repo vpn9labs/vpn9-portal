@@ -20,9 +20,39 @@ class SitemapsController < ApplicationController
         lastmod: Time.current
       },
       {
-        url: "#{@base_url}/session/new",
-        changefreq: "monthly",
+        url: "#{@base_url}/plans",
+        changefreq: "weekly",
         priority: 0.8,
+        lastmod: Time.current
+      },
+      {
+        url: "#{@base_url}/attestation",
+        changefreq: "weekly",
+        priority: 0.7,
+        lastmod: Time.current
+      },
+      {
+        url: "#{@base_url}/transparency",
+        changefreq: "weekly",
+        priority: 0.7,
+        lastmod: Time.current
+      },
+      {
+        url: "#{@base_url}/security",
+        changefreq: "weekly",
+        priority: 0.7,
+        lastmod: Time.current
+      },
+      {
+        url: "#{@base_url}/affiliates/login",
+        changefreq: "monthly",
+        priority: 0.6,
+        lastmod: Time.current
+      },
+      {
+        url: "#{@base_url}/affiliates/new",
+        changefreq: "monthly",
+        priority: 0.6,
         lastmod: Time.current
       },
       {
@@ -69,10 +99,6 @@ class SitemapsController < ApplicationController
         lastmod: Time.current
       }
     end
-
-    # You can add dynamic content here, for example:
-    # @blog_posts = BlogPost.published.select(:slug, :updated_at) if defined?(BlogPost)
-    # @products = Product.active.select(:slug, :updated_at) if defined?(Product)
 
     respond_to do |format|
       format.xml { render layout: false }

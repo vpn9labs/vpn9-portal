@@ -21,6 +21,11 @@
 
     <%= yield :head %>
 
+    <%# Fallback: inject Organization JSON-LD unless already included via helper %>
+    <% unless @_structured_data_has_org %>
+      <%= render_structured_data structured_data_for_organization %>
+    <% end %>
+
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
     <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 

@@ -4,6 +4,22 @@ module SeoHelper
   def render_structured_data(*schemas, graph: false)
     schemas = schemas.flatten
 
+    # Stricter guard: mark when Organization schema is included anywhere
+    begin
+      if schemas.any? { |s|
+           s.is_a?(Hash) && (
+             (s["@type"] == "Organization") ||
+             (s[:@type] == "Organization") ||
+             (s["@type"].is_a?(Array) && s["@type"].include?("Organization")) ||
+             (s[:@type].is_a?(Array) && s[:@type].include?("Organization"))
+           )
+         }
+        @_structured_data_has_org = true
+      end
+    rescue => _e
+      # No-op: best-effort detection should not break rendering
+    end
+
     if graph
       payloads = [
         {
@@ -26,14 +42,16 @@ module SeoHelper
   end
   def default_meta_tags
     # Always use primary domain for canonical URLs to avoid duplicate content
+    # Strip query parameters for canonical URL to prevent duplicate content issues
     canonical_url = request.original_url.gsub(/https?:\/\/[^\/]+/, "https://vpn9.com")
+    canonical_url = canonical_url.split("?").first unless params[:page].present?
 
     {
       title: "VPN9 - True Privacy VPN with Zero Logs | Anonymous Bitcoin & Monero Payments",
       description: "The only VPN that truly keeps no logs. Anonymous accounts, no email required. Pay with Bitcoin or Monero. Military-grade encryption. Open source.",
       keywords: "VPN, privacy, no logs, anonymous VPN, Bitcoin VPN, Monero VPN, WireGuard, zero logs VPN, private VPN, secure VPN",
       author: "VPN9",
-      robots: "index, follow",
+      robots: determine_robots_meta,
       canonical: canonical_url,
       'og:title': "VPN9 - True Privacy VPN with Zero Logs",
       'og:description': "The only VPN service that truly keeps no logs. Create anonymous accounts without email. Pay with cryptocurrency for complete privacy.",
@@ -76,6 +94,43 @@ module SeoHelper
       ])
     end
   end
+
+  private
+
+  def determine_robots_meta
+    # Determine robots meta tag based on current path
+    noindex_paths = [
+      "/session",
+      "/session/new",
+      "/signup",
+      "/passwords",
+      "/affiliates/dashboard",  # Authenticated area - should not be indexed
+      "/affiliates/earnings",    # Authenticated area - should not be indexed
+      "/affiliates/profile",     # Authenticated area - should not be indexed
+      "/affiliates/referrals",   # Authenticated area - should not be indexed
+      "/affiliates/marketing_tools", # Authenticated area - should not be indexed
+      "/affiliates/thank-you",   # Post-signup page - should not be indexed
+      "/devices",
+      "/device_setup",
+      "/subscriptions",
+      "/payments",
+      "/account_deletion"
+    ]
+
+    current_path = request.path
+
+    # Check if current path should be noindexed
+    if noindex_paths.any? { |path| current_path.start_with?(path) }
+      "noindex, nofollow"
+    elsif current_path == "/affiliates"
+      # Affiliates index always redirects, so noindex it
+      "noindex, nofollow"
+    else
+      "index, follow"
+    end
+  end
+
+  public
 
   def structured_data_for_vpn_service
     {

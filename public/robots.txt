@@ -5,11 +5,13 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
-Disallow: /api/internal/
-Disallow: /session
-Disallow: /password_reset/
-Disallow: /affiliates/
+Disallow: /api/
 Disallow: /downloads/temp/
+Disallow: /devices/
+Disallow: /device_setup/
+Disallow: /subscriptions/
+Disallow: /payments/
+Disallow: /account_deletion
 
 # Sitemap location (dynamically generated)
 Sitemap: https://vpn9.com/sitemap.xml

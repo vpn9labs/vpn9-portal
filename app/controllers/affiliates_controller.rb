@@ -3,6 +3,9 @@ class AffiliatesController < ApplicationController
   layout "public"
 
   def index
+    # Add noindex header since this page always redirects
+    response.headers["X-Robots-Tag"] = "noindex, nofollow"
+
     # Redirect based on authentication status
     if session[:affiliate_id] && Affiliate.exists?(id: session[:affiliate_id])
       redirect_to affiliates_dashboard_path
