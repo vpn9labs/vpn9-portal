@@ -30,7 +30,7 @@
 #   @return [ActiveSupport::TimeWithZone, nil]
 # @!attribute [r] user_id
 #   Owning user foreign key.
-#   @return [String] UUID 
+#   @return [String] UUID
 # @!attribute [r] plan_id
 #   Associated plan foreign key.
 #   @return [String] UUID
