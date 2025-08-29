@@ -36,7 +36,7 @@ class PaymentsControllerTest < ActionDispatch::IntegrationTest
       post plan_payments_path(@plan), params: { crypto: "btc" }
     end
 
-    payment = Payment.last
+    payment = Payment.order(:created_at).last
     assert_equal @user, payment.user
     assert_equal @plan, payment.plan
     assert_equal "btc", payment.crypto_currency

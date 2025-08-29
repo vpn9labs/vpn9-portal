@@ -102,7 +102,7 @@ class Payments::BitcartWebhookControllerTest < ActionDispatch::IntegrationTest
       post webhook_payments_path, params: webhook_params
     end
 
-    subscription = @user.subscriptions.last
+    subscription = @user.subscriptions.order(:created_at).last
     assert_equal @plan, subscription.plan
     assert_equal "active", subscription.status
   end

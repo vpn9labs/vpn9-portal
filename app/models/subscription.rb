@@ -30,10 +30,10 @@
 #   @return [ActiveSupport::TimeWithZone, nil]
 # @!attribute [r] user_id
 #   Owning user foreign key.
-#   @return [Integer]
+#   @return [String] UUID 
 # @!attribute [r] plan_id
 #   Associated plan foreign key.
-#   @return [Integer]
+#   @return [String] UUID
 #
 class Subscription < ApplicationRecord
   belongs_to :user

@@ -318,7 +318,7 @@ class DeviceTest < ActiveSupport::TestCase
     # Try to create duplicate with raw SQL (bypassing Rails validations)
     assert_raises(ActiveRecord::RecordNotUnique) do
       ActiveRecord::Base.connection.execute(
-        "INSERT INTO devices (user_id, name, public_key, created_at, updated_at) VALUES (#{@user.id}, '#{device.name}', 'new_key', NOW(), NOW())"
+        "INSERT INTO devices (user_id, name, public_key, created_at, updated_at) VALUES ('#{@user.id}', '#{device.name}', 'new_key', NOW(), NOW())"
       )
     end
   end

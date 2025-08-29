@@ -314,7 +314,7 @@ class Admin::PlansControllerTest < ActionDispatch::IntegrationTest
     assert_match "Plan was successfully created", response.body
 
     # Verify plan was created correctly
-    new_plan = Plan.last
+    new_plan = Plan.order(:created_at).last
     assert_equal "New Test Plan", new_plan.name
     assert_equal 24.99, new_plan.price
     assert_equal 90, new_plan.duration_days
@@ -371,7 +371,7 @@ class Admin::PlansControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to admin_plans_path
-    new_plan = Plan.last
+    new_plan = Plan.order(:created_at).last
     assert_equal 180, new_plan.duration_days
   end
 
@@ -388,7 +388,7 @@ class Admin::PlansControllerTest < ActionDispatch::IntegrationTest
     }
 
     assert_redirected_to admin_plans_path
-    new_plan = Plan.last
+    new_plan = Plan.order(:created_at).last
     assert_equal "USD", new_plan.currency # Default currency
     assert_equal true, new_plan.active # Default to active
   end
@@ -749,7 +749,7 @@ class Admin::PlansControllerTest < ActionDispatch::IntegrationTest
     }
 
     assert_redirected_to admin_plans_path
-    enterprise_plan = Plan.last
+    enterprise_plan = Plan.order(:created_at).last
     assert_equal 999999.99, enterprise_plan.price
   end
 

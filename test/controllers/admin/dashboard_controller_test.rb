@@ -384,8 +384,8 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
     # Most recent should appear first
     payments = Payment.successful.recent.limit(10)
     if payments.count > 1
-      first_payment = payments.first
-      last_payment = payments.last
+      first_payment = payments.order(:created_at).first
+      last_payment = payments.order(:created_at).last
       assert first_payment.created_at > last_payment.created_at
     end
   end
@@ -515,8 +515,8 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
     # Most recent users should appear first
     users = User.order(created_at: :desc).limit(10)
     if users.count > 1
-      first_user = users.first
-      last_user = users.last
+      first_user = users.order(:created_at).first
+      last_user = users.order(:created_at).last
       assert first_user.created_at > last_user.created_at
     end
   end

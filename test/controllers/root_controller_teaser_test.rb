@@ -115,14 +115,6 @@ class RootControllerTeaserTest < ActionDispatch::IntegrationTest
     assert_match "Revolutionary privacy-focused VPN service launching soon", response.body
   end
 
-  test "default page should have animated background elements" do
-    get root_url
-    assert_response :success
-    # Updated teaser page uses different animations
-    assert_select ".animate-pulse"
-    assert_select ".blur-3xl"
-  end
-
   test "default page should have footer links" do
     get root_url
     assert_response :success

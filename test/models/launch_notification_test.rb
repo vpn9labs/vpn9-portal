@@ -65,8 +65,8 @@ class LaunchNotificationTest < ActiveSupport::TestCase
     old = LaunchNotification.create!(email: "old@example.com", created_at: 2.days.ago)
     new = LaunchNotification.create!(email: "new@example.com", created_at: 1.hour.ago)
 
-    assert_equal new, LaunchNotification.recent.first
-    assert_equal old, LaunchNotification.recent.last
+    assert_equal new, LaunchNotification.recent.order(:created_at).first
+    assert_equal old, LaunchNotification.recent.order(:created_at).last
   end
 
   test "should filter by source" do

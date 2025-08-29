@@ -48,7 +48,7 @@ class SignupsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    user = User.last
+    user = User.order(:created_at).last
     assert_response :redirect
     assert_redirected_to root_path
     assert_equal "Welcome! Your account has been created. Please save your passphrase - you'll need it to access your account.", flash[:notice]
@@ -67,7 +67,7 @@ class SignupsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    user = User.last
+    user = User.order(:created_at).last
     assert_nil user.email_address
   end
 
@@ -82,7 +82,7 @@ class SignupsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    user = User.last
+    user = User.order(:created_at).last
     assert_response :redirect
     assert_nil user.email_address
   end
@@ -114,7 +114,7 @@ class SignupsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    user = User.last
+    user = User.order(:created_at).last
     assert_response :redirect
     assert_redirected_to root_path
     # Check flash notice contains success message
@@ -151,7 +151,7 @@ class SignupsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    user = User.last
+    user = User.order(:created_at).last
     assert_equal @valid_email, user.email_address
     # User should still have passphrase but no custom password
     assert_not_nil user.passphrase_hash
@@ -165,7 +165,7 @@ class SignupsControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    user = User.last
+    user = User.order(:created_at).last
     assert_equal "test@example.com", user.email_address
   end
 
@@ -177,7 +177,7 @@ class SignupsControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    user = User.last
+    user = User.order(:created_at).last
     assert_equal "test@example.com", user.email_address
   end
 
@@ -230,9 +230,10 @@ class SignupsControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    user = User.last
+    user = User.order(:created_at).last
     # Email should be encrypted in database
-    raw_value = User.connection.execute("SELECT email_address FROM users WHERE id = #{user.id}").first["email_address"]
+    quoted_id = ActiveRecord::Base.connection.quote(user.id)
+    raw_value = User.connection.execute("SELECT email_address FROM users WHERE id = #{quoted_id}").first["email_address"]
     assert_not_equal @valid_email, raw_value
   end
 
@@ -316,7 +317,7 @@ class SignupsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    user = User.last
+    user = User.order(:created_at).last
     assert_nil user.email_address
   end
 
@@ -332,7 +333,7 @@ class SignupsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    user = User.last
+    user = User.order(:created_at).last
     assert_equal @valid_email, user.email_address
     assert_not_nil user.passphrase_hash
   end
@@ -349,7 +350,7 @@ class SignupsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    user = User.last
+    user = User.order(:created_at).last
     assert_nil user.email_address
     assert_not_nil user.passphrase_hash
   end
@@ -380,9 +381,9 @@ class SignupsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    referral = Referral.last
+    referral = Referral.order(:created_at).last
     assert_equal affiliate, referral.affiliate
-    assert_equal User.last, referral.user
+    assert_equal User.order(:created_at).last, referral.user
   end
 
   test "should track affiliate referral for email signup" do
@@ -410,9 +411,9 @@ class SignupsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    referral = Referral.last
+    referral = Referral.order(:created_at).last
     assert_equal affiliate, referral.affiliate
-    assert_equal User.last, referral.user
+    assert_equal User.order(:created_at).last, referral.user
   end
 
   # === UI Elements ===

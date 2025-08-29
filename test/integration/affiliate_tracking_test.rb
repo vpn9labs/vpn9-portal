@@ -25,7 +25,7 @@ class AffiliateTrackingTest < ActionDispatch::IntegrationTest
 
     # Verify click was tracked
     assert_equal 1, @affiliate.affiliate_clicks.count
-    click = @affiliate.affiliate_clicks.last
+    click = @affiliate.affiliate_clicks.order(:created_at).last
     assert_not_nil click.ip_hash
     assert_equal "/signup?ref=#{@affiliate.code}", click.landing_page
 

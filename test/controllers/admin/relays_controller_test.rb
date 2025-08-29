@@ -179,7 +179,7 @@ class Admin::RelaysControllerTest < ActionDispatch::IntegrationTest
         }
       end
 
-      new_relay = Relay.last
+      new_relay = Relay.order(:created_at).last
       assert_redirected_to admin_relay_path(new_relay)
       follow_redirect!
       assert_select ".bg-green-50", text: /successfully created/

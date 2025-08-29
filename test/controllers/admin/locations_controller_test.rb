@@ -218,7 +218,7 @@ class Admin::LocationsControllerTest < ActionDispatch::IntegrationTest
         }
       end
 
-      new_location = Location.last
+      new_location = Location.order(:created_at).last
       assert_redirected_to admin_location_path(new_location)
       follow_redirect!
       assert_select ".bg-green-50", text: /successfully created/
@@ -246,7 +246,7 @@ class Admin::LocationsControllerTest < ActionDispatch::IntegrationTest
         }
       end
 
-      new_location = Location.last
+      new_location = Location.order(:created_at).last
       assert_equal "DE", new_location.country_code
       assert_equal "Berlin", new_location.city
       # Geocoding should have set coordinates
@@ -311,7 +311,7 @@ class Admin::LocationsControllerTest < ActionDispatch::IntegrationTest
         }
       end
 
-      new_location = Location.last
+      new_location = Location.order(:created_at).last
       assert_nil new_location.latitude
       assert_nil new_location.longitude
       assert_redirected_to admin_location_path(new_location)

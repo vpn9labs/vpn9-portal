@@ -85,7 +85,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_152000) do
     t.index ["status"], name: "index_affiliates_on_status"
   end
 
-  create_table "commissions", force: :cascade do |t|
+  create_table "commissions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "payment_id", null: false
     t.decimal "amount", precision: 10, scale: 2, null: false
     t.string "currency", default: "USD"
@@ -100,7 +100,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_152000) do
     t.uuid "affiliate_id"
     t.uuid "referral_id"
     t.uuid "payout_id"
+    t.index ["affiliate_id", "status"], name: "index_commissions_on_affiliate_id_and_status"
     t.index ["affiliate_id"], name: "index_commissions_on_affiliate_id"
+    t.index ["id"], name: "index_commissions_on_id", unique: true
     t.index ["payment_id"], name: "index_commissions_on_payment_id"
     t.index ["payment_id"], name: "index_commissions_on_payment_id_unique", unique: true
     t.index ["payout_id"], name: "index_commissions_on_payout_id"
@@ -231,43 +233,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_152000) do
     t.index ["user_id"], name: "index_referrals_on_user_id_unique", unique: true
   end
 
-  create_table "relay_bandwidth_stats", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.date "date", null: false
-    t.bigint "bandwidth_in", default: 0, null: false
-    t.bigint "bandwidth_out", default: 0, null: false
-    t.integer "peak_connections", default: 0
-    t.integer "unique_tokens", default: 0
-    t.float "avg_cpu_usage"
-    t.float "avg_memory_usage"
-    t.float "uptime_percentage", default: 100.0
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.uuid "relay_id"
-    t.index ["date"], name: "index_relay_bandwidth_stats_on_date"
-    t.index ["id"], name: "index_relay_bandwidth_stats_on_id", unique: true
-    t.index ["relay_id", "date"], name: "index_relay_bandwidth_stats_on_relay_id_and_date", unique: true
-    t.index ["relay_id"], name: "index_relay_bandwidth_stats_on_relay_id"
-  end
-
-  create_table "relay_monthly_summaries", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.integer "year", null: false
-    t.integer "month", null: false
-    t.bigint "total_bandwidth_in", default: 0, null: false
-    t.bigint "total_bandwidth_out", default: 0, null: false
-    t.bigint "total_bandwidth", default: 0, null: false
-    t.integer "max_concurrent_connections", default: 0
-    t.float "avg_daily_bandwidth"
-    t.float "cost_estimate"
-    t.integer "days_active", default: 0
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.uuid "relay_id"
-    t.index ["id"], name: "index_relay_monthly_summaries_on_id", unique: true
-    t.index ["relay_id", "year", "month"], name: "index_relay_monthly_summaries_on_relay_id_and_year_and_month", unique: true
-    t.index ["relay_id"], name: "index_relay_monthly_summaries_on_relay_id"
-    t.index ["year", "month"], name: "index_relay_monthly_summaries_on_year_and_month"
-  end
-
   create_table "relays", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name"
     t.string "hostname"
@@ -348,8 +313,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_152000) do
   add_foreign_key "payouts", "affiliates"
   add_foreign_key "referrals", "affiliates"
   add_foreign_key "referrals", "users"
-  add_foreign_key "relay_bandwidth_stats", "relays"
-  add_foreign_key "relay_monthly_summaries", "relays"
   add_foreign_key "relays", "locations"
   add_foreign_key "sessions", "users", on_delete: :cascade
   add_foreign_key "subscriptions", "plans"

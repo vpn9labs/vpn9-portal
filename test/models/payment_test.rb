@@ -305,7 +305,7 @@ class PaymentTest < ActiveSupport::TestCase
       @payment.update_from_webhook!(webhook_data, "192.168.1.1")
     end
 
-    log = @payment.webhook_logs.last
+    log = @payment.webhook_logs.order(:created_at).last
     assert_equal "PAID", log.status
     assert_equal "192.168.1.1", log.ip_address
     assert_not_nil log.processed_at

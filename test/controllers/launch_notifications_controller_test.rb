@@ -53,7 +53,7 @@ class LaunchNotificationsControllerTest < ActionDispatch::IntegrationTest
          headers: { "HTTP_USER_AGENT" => "Test Browser" },
          as: :json
 
-    notification = LaunchNotification.last
+    notification = LaunchNotification.order(:created_at).last
     assert_equal "tracker@example.com", notification.email
     assert_equal "Test Browser", notification.user_agent
     assert_equal false, notification.notified
@@ -67,7 +67,7 @@ class LaunchNotificationsControllerTest < ActionDispatch::IntegrationTest
       utm_medium: "social"
     }, as: :json
 
-    notification = LaunchNotification.last
+    notification = LaunchNotification.order(:created_at).last
     assert_equal "utm@example.com", notification.email
     # Note: metadata extraction happens in before_create callback
     # which requires request_params to be set
@@ -76,7 +76,7 @@ class LaunchNotificationsControllerTest < ActionDispatch::IntegrationTest
   test "should normalize email to lowercase" do
     post launch_notifications_url, params: { email: "UPPERCASE@EXAMPLE.COM" }, as: :json
 
-    notification = LaunchNotification.last
+    notification = LaunchNotification.order(:created_at).last
     assert_equal "uppercase@example.com", notification.email
   end
 

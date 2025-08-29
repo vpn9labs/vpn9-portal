@@ -48,7 +48,7 @@ class AffiliatesControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to thank_you_affiliates_path
-    new_affiliate = Affiliate.last
+    new_affiliate = Affiliate.order(:created_at).last
     assert_equal "New Affiliate", new_affiliate.name
     assert_equal "new@example.com", new_affiliate.email
     assert_equal "pending", new_affiliate.status
@@ -88,7 +88,7 @@ class AffiliatesControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    new_affiliate = Affiliate.last
+    new_affiliate = Affiliate.order(:created_at).last
     assert_not_nil new_affiliate.code
     assert_match /^[A-Z0-9]{8}$/, new_affiliate.code
   end
@@ -109,7 +109,7 @@ class AffiliatesControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    new_affiliate = Affiliate.last
+    new_affiliate = Affiliate.order(:created_at).last
     assert_equal 20.0, new_affiliate.commission_rate
     assert_equal 100.0, new_affiliate.minimum_payout_amount.to_f
     assert_equal "pending", new_affiliate.status

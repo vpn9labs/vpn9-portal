@@ -35,8 +35,8 @@ module DeviceRegistry
     end
 
     # Deactivate a single device: remove from sets, then delete metadata.
-    # @param user_id [Integer]
-    # @param device_id [Integer]
+    # @param user_id [String] UUID
+    # @param device_id [String] UUID
     def deactivate_device!(user_id, device_id)
       remove_from_sets(user_id, [ device_id ])
       delete_device_hash(device_id)
@@ -45,8 +45,8 @@ module DeviceRegistry
     end
 
     # Batch activate: upsert metadata for each device id, then add to sets.
-    # @param user_id [Integer]
-    # @param device_ids [Array<Integer>]
+    # @param user_id [String] UUID
+    # @param device_ids [Array<String>] UUIDs
     def activate_devices!(user_id, device_ids)
       return if device_ids.blank?
       Device.where(id: device_ids).find_each { |d| upsert_device_hash(d) }
@@ -56,8 +56,8 @@ module DeviceRegistry
     end
 
     # Batch deactivate: remove from sets, then delete each device hash.
-    # @param user_id [Integer]
-    # @param device_ids [Array<Integer>]
+    # @param user_id [String] UUID
+    # @param device_ids [Array<String>] UUIDs
     def deactivate_devices!(user_id, device_ids)
       return if device_ids.blank?
       remove_from_sets(user_id, device_ids)
@@ -84,7 +84,7 @@ module DeviceRegistry
     end
 
     # Kredis set of active device IDs (as strings) for a specific user
-    # @param user_id [Integer,String]
+    # @param user_id [String] UUID
     # @return [Kredis::Types::Set]
     def user_active_set(user_id)
       kredis.set("vpn9:user:#{user_id}:devices:active")
@@ -92,7 +92,7 @@ module DeviceRegistry
 
     # Per‑device hash with details needed by the control plane.
     # Fields: id, user_id, name, public_key, ipv4, ipv6, allowed_ips.
-    # @param device_id [Integer,String]
+    # @param device_id [String] UUID
     # @return [Kredis::Types::Hash]
     def device_hash(device_id)
       kredis.hash("vpn9:device:#{device_id}")
@@ -177,8 +177,8 @@ module DeviceRegistry
       User.find_each do |u|
         current_members = user_active_set(u.id).members
         desired = u.devices.where(status: :active).pluck(:id).map(&:to_s)
-        to_add = (desired - current_members).map(&:to_i)
-        to_remove = (current_members - desired).map(&:to_i)
+        to_add = (desired - current_members)
+        to_remove = (current_members - desired)
         activate_devices!(u.id, to_add) if to_add.any?
         deactivate_devices!(u.id, to_remove) if to_remove.any?
       end

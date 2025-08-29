@@ -60,7 +60,7 @@ class Admin::AffiliatesControllerTest < ActionDispatch::IntegrationTest
         }
       }
     end
-    assert_redirected_to admin_affiliate_path(Affiliate.last)
+    assert_redirected_to admin_affiliate_path(Affiliate.order(:created_at).last)
     assert_equal "Affiliate created successfully", flash[:notice]
   end
 
@@ -73,7 +73,7 @@ class Admin::AffiliatesControllerTest < ActionDispatch::IntegrationTest
         commission_rate: 10.0
       }
     }
-    affiliate = Affiliate.last
+    affiliate = Affiliate.order(:created_at).last
     assert_not_nil affiliate.code
     assert affiliate.code.length >= 8
   end

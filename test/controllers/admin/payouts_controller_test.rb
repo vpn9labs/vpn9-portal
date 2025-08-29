@@ -441,8 +441,8 @@ class Admin::PayoutsControllerTest < ActionDispatch::IntegrationTest
     # Parse the HTML to check what commissions are actually displayed
     doc = Nokogiri::HTML(response.body)
 
-    # Find all commission IDs in the table (they appear as #ID with whitespace)
-    commission_ids = doc.css("tbody td").map { |td| td.text.strip }.select { |text| text.match(/^#\d+$/) }
+    # Find all commission IDs in the table (they appear as #UUID with whitespace)
+    commission_ids = doc.css("tbody td").map { |td| td.text.strip }.select { |text| text.match(/^#[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/) }
 
     # Check that approved commissions are shown
     assert_includes commission_ids, "##{@commission_approved1.id}"

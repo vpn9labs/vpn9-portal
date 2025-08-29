@@ -20,6 +20,7 @@ class MigratePrimaryKeysToUuid < ActiveRecord::Migration[8.0]
     add_uuid(:referrals)
     add_uuid(:sessions)
     add_uuid(:subscriptions)
+    add_uuid(:commissions)
     # payments already uses UUID PKs; device_sessions created with id: :uuid
 
     # 2) Convert foreign keys to reference UUIDs (via the temporary uuid columns)
@@ -69,6 +70,7 @@ class MigratePrimaryKeysToUuid < ActiveRecord::Migration[8.0]
     finalize_pk_swap(:relays)
     finalize_pk_swap(:referrals)
     finalize_pk_swap(:payouts)
+    finalize_pk_swap(:commissions)
 
     # Leaf tables or ones only referenced by already-swapped parents
     finalize_pk_swap(:admin_sessions)
@@ -177,71 +179,72 @@ class MigratePrimaryKeysToUuid < ActiveRecord::Migration[8.0]
 
   def recreate_common_indexes(table, column)
     # This method re-adds indexes known from the schema for each table/column combo.
-    case [table.to_sym, column.to_sym]
-    when [:admin_sessions, :admin_id]
+    case [ table.to_sym, column.to_sym ]
+    when [ :admin_sessions, :admin_id ]
       add_index :admin_sessions, :admin_id unless index_exists?(:admin_sessions, :admin_id)
 
-    when [:affiliate_clicks, :affiliate_id]
+    when [ :affiliate_clicks, :affiliate_id ]
       add_index :affiliate_clicks, :affiliate_id unless index_exists?(:affiliate_clicks, :affiliate_id)
-      add_index :affiliate_clicks, [:affiliate_id, :created_at] unless index_exists?(:affiliate_clicks, [:affiliate_id, :created_at])
+      add_index :affiliate_clicks, [ :affiliate_id, :created_at ] unless index_exists?(:affiliate_clicks, [ :affiliate_id, :created_at ])
 
-    when [:referrals, :affiliate_id]
+    when [ :referrals, :affiliate_id ]
       add_index :referrals, :affiliate_id unless index_exists?(:referrals, :affiliate_id)
-      add_index :referrals, [:affiliate_id, :status] unless index_exists?(:referrals, [:affiliate_id, :status])
-    when [:referrals, :user_id]
+      add_index :referrals, [ :affiliate_id, :status ] unless index_exists?(:referrals, [ :affiliate_id, :status ])
+    when [ :referrals, :user_id ]
       add_index :referrals, :user_id, unique: true, name: 'index_referrals_on_user_id_unique' unless index_exists?(:referrals, :user_id, name: 'index_referrals_on_user_id_unique')
 
-    when [:payouts, :affiliate_id]
+    when [ :payouts, :affiliate_id ]
       add_index :payouts, :affiliate_id unless index_exists?(:payouts, :affiliate_id)
-      add_index :payouts, [:affiliate_id, :status] unless index_exists?(:payouts, [:affiliate_id, :status])
+      add_index :payouts, [ :affiliate_id, :status ] unless index_exists?(:payouts, [ :affiliate_id, :status ])
       add_index :payouts, :status unless index_exists?(:payouts, :status)
 
-    when [:commissions, :affiliate_id]
+    when [ :commissions, :affiliate_id ]
       add_index :commissions, :affiliate_id unless index_exists?(:commissions, :affiliate_id)
-    when [:commissions, :referral_id]
+      add_index :commissions, [ :affiliate_id, :status ] unless index_exists?(:commissions, [ :affiliate_id, :status ])
+    when [ :commissions, :referral_id ]
       add_index :commissions, :referral_id unless index_exists?(:commissions, :referral_id)
-    when [:commissions, :payout_id]
+    when [ :commissions, :payout_id ]
       add_index :commissions, :payout_id unless index_exists?(:commissions, :payout_id)
 
-    when [:devices, :user_id]
+    when [ :devices, :user_id ]
       add_index :devices, :user_id unless index_exists?(:devices, :user_id)
-      add_index :devices, [:user_id, :status] unless index_exists?(:devices, [:user_id, :status])
+      add_index :devices, [ :user_id, :status ] unless index_exists?(:devices, [ :user_id, :status ])
 
-    when [:sessions, :user_id]
+    when [ :sessions, :user_id ]
       add_index :sessions, :user_id unless index_exists?(:sessions, :user_id)
 
-    when [:subscriptions, :user_id]
+    when [ :subscriptions, :user_id ]
       add_index :subscriptions, :user_id unless index_exists?(:subscriptions, :user_id)
       add_index :subscriptions, :status unless index_exists?(:subscriptions, :status)
       add_index :subscriptions, :expires_at unless index_exists?(:subscriptions, :expires_at)
-    when [:subscriptions, :plan_id]
+    when [ :subscriptions, :plan_id ]
       add_index :subscriptions, :plan_id unless index_exists?(:subscriptions, :plan_id)
 
-    when [:payments, :user_id]
+    when [ :payments, :user_id ]
       add_index :payments, :user_id unless index_exists?(:payments, :user_id)
-    when [:payments, :plan_id]
+    when [ :payments, :plan_id ]
       add_index :payments, :plan_id unless index_exists?(:payments, :plan_id)
-    when [:payments, :subscription_id]
+    when [ :payments, :subscription_id ]
       add_index :payments, :subscription_id unless index_exists?(:payments, :subscription_id)
 
-    when [:relays, :location_id]
+    when [ :relays, :location_id ]
       add_index :relays, :location_id unless index_exists?(:relays, :location_id)
 
-    when [:relay_bandwidth_stats, :relay_id]
+    when [ :relay_bandwidth_stats, :relay_id ]
       add_index :relay_bandwidth_stats, :relay_id unless index_exists?(:relay_bandwidth_stats, :relay_id)
-      add_index :relay_bandwidth_stats, [:relay_id, :date], unique: true, name: 'index_relay_bandwidth_stats_on_relay_id_and_date' unless index_exists?(:relay_bandwidth_stats, [:relay_id, :date], name: 'index_relay_bandwidth_stats_on_relay_id_and_date')
+      add_index :relay_bandwidth_stats, [ :relay_id, :date ], unique: true, name: 'index_relay_bandwidth_stats_on_relay_id_and_date' unless index_exists?(:relay_bandwidth_stats, [ :relay_id, :date ], name: 'index_relay_bandwidth_stats_on_relay_id_and_date')
 
-    when [:relay_monthly_summaries, :relay_id]
+    when [ :relay_monthly_summaries, :relay_id ]
       add_index :relay_monthly_summaries, :relay_id unless index_exists?(:relay_monthly_summaries, :relay_id)
-      add_index :relay_monthly_summaries, [:relay_id, :year, :month], unique: true, name: 'index_relay_monthly_summaries_on_relay_id_and_year_and_month' unless index_exists?(:relay_monthly_summaries, [:relay_id, :year, :month], name: 'index_relay_monthly_summaries_on_relay_id_and_year_and_month')
-      add_index :relay_monthly_summaries, [:year, :month] unless index_exists?(:relay_monthly_summaries, [:year, :month])
+      add_index :relay_monthly_summaries, [ :relay_id, :year, :month ], unique: true, name: 'index_relay_monthly_summaries_on_relay_id_and_year_and_month' unless index_exists?(:relay_monthly_summaries, [ :relay_id, :year, :month ], name: 'index_relay_monthly_summaries_on_relay_id_and_year_and_month')
+      add_index :relay_monthly_summaries, [ :year, :month ] unless index_exists?(:relay_monthly_summaries, [ :year, :month ])
 
-    when [:device_sessions, :user_id]
+    when [ :device_sessions, :user_id ]
       add_index :device_sessions, :user_id unless index_exists?(:device_sessions, :user_id)
       add_index :device_sessions, :device_id unless index_exists?(:device_sessions, :device_id)
       add_index :device_sessions, :active unless index_exists?(:device_sessions, :active)
       add_index :device_sessions, :refresh_token_hash, unique: true unless index_exists?(:device_sessions, :refresh_token_hash)
-      add_index :device_sessions, [:user_id, :device_id], unique: true unless index_exists?(:device_sessions, [:user_id, :device_id])
+      add_index :device_sessions, [ :user_id, :device_id ], unique: true unless index_exists?(:device_sessions, [ :user_id, :device_id ])
     end
   end
 

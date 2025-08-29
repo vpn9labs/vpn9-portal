@@ -82,7 +82,7 @@ class Admin::SessionsControllerTest < ActionDispatch::IntegrationTest
     # Don't follow redirect to avoid dashboard encryption issues in test
 
     # Verify session was created
-    admin_session = AdminSession.last
+    admin_session = AdminSession.order(:created_at).last
     assert_equal @admin, admin_session.admin
     assert_equal "Test Browser", admin_session.user_agent
   end
@@ -192,7 +192,7 @@ class Admin::SessionsControllerTest < ActionDispatch::IntegrationTest
       "User-Agent" => "Mozilla/5.0 Test Browser"
     }
 
-    admin_session = AdminSession.last
+    admin_session = AdminSession.order(:created_at).last
     assert_equal "Mozilla/5.0 Test Browser", admin_session.user_agent
   end
 
@@ -233,7 +233,7 @@ class Admin::SessionsControllerTest < ActionDispatch::IntegrationTest
     login_as_admin(@admin)
 
     # Get the actual session record
-    admin_session = AdminSession.last
+    admin_session = AdminSession.order(:created_at).last
     assert_not_nil admin_session
 
     assert_difference "AdminSession.count", -1 do
@@ -274,14 +274,14 @@ class Admin::SessionsControllerTest < ActionDispatch::IntegrationTest
   test "should only destroy current admin's session" do
     # Login as first admin
     login_as_admin(@admin)
-    first_session = AdminSession.last
+    first_session = AdminSession.order(:created_at).last
 
     # Login as second admin (in different browser/session)
     post admin_session_url, params: {
       email: @other_admin.email,
       password: "AnotherPassword456!"
     }
-    second_session = AdminSession.last
+    second_session = AdminSession.order(:created_at).last
 
     # Logout should only destroy current session
     delete admin_session_url
@@ -425,7 +425,7 @@ class Admin::SessionsControllerTest < ActionDispatch::IntegrationTest
     login_as_admin(@admin)
 
     # Manually destroy the session record
-    AdminSession.last.destroy
+    AdminSession.order(:created_at).last.destroy
 
     # Should redirect to login
     get admin_root_url
@@ -505,7 +505,7 @@ class Admin::SessionsControllerTest < ActionDispatch::IntegrationTest
       email: @admin.email,
       password: "SecurePassword123!"
     }
-    first_session = AdminSession.last
+    first_session = AdminSession.order(:created_at).last
     assert_not_nil first_session
     assert_equal @admin, first_session.admin
 
@@ -517,7 +517,7 @@ class Admin::SessionsControllerTest < ActionDispatch::IntegrationTest
       email: @other_admin.email,
       password: "AnotherPassword456!"
     }
-    second_session = AdminSession.last
+    second_session = AdminSession.order(:created_at).last
     assert_not_nil second_session
     assert_equal @other_admin, second_session.admin
 
@@ -601,7 +601,7 @@ class Admin::SessionsControllerTest < ActionDispatch::IntegrationTest
     }
 
     assert_redirected_to admin_root_url
-    admin_session = AdminSession.last
+    admin_session = AdminSession.order(:created_at).last
     assert_nil admin_session.user_agent
   end
 

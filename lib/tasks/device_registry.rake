@@ -11,7 +11,7 @@ namespace :device_registry do
     only_active = ActiveModel::Type::Boolean.new.cast(args[:only_active])
 
     ids = if only_active
-      DeviceRegistry.global_active_set.members.map(&:to_i)
+      DeviceRegistry.global_active_set.members
     else
       Device.pluck(:id)
     end

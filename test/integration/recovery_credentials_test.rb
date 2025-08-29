@@ -140,7 +140,7 @@ class RecoveryCredentialsTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
 
     # Get the created user
-    user = User.last
+    user = User.order(:created_at).last
 
     # Follow the redirect to root which should show recovery credentials
     follow_redirect!

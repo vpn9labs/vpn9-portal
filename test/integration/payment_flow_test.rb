@@ -46,7 +46,7 @@ class PaymentFlowTest < ActionDispatch::IntegrationTest
       post plan_payments_path(@plan), params: { crypto: "btc" }
     end
 
-    payment = Payment.last
+    payment = Payment.order(:created_at).last
     assert_equal @user, payment.user
     assert_equal @plan, payment.plan
     assert_equal "pending", payment.status
@@ -88,7 +88,7 @@ class PaymentFlowTest < ActionDispatch::IntegrationTest
     assert_not_nil payment.paid_at
 
     # Step 7: Verify subscription created
-    subscription = @user.subscriptions.last
+    subscription = @user.subscriptions.order(:created_at).last
     assert_not_nil subscription
     assert_equal @plan, subscription.plan
     assert_equal "active", subscription.status
@@ -118,7 +118,7 @@ class PaymentFlowTest < ActionDispatch::IntegrationTest
     PaymentProcessor.stubs(:create_payment).returns(@mock_payment_response)
 
     post plan_payments_path(@plan), params: { crypto: "btc" }
-    payment = Payment.last
+    payment = Payment.order(:created_at).last
 
     original_expires_at = existing_subscription.expires_at
 
@@ -158,7 +158,7 @@ class PaymentFlowTest < ActionDispatch::IntegrationTest
     PaymentProcessor.stubs(:create_payment).returns(@mock_payment_response)
 
     post plan_payments_path(@plan), params: { crypto: "btc" }
-    payment = Payment.last
+    payment = Payment.order(:created_at).last
 
     # Simulate expired payment
     assert_no_difference "Subscription.count" do

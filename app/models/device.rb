@@ -33,7 +33,7 @@
 #   @return [String]
 # @!attribute [r] user_id
 #   Owning user foreign key.
-#   @return [Integer]
+#   @return [String] UUID
 # @!attribute [r] status
 #   Access state for the device (`active` or `inactive`).
 #   @return [String] enum value
