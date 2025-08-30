@@ -91,13 +91,13 @@ production:
     password: <%= ENV["VPN9_POSTGRES_PASSWORD"]%>
   cache:
     <<: *primary_production
-    database: rails_new_postgres_production_cache
+    database: vpn9_production_cache
     migrations_paths: db/cache_migrate
   queue:
     <<: *primary_production
-    database: rails_new_postgres_production_queue
+    database: vpn9_production_queue
     migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
-    database: rails_new_postgres_production_cable
+    database: vpn9_production_cable
     migrations_paths: db/cable_migrate
