@@ -6,23 +6,11 @@ class SitemapsController < ApplicationController
     @primary_domain = ENV.fetch("PRIMARY_DOMAIN", "vpn9.com")
     @base_url = "https://#{@primary_domain}"
 
-    @static_pages = [
+    static_pages = [
       {
         url: "#{@base_url}/",
         changefreq: "weekly",
         priority: 1.0,
-        lastmod: Time.current
-      },
-      {
-        url: "#{@base_url}/signup",
-        changefreq: "monthly",
-        priority: 0.9,
-        lastmod: Time.current
-      },
-      {
-        url: "#{@base_url}/login",
-        changefreq: "weekly",
-        priority: 0.8,
         lastmod: Time.current
       },
       {
@@ -41,6 +29,20 @@ class SitemapsController < ApplicationController
         url: "#{@base_url}/security",
         changefreq: "weekly",
         priority: 0.7,
+        lastmod: Time.current
+      }
+    ]
+    live_pages = [
+      {
+        url: "#{@base_url}/signup",
+        changefreq: "monthly",
+        priority: 0.9,
+        lastmod: Time.current
+      },
+      {
+        url: "#{@base_url}/login",
+        changefreq: "weekly",
+        priority: 0.8,
         lastmod: Time.current
       },
       {
@@ -81,7 +83,10 @@ class SitemapsController < ApplicationController
       }
     ]
 
-    # Add legal pages if they exist
+    @static_pages = static_pages
+    @static_pages += live_pages if Rails.application.config.vpn9_launched
+
+    # Add legal pages once they exist
     if defined?(privacy_policy_url)
       @static_pages << {
         url: privacy_policy_url,

@@ -30,5 +30,7 @@ module Vpn9
 
     require Rails.root.join("lib/webhook_ip_whitelist")
     config.middleware.use ::WebhookIpWhitelist
+
+    config.vpn9_launched = ENV["VPN9_LAUNCHED"] == "true"
   end
 end

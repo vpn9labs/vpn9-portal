@@ -1,6 +1,15 @@
 require "test_helper"
 
 class SitemapsControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    @vpn9_launched_before = Rails.application.config.vpn9_launched
+    Rails.application.config.vpn9_launched = true
+  end
+
+  teardown do
+    Rails.application.config.vpn9_launched = @vpn9_launched_before
+  end
+
   test "should get sitemap" do
     get sitemap_url(format: :xml)
     assert_response :success
@@ -8,6 +17,7 @@ class SitemapsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "sitemap should contain required URLs" do
+
     get sitemap_url(format: :xml)
     assert_response :success
 
