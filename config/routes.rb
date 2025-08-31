@@ -8,7 +8,8 @@ Rails.application.routes.draw do
 
   get "/signup", to: "signups#new"
   post "/signup", to: "signups#create"
-  resource :session
+  get "/login", to: "sessions#new", as: :new_session
+  resource :session, only: [ :create, :destroy ]
   resources :passwords, param: :token
 
   # Launch notification signups (teaser page)

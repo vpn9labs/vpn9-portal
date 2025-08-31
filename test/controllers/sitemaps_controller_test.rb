@@ -26,7 +26,7 @@ class SitemapsControllerTest < ActionDispatch::IntegrationTest
     # Check for essential pages
     assert urls.any? { |url| url.include?("/") }, "Should include root URL"
     assert urls.any? { |url| url.include?("/signup") }, "Should include signup URL"
-    assert urls.any? { |url| url.include?("/session/new") }, "Should include login URL"
+    assert urls.any? { |url| url.include?("/login") }, "Should include login URL"
 
     # Check for proper structure
     doc.css("url").each do |url_node|

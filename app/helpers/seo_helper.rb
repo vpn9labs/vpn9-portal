@@ -101,7 +101,7 @@ module SeoHelper
     # Determine robots meta tag based on current path
     noindex_paths = [
       "/session",
-      "/session/new",
+      "/login",
       "/signup",
       "/passwords",
       "/affiliates/dashboard",  # Authenticated area - should not be indexed

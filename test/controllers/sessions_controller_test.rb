@@ -15,7 +15,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     @anonymous_passphrase = @anonymous_user.send(:issued_passphrase)
   end
 
-  # === GET /session/new ===
+  # === GET /login ===
 
   test "should get new session page" do
     get new_session_url

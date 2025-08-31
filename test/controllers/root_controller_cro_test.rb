@@ -133,7 +133,7 @@ class RootControllerCroTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "nav"
     assert_select "a[href='/signup']"
-    assert_select "a[href='/session/new']"
+    assert_select "a[href='/login']"
   end
 
   test "CRO page should have all sections" do
