@@ -17,7 +17,6 @@ class SitemapsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "sitemap should contain required URLs" do
-
     get sitemap_url(format: :xml)
     assert_response :success
 
