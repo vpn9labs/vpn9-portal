@@ -34,7 +34,7 @@ class DeviceSetupController < ApplicationController
     @locations = Location.joins(:relays)
                         .where(relays: { status: :active })
                         .distinct
-                        .select(:id, :name, :country, :city)
+                        .select(:id, :city, :country_code)
 
     render json: @locations.map { |loc|
       {

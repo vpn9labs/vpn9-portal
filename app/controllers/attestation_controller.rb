@@ -4,24 +4,25 @@
 # No authentication required - this is public transparency information
 class AttestationController < ApplicationController
   allow_unauthenticated_access
+  layout "public"
 
   # GET /attestation
   # Public web page showing build verification and transparency dashboard
   def show
-    render :show, layout: "public"
+    render :show
   end
 
   # GET /transparency
   # Transparency log page showing all historical builds
   def transparency
     @builds = fetch_transparency_log
-    render :transparency, layout: "public"
+    render :transparency
   end
 
   # GET /security
   # Security and verification documentation
   def security
-    render :security, layout: "public"
+    render :security
   end
 
   private
