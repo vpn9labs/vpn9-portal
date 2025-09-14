@@ -1,7 +1,7 @@
 <div class="space-y-6">
   <%# Page Header %>
   <div class="flex justify-between items-center">
-    <h1 class="text-3xl font-bold text-gray-900">Affiliate Analytics</h1>
+    <h1 class="text-2xl font-semibold text-gray-900">Affiliate Analytics</h1>
     <div class="flex space-x-4">
       <%= form_with url: admin_analytics_path, method: :get, local: true, class: "flex items-center space-x-2" do |f| %>
         <%= f.date_field :start_date, value: @date_range.first.to_date, class: "rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>

@@ -1,10 +1,9 @@
-<div class="container mx-auto px-4 py-8">
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold">Relays</h1>
+    <h1 class="text-2xl font-semibold text-gray-900">Relays</h1>
     <%= link_to "New Relay", new_admin_relay_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
   </div>
 
-  <div class="overflow-hidden shadow border border-gray-200 sm:rounded-lg">
+  <div class="overflow-x-auto shadow border border-gray-200 sm:rounded-lg">
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
         <tr>
@@ -61,4 +60,3 @@
       </div>
     <% end %>
   </div>
-</div>

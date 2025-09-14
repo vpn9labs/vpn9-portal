@@ -362,6 +362,68 @@ class Admin::SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name='subscription[expires_at]'][value]"
   end
 
+  # ========== New/Create Action Tests ==========
+
+  test "should get new when authenticated as admin" do
+    login_as_admin
+    get new_admin_subscription_url
+    assert_response :success
+    assert_select "h1", "New Subscription"
+  end
+
+  test "new should preselect user when user_id provided" do
+    login_as_admin
+    get new_admin_subscription_url(user_id: @user_no_subscription.id)
+    assert_response :success
+    # Verify the user's option is selected in the user select
+    assert_select "select[name='subscription[user_id]'] option[selected][value='#{@user_no_subscription.id}']"
+  end
+
+  test "should create active subscription with defaults" do
+    login_as_admin
+
+    assert_difference -> { Subscription.count }, +1 do
+      post admin_subscriptions_url, params: {
+        subscription: {
+          user_id: @user_no_subscription.id,
+          plan_id: @monthly_plan.id
+        }
+      }
+    end
+
+    new_sub = Subscription.order(created_at: :desc).first
+    assert_redirected_to admin_subscription_path(new_sub)
+    assert_equal "active", new_sub.status
+    assert_in_delta Time.current.to_i, new_sub.started_at.to_i, 5
+    # For monthly plan with 30 days, expires_at should be about 30 days from now
+    assert new_sub.expires_at > 20.days.from_now
+  end
+
+  test "should create lifetime subscription with far future expiry when plan is lifetime" do
+    login_as_admin
+    lifetime_plan = Plan.create!(
+      name: "Lifetime",
+      price: 299.0,
+      currency: "USD",
+      lifetime: true,
+      device_limit: 10,
+      active: true
+    )
+
+    assert_difference -> { Subscription.count }, +1 do
+      post admin_subscriptions_url, params: {
+        subscription: {
+          user_id: @user_no_subscription.id,
+          plan_id: lifetime_plan.id
+        }
+      }
+    end
+
+    new_sub = Subscription.order(created_at: :desc).first
+    assert_equal "active", new_sub.status
+    assert new_sub.expires_at > 90.years.from_now
+  end
+
   test "should show all status options in edit form" do
     login_as_admin
     get edit_admin_subscription_url(@active_subscription)

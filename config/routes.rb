@@ -39,7 +39,7 @@ Rails.application.routes.draw do
     resources :users, only: [ :index, :show, :edit, :update ] do
       resources :devices, only: [ :destroy ]
     end
-    resources :subscriptions, only: [ :index, :show, :edit, :update ]
+    resources :subscriptions, only: [ :index, :show, :edit, :update, :new, :create ]
     resources :plans
     resources :locations
     resources :relays

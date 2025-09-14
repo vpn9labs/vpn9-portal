@@ -38,8 +38,11 @@
 </div>
 
 <div class="mb-8">
-  <h2 class="text-xl font-semibold text-gray-900 mb-4">Subscriptions</h2>
-  <div class="bg-white shadow overflow-hidden rounded-lg">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-xl font-semibold text-gray-900">Subscriptions</h2>
+    <%= link_to "Add Subscription", new_admin_subscription_path(user_id: @user.id), class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+  </div>
+  <div class="overflow-x-auto shadow border border-gray-200 sm:rounded-lg">
     <% if @subscriptions.any? %>
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
@@ -84,7 +87,7 @@
 
 <div class="mb-8">
   <h2 class="text-xl font-semibold text-gray-900 mb-4">Payments</h2>
-  <div class="bg-white shadow overflow-hidden rounded-lg">
+  <div class="overflow-x-auto shadow border border-gray-200 sm:rounded-lg">
     <% if @payments.any? %>
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
@@ -138,7 +141,7 @@
       (<%= @devices.count %> of <%= @user.device_limit %> devices used)
     </span>
   </h2>
-  <div class="bg-white shadow overflow-hidden rounded-lg">
+  <div class="overflow-x-auto shadow border border-gray-200 sm:rounded-lg">
     <% if @devices.any? %>
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">

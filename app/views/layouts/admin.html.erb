@@ -204,10 +204,10 @@
       </div>
 
       <%# Main content %>
-      <div class="flex flex-col w-0 flex-1 overflow-hidden">
-        <main class="flex-1 relative overflow-y-auto focus:outline-none">
+      <div class="flex flex-col w-0 flex-1 overflow-hidden min-h-0">
+        <main class="flex-1 relative overflow-y-auto focus:outline-none min-h-0">
           <div class="py-6">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+            <div class="px-4 sm:px-6 md:px-8 w-full">
               <% if notice.present? %>
                 <div class="mb-4 rounded-md bg-green-50 p-4">
                   <p class="text-sm font-medium text-green-800"><%= notice %></p>

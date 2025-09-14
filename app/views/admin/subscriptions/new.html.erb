@@ -1,0 +1,76 @@
+<div class="mb-8">
+  <h1 class="text-2xl font-semibold text-gray-900">New Subscription</h1>
+  <p class="text-gray-600 mt-2">Create an active subscription for a user without requiring payment.</p>
+  <% if @subscription.errors.any? %>
+    <div class="mt-4 rounded-md bg-red-50 p-4">
+      <div class="flex">
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">
+            There were <%= pluralize(@subscription.errors.count, "error") %> with your submission
+          </h3>
+          <div class="mt-2 text-sm text-red-700">
+            <ul class="list-disc pl-5 space-y-1">
+              <% @subscription.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<div class="bg-white shadow overflow-hidden rounded-lg">
+  <div class="px-4 py-5 sm:p-6">
+    <%= form_with model: @subscription, url: admin_subscriptions_path, local: true do |form| %>
+      <div class="grid grid-cols-6 gap-6">
+        <div class="col-span-6 sm:col-span-3">
+          <%= form.label :user_id, "User", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.select :user_id,
+                options_for_select(User.order(created_at: :desc).map { |u| [u.email_address || "User ##{u.id}", u.id] }, @subscription.user_id),
+                {},
+                class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+        </div>
+
+        <div class="col-span-6 sm:col-span-3">
+          <%= form.label :plan_id, "Plan", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.select :plan_id,
+                options_from_collection_for_select(Plan.order(:name), :id, :name, @subscription.plan_id),
+                {},
+                class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+        </div>
+
+        <div class="col-span-6 sm:col-span-3">
+          <%= form.label :status, class: "block text-sm font-medium text-gray-700" %>
+          <%= form.select :status, options_for_select(Subscription.statuses.keys.map { |k| [k.humanize, k] }, @subscription.status || :active), {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+          <p class="mt-1 text-xs text-gray-500">Default is Active.</p>
+        </div>
+
+        <div class="col-span-6 sm:col-span-3">
+          <%= form.label :started_at, class: "block text-sm font-medium text-gray-700" %>
+          <%= form.datetime_field :started_at, value: @subscription.started_at&.strftime("%Y-%m-%dT%H:%M"), class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+          <p class="mt-1 text-xs text-gray-500">Defaults to now if left blank.</p>
+        </div>
+
+        <div class="col-span-6 sm:col-span-3">
+          <%= form.label :expires_at, class: "block text-sm font-medium text-gray-700" %>
+          <%= form.datetime_field :expires_at, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+          <p class="mt-1 text-xs text-gray-500">If left blank, will be set from the selected plan’s duration (or far future for lifetime plans).</p>
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-center justify-between">
+        <%= link_to "Cancel", admin_subscriptions_path, class: "text-sm text-gray-600 hover:text-gray-900" %>
+        <%= form.submit "Create Subscription", class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="mt-6">
+  <%= link_to "← Back to Subscriptions", admin_subscriptions_path, class: "text-indigo-600 hover:text-indigo-900" %>
+  <% if @subscription.user_id.present? %>
+    <%= link_to "Back to User", admin_user_path(@subscription.user_id), class: "ml-4 text-indigo-600 hover:text-indigo-900" %>
+  <% end %>
+</div>
