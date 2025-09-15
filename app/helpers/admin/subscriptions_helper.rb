@@ -12,4 +12,3 @@ module Admin::SubscriptionsHelper
     email.present? ? email : "User ##{user.id}"
   end
 end
-
