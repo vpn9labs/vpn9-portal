@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import nacl from "tweetnacl"
 
 export default class extends Controller {
   static targets = [
@@ -65,12 +66,11 @@ export default class extends Controller {
     privateKeyBytes[0] &= 248
     privateKeyBytes[31] &= 127
     privateKeyBytes[31] |= 64
-    
-    // For demo purposes, generate a mock public key
-    // In production, use a proper Curve25519 library like tweetnacl-js
-    const publicKeyBytes = new Uint8Array(32)
-    crypto.getRandomValues(publicKeyBytes)
-    
+
+    // Derive X25519 public key from the clamped private key
+    // WireGuard uses X25519 = scalarMult.base(secret)
+    const publicKeyBytes = nacl.scalarMult.base(privateKeyBytes)
+
     return {
       privateKey: this.base64Encode(privateKeyBytes),
       publicKey: this.base64Encode(publicKeyBytes)
@@ -84,6 +84,16 @@ export default class extends Controller {
       binary += String.fromCharCode(bytes[i])
     }
     return btoa(binary)
+  }
+
+  // Base64 decode to Uint8Array (expects standard Base64)
+  base64Decode(b64) {
+    const clean = (b64 || '').trim()
+    if (!clean) return new Uint8Array()
+    const bin = atob(clean)
+    const out = new Uint8Array(bin.length)
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i)
+    return out
   }
 
   // Toggle between generate and manual key entry
@@ -199,6 +209,27 @@ export default class extends Controller {
 
   // Handle manual key input
   manualKeyInput() {
+    try {
+      // If a private key was entered but public key is empty, derive it
+      if (this.hasManualPrivateKeyTarget && this.hasManualPublicKeyTarget) {
+        const privB64 = (this.manualPrivateKeyTarget.value || '').trim()
+        const pubVal = (this.manualPublicKeyTarget.value || '').trim()
+
+        if (privB64 && !pubVal) {
+          const priv = this.base64Decode(privB64)
+          if (priv.length === 32) {
+            // Clamp and derive public
+            priv[0] &= 248
+            priv[31] &= 127
+            priv[31] |= 64
+            const pub = nacl.scalarMult.base(priv)
+            this.manualPublicKeyTarget.value = this.base64Encode(pub)
+          }
+        }
+      }
+    } catch (e) {
+      // Silently ignore invalid input; UI feedback happens elsewhere
+    }
     this.updateDownloadButton()
   }
 
