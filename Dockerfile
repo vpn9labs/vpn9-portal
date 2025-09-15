@@ -59,7 +59,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get update -qq && \
     apt-get install --no-install-recommends -y \
         build-essential=12.12 \
-        git=1:2.47.2-0.2 \
+        git=1:2.47.3-0+deb13u1 \
         libyaml-dev=0.2.5-2 \
         pkg-config=1.8.1-4 \
         unzip=6.0-29 && \
