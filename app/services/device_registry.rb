@@ -20,6 +20,9 @@
 #
 module DeviceRegistry
   GLOBAL_ACTIVE_KEY = "vpn9:devices:active".freeze
+  PREFERRED_RELAY_KEY_PREFIX = "vpn9:device-pref".freeze
+  PREFERRED_RELAY_SALT = "device_registry:preferred_relay:v1".freeze
+  DEFAULT_PREFERRED_RELAY_TTL = 300
 
   class << self
     # High-level API (active-only semantics)
@@ -75,6 +78,29 @@ module DeviceRegistry
     # @param provider [#set,#hash]
     def kredis=(provider)
       @kredis = provider
+      remove_instance_variable(:@redis) if defined?(@redis)
+    end
+
+    # Allow overriding the Redis client used for preferred relay hints.
+    # When not explicitly set, falls back to the provider's redis or Kredis.redis.
+    # @return [Redis]
+    def redis
+      return @redis if defined?(@redis) && @redis
+
+      provider = kredis
+      if provider.respond_to?(:redis)
+        provider.redis
+      elsif defined?(Kredis) && Kredis.respond_to?(:redis)
+        Kredis.redis
+      else
+        raise "DeviceRegistry redis provider is not configured"
+      end
+    end
+
+    # Inject a Redis client for tests.
+    # @param client [#setex,#get,#del]
+    def redis=(client)
+      @redis = client
     end
 
     # Kredis set of all active device IDs (as strings)
@@ -96,6 +122,80 @@ module DeviceRegistry
     # @return [Kredis::Types::Hash]
     def device_hash(device_id)
       kredis.hash("vpn9:device:#{device_id}")
+    end
+
+    # Store an encrypted preferred relay hint for a device.
+    # @param device_id [String]
+    # @param relay_id [String]
+    # @param ttl [Integer] seconds before the hint expires (default 300)
+    # @return [Boolean]
+    def set_preferred_relay(device_id, relay_id, ttl: DEFAULT_PREFERRED_RELAY_TTL)
+      return false if device_id.blank? || relay_id.blank?
+
+      payload = preferred_relay_encryptor.encrypt_and_sign(relay_id.to_s)
+      key = preferred_relay_key(device_id)
+      expires_in = ttl.to_i
+
+      client = redis
+      if client.respond_to?(:setex)
+        client.setex(key, expires_in, payload)
+      elsif client.respond_to?(:set)
+        client.set(key, payload, ex: expires_in)
+      else
+        raise NoMethodError, "Redis client does not support setex or set"
+      end
+      true
+    rescue KeyError => e
+      Rails.logger.warn "DeviceRegistry.set_preferred_relay missing configuration: #{e.message}"
+      false
+    rescue => e
+      Rails.logger.warn "DeviceRegistry.set_preferred_relay error: #{e.class}: #{e.message}"
+      false
+    end
+
+    # Consume and delete an encrypted preferred relay hint.
+    # @param device_id [String]
+    # @return [String, nil] relay id if available
+    def consume_preferred_relay(device_id)
+      return nil if device_id.blank?
+
+      key = preferred_relay_key(device_id)
+      client = redis
+      raw = fetch_and_delete_hint(client, key)
+      return nil if raw.blank?
+
+      preferred_relay_encryptor.decrypt_and_verify(raw)
+    rescue ActiveSupport::MessageEncryptor::InvalidMessage => e
+      Rails.logger.warn "DeviceRegistry.consume_preferred_relay invalid payload: #{e.message}"
+      nil
+    rescue KeyError => e
+      Rails.logger.warn "DeviceRegistry.consume_preferred_relay missing configuration: #{e.message}"
+      nil
+    rescue => e
+      Rails.logger.warn "DeviceRegistry.consume_preferred_relay error: #{e.class}: #{e.message}"
+      nil
+    end
+
+    # Peek at the preferred relay hint without deleting the key (for tests)
+    # @param device_id [String]
+    # @return [String, nil]
+    def peek_preferred_relay(device_id)
+      return nil if device_id.blank?
+
+      key = preferred_relay_key(device_id)
+      raw = redis.get(key)
+      return nil if raw.blank?
+
+      preferred_relay_encryptor.decrypt_and_verify(raw)
+    rescue ActiveSupport::MessageEncryptor::InvalidMessage => e
+      Rails.logger.warn "DeviceRegistry.peek_preferred_relay invalid payload: #{e.message}"
+      nil
+    rescue KeyError => e
+      Rails.logger.warn "DeviceRegistry.peek_preferred_relay missing configuration: #{e.message}"
+      nil
+    rescue => e
+      Rails.logger.warn "DeviceRegistry.peek_preferred_relay error: #{e.class}: #{e.message}"
+      nil
     end
 
     # Upsert a device's record into Redis (metadata only).
@@ -205,6 +305,31 @@ module DeviceRegistry
       ids = device_ids.map(&:to_s)
       user_active_set(user_id).remove(*ids)
       global_active_set.remove(*ids)
+    end
+
+    def preferred_relay_key(device_id)
+      "#{PREFERRED_RELAY_KEY_PREFIX}:#{device_id}"
+    end
+
+    def preferred_relay_encryptor
+      secret = ENV.fetch("DEVICE_PREF_SECRET")
+      cache = (@preferred_relay_encryptor_cache ||= {})
+      if cache[:secret] != secret
+        key = ActiveSupport::KeyGenerator.new(secret).generate_key(PREFERRED_RELAY_SALT, ActiveSupport::MessageEncryptor.key_len)
+        cache[:encryptor] = ActiveSupport::MessageEncryptor.new(key)
+        cache[:secret] = secret
+      end
+      cache[:encryptor]
+    end
+
+    def fetch_and_delete_hint(client, key)
+      if client.respond_to?(:getdel)
+        client.getdel(key)
+      else
+        value = client.get(key)
+        client.del(key) if value && client.respond_to?(:del)
+        value
+      end
     end
   end
 end

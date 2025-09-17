@@ -48,6 +48,7 @@ class DeviceRegistryKredisCompatTest < ActiveSupport::TestCase
 
   def teardown
     DeviceRegistry.kredis = @original
+    DeviceRegistry.redis = nil
   end
 
   test "activate_device! falls back when hash.update rejects arguments for active devices" do

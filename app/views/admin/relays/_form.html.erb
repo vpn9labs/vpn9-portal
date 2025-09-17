@@ -1,4 +1,4 @@
-<%= form_with(model: [:admin, relay], local: true) do |form| %>
+<%= form_with(model: [:admin, relay], data: { turbo: false }) do |form| %>
   <% if relay.errors.any? %>
     <div class="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
       <h2 class="font-bold mb-2"><%= pluralize(relay.errors.count, "error") %> prohibited this relay from being saved:</h2>

@@ -140,7 +140,7 @@ class Admin::RelaysControllerTest < ActionDispatch::IntegrationTest
       get new_admin_relay_url
       assert_response :success
 
-      assert_select "form[action=?]", admin_relays_path do
+      assert_select "form[action=?][data-turbo=?]", admin_relays_path, "false" do
         assert_select "input[name=?]", "relay[name]"
         assert_select "select[name=?]", "relay[location_id]"
         assert_select "input[name=?]", "relay[hostname]"

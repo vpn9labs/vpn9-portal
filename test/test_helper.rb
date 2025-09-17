@@ -14,9 +14,13 @@ if ENV["JWT_PRIVATE_KEY"].nil?
   ENV["JWT_PUBLIC_KEY"] = Base64.encode64(key.public_key.to_pem)
 end
 
+ENV["DEVICE_PREF_SECRET"] ||= "test_device_pref_secret_key_that_is_long_enough_to_encrypt"
+
 require_relative "../config/environment"
 require "rails/test_help"
 require "mocha/minitest"
+
+Dir[File.join(__dir__, "support/**/*.rb")].sort.each { |file| require file }
 
 # Ensure Geocoder never makes external calls in tests
 # Use the in-memory test lookup with a fast timeout and a safe default stub
