@@ -38,7 +38,8 @@ class TokenService
     # @example
     #   token = TokenService.generate_token(current_user)
     def generate_token(user)
-      # Only issue tokens for users with active subscriptions
+      # Only issue tokens for users with active status and subscriptions
+      return nil unless user&.active?
       return nil unless user.has_active_subscription?
 
       payload = {
@@ -92,7 +93,10 @@ class TokenService
       token_data = verify_token(token)
       return nil unless token_data
 
-      User.find_by(id: token_data[:user_id])
+      user = User.find_by(id: token_data[:user_id])
+      return nil unless user&.active?
+
+      user
     rescue
       nil
     end

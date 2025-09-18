@@ -72,6 +72,19 @@ class Api::V1::RelaysControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should reject requests when user becomes inactive" do
+    create_active_subscription_for(@user)
+    token = generate_valid_token_for(@user)
+    @user.update!(status: :locked)
+
+    get api_v1_relays_url,
+        headers: { "Authorization" => "Bearer #{token}" },
+        as: :json
+
+    assert_response :unauthorized
+    assert_equal "Invalid or expired token", json_response["error"]
+  end
+
   # === Subscription Tests ===
 
   test "should require active subscription" do

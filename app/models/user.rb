@@ -120,7 +120,6 @@ class User < ApplicationRecord
     # Extract the stored hash (skip the search prefix)
     stored_hash = passphrase_hash[16..-1]
     result = Argon2::Password.verify_password(candidate, stored_hash)
-    Rails.logger.info "Passphrase verification for user #{id}: candidate=#{candidate.inspect}, result=#{result}"
     result
   end
 

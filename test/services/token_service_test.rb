@@ -50,6 +50,22 @@ class TokenServiceTest < ActiveSupport::TestCase
     assert_nil token
   end
 
+  test "should not generate token for locked user" do
+    @user.update!(status: :locked)
+
+    token = TokenService.generate_token(@user)
+
+    assert_nil token
+  end
+
+  test "should not generate token for closed user" do
+    @user.update!(status: :closed)
+
+    token = TokenService.generate_token(@user)
+
+    assert_nil token
+  end
+
   test "generated token should contain correct user id" do
     token = TokenService.generate_token(@user)
     decoded = JWT.decode(token, nil, false) # Decode without verification
@@ -226,6 +242,24 @@ class TokenServiceTest < ActiveSupport::TestCase
     Device.where(user_id: user_id).delete_all
     Subscription.where(user_id: user_id).delete_all
     User.where(id: user_id).delete_all
+
+    authenticated_user = TokenService.authenticate_token(token)
+
+    assert_nil authenticated_user
+  end
+
+  test "should not authenticate token for locked user" do
+    token = TokenService.generate_token(@user)
+    @user.update!(status: :locked)
+
+    authenticated_user = TokenService.authenticate_token(token)
+
+    assert_nil authenticated_user
+  end
+
+  test "should not authenticate token for closed user" do
+    token = TokenService.generate_token(@user)
+    @user.update!(status: :closed)
 
     authenticated_user = TokenService.authenticate_token(token)
 

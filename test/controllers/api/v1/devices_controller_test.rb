@@ -109,6 +109,26 @@ class Api::V1::DevicesControllerTest < ActionDispatch::IntegrationTest
     assert_equal limited_user.device_limit, json_response["device_limit"]
   end
 
+  test "should reject device creation when user becomes inactive" do
+    create_active_subscription_for(@user)
+    token = generate_valid_token_for(@user)
+    @user.update!(status: :locked)
+
+    post api_v1_devices_url,
+         params: {
+           device: {
+             public_key: "pubkey-#{SecureRandom.hex(6)}",
+             name: "inactive-device"
+           },
+           relay_id: @relay.id
+         },
+         headers: { "Authorization" => "Bearer #{token}" },
+         as: :json
+
+    assert_response :unauthorized
+    assert_equal "Invalid or expired token", json_response["error"]
+  end
+
   test "should require relay id" do
     create_active_subscription_for(@user)
     token = generate_valid_token_for(@user)
@@ -194,6 +214,20 @@ class Api::V1::DevicesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :not_found
     assert_equal "Device not found", json_response["error"]
+  end
+
+  test "verify rejects requests from inactive user" do
+    create_active_subscription_for(@user)
+    token = generate_valid_token_for(@user)
+    @user.update!(status: :locked)
+
+    post verify_api_v1_devices_url,
+         params: { public_key: devices(:another_device).public_key },
+         headers: { "Authorization" => "Bearer #{token}" },
+         as: :json
+
+    assert_response :unauthorized
+    assert_equal "Invalid or expired token", json_response["error"]
   end
 
   test "verify does not leak devices from other users" do

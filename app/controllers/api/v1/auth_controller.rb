@@ -17,6 +17,11 @@ class Api::V1::AuthController < ActionController::API
       return
     end
 
+    unless user.active?
+      render json: { error: "Account inactive" }, status: :forbidden
+      return
+    end
+
     # Check subscription
     unless user.has_active_subscription?
       render json: {

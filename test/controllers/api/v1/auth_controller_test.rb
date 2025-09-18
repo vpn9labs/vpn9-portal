@@ -57,6 +57,18 @@ class Api::V1::AuthControllerTest < ActionDispatch::IntegrationTest
     assert json["subscription_required"]
   end
 
+  test "should reject token request for inactive user" do
+    @user.update!(status: :locked)
+
+    post api_v1_token_path, params: {
+      passphrase: "#{@passphrase}:password"
+    }, as: :json
+
+    assert_response :forbidden
+    json = JSON.parse(response.body)
+    assert_equal "Account inactive", json["error"]
+  end
+
   test "should require passphrase parameter" do
     post api_v1_token_path, params: {}, as: :json
 
