@@ -3,6 +3,7 @@ class Api::V1::AuthController < ActionController::API
   # Get a token for VPN access - NO tracking, NO logging
   def token
     passphrase = params[:passphrase]
+    client_label = params[:client_label]
 
     if passphrase.blank?
       render json: { error: "Missing passphrase" }, status: :bad_request
@@ -39,11 +40,21 @@ class Api::V1::AuthController < ActionController::API
       return
     end
 
+    refresh_token_payload = RefreshTokenService.issue_for(user, client_label: client_label)
+
+    unless refresh_token_payload
+      render json: { error: "Failed to issue refresh token" }, status: :internal_server_error
+      return
+    end
+
+    subscription = user.current_subscription
+
     # Return token with minimal information
     render json: {
       token: token,
+      refresh_token: refresh_token_payload[:token],
       expires_in: TokenService::ACCESS_TOKEN_EXPIRY.to_i,
-      subscription_expires_at: user.current_subscription.expires_at
+      subscription_expires_at: subscription&.expires_at
     }
   end
 
@@ -69,5 +80,41 @@ class Api::V1::AuthController < ActionController::API
     else
       render json: { valid: false }, status: :unauthorized
     end
+  end
+
+  # POST /api/v1/auth/refresh
+  # Exchange a refresh token for a new access token (and rotate refresh token)
+  def refresh
+    refresh_token = params[:refresh_token]
+
+    if refresh_token.blank?
+      render json: { error: "Missing refresh token" }, status: :bad_request
+      return
+    end
+
+    refreshed = RefreshTokenService.exchange(refresh_token)
+
+    unless refreshed
+      render json: { error: "Invalid or expired refresh token" }, status: :unauthorized
+      return
+    end
+
+    user = refreshed[:user]
+    token = TokenService.generate_token(user)
+
+    unless token
+      RefreshTokenService.revoke_for_user!(user)
+      render json: { error: "Unable to issue access token" }, status: :unauthorized
+      return
+    end
+
+    subscription = user.current_subscription
+
+    render json: {
+      token: token,
+      refresh_token: refreshed[:refresh_token],
+      expires_in: TokenService::ACCESS_TOKEN_EXPIRY.to_i,
+      subscription_expires_at: subscription&.expires_at
+    }, status: :ok
   end
 end

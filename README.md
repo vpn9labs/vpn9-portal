@@ -10,7 +10,7 @@ VPN9 is a privacy-focused VPN service that open sources all of its code. This re
 - **Zero-logs policy**: No connection tracking, IP logging, or user activity monitoring
 - **Anonymous accounts**: Passphrase-based authentication without requiring personal information
 - **No device tracking**: The Rails app doesn't know which devices connect or which relays users choose
-- **Stateless JWT tokens**: Self-contained tokens with no server-side session storage
+- **Stateless JWT tokens**: Self-contained access tokens with hashed, rotating refresh tokens
 - **Client-side key generation**: WireGuard keys generated in browser, never touch servers
 
 ### Payment & Subscriptions
@@ -35,7 +35,7 @@ VPN9 is a privacy-focused VPN service that open sources all of its code. This re
 
 - **Framework**: Rails 8.0.2
 - **Database**: PostgreSQL (production), SQLite (development)
-- **Authentication**: Argon2 password hashing, JWT tokens for API
+- **Authentication**: Argon2 password hashing, JWT access + refresh tokens for API
 - **Frontend**: Hotwire (Turbo + Stimulus), Tailwind CSS
 - **Background Jobs**: Solid Queue
 - **Caching**: Solid Cache
@@ -51,8 +51,8 @@ VPN9 is a privacy-focused VPN service that open sources all of its code. This re
 4. Recovery codes provided for account recovery
 
 ### API Authentication
-- Stateless JWT tokens with 24-hour expiry
-- No refresh tokens or session tracking
+- Stateless JWT access tokens with 24-hour expiry
+- Rotating refresh tokens stored only as hashes for revocation
 - Tokens contain minimal data (user ID, subscription expiry)
 - Relays validate tokens independently without callbacks
 
@@ -161,7 +161,11 @@ VPN9 uses Bitcart for cryptocurrency payment processing. To set up Bitcart:
 #### Authentication
 - `POST /api/v1/auth/token` - Get VPN access token
   - Body: `{ "passphrase": "seven word passphrase here" }`
-  - Returns: JWT token valid for 24 hours
+  - Returns: JWT token valid for 24 hours plus refresh token
+
+- `POST /api/v1/auth/refresh` - Exchange refresh token for new access token
+  - Body: `{ "refresh_token": "opaque refresh token" }`
+  - Returns: new JWT token and rotated refresh token
 
 - `GET /api/v1/auth/verify` - Verify token validity
   - Header: `Authorization: Bearer <token>`

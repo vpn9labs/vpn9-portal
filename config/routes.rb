@@ -159,6 +159,7 @@ Rails.application.routes.draw do
       # Minimal auth - no tracking
       scope :auth do
         post :token, to: "auth#token"
+        post :refresh, to: "auth#refresh"
         get :verify, to: "auth#verify"
       end
 

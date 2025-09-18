@@ -82,6 +82,7 @@ class User < ApplicationRecord
   has_many :subscriptions
   has_many :payments
   has_many :devices, dependent: :destroy
+  has_many :api_refresh_tokens, dependent: :destroy
   has_one :referral
   has_one :referring_affiliate, through: :referral, source: :affiliate
 
@@ -99,6 +100,7 @@ class User < ApplicationRecord
 
   before_create :generate_passphrase
   before_create :populate_recovery_code
+  after_update_commit :revoke_refresh_tokens_if_credentials_changed
 
   # Argon2id digest
   # Derive an Argon2id hash for a given raw credential identifier.
@@ -207,6 +209,7 @@ class User < ApplicationRecord
 
       # Destroy all sessions (they should cascade delete)
       sessions.destroy_all
+      RefreshTokenService.revoke_for_user!(self)
 
       # Clear personal data but keep the record for audit trail
       self.email_address = nil if respond_to?(:email_address=)
@@ -225,6 +228,12 @@ class User < ApplicationRecord
   end
 
   private
+
+    def revoke_refresh_tokens_if_credentials_changed
+      return unless saved_change_to_passphrase_hash?
+
+      RefreshTokenService.revoke_for_user!(self)
+    end
 
     # Generate the passphrase and store both a searchable SHA256 prefix and
     # a secure Argon2id of the full identifier (with optional appended password).

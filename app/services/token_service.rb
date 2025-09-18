@@ -1,4 +1,5 @@
 require "jwt"
+require "securerandom"
 
 #
 # TokenService provides minimal, privacy‑preserving JWT handling.
@@ -24,6 +25,7 @@ require "jwt"
 # - exp: Integer          # expiration (unix epoch seconds)
 # - iat: Integer          # issued at (unix epoch seconds)
 # - subscription_expires: Integer | nil  # user's subscription expiry
+# - jti: String           # unique token identifier for replay safety
 #
 class TokenService
   # Token expiration times
@@ -42,12 +44,16 @@ class TokenService
       return nil unless user&.active?
       return nil unless user.has_active_subscription?
 
+      subscription = user.current_subscription
+      return nil unless subscription
+
       payload = {
         sub: user.id.to_s,
         exp: ACCESS_TOKEN_EXPIRY.from_now.to_i,
         iat: Time.current.to_i,
+        jti: SecureRandom.uuid,
         # Include subscription info so relays can verify without callbacks
-        subscription_expires: user.current_subscription.expires_at.to_i
+        subscription_expires: subscription.expires_at.to_i
       }
 
       JWT.encode(payload, private_key, "RS256")
@@ -60,7 +66,7 @@ class TokenService
     # the database; callers decide what to do with the decoded data.
     #
     # @param token [String]
-    # @return [Hash, nil] with keys: :user_id (String), :expires_at (Time), :subscription_expires (Time|nil)
+    # @return [Hash, nil] with keys: :user_id (String), :expires_at (Time), :subscription_expires (Time|nil), :token_id (String|nil)
     # @example
     #   data = TokenService.verify_token(token)
     #   if data && Time.current < data[:expires_at]
@@ -74,7 +80,8 @@ class TokenService
       {
         user_id: payload[0]["sub"].to_s,
         expires_at: Time.at(payload[0]["exp"]),
-        subscription_expires: payload[0]["subscription_expires"] ? Time.at(payload[0]["subscription_expires"]) : nil
+        subscription_expires: payload[0]["subscription_expires"] ? Time.at(payload[0]["subscription_expires"]) : nil,
+        token_id: payload[0]["jti"]
       }
     rescue JWT::ExpiredSignature
       nil # Token expired

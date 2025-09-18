@@ -95,6 +95,7 @@ class Device < ApplicationRecord
 
       # Remove any previously active devices from registry (and their hashes)
       DeviceRegistry.deactivate_devices!(user.id, previous_active_ids)
+      RefreshTokenService.revoke_for_user!(user)
     end
   end
 

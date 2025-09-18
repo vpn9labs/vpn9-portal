@@ -99,6 +99,13 @@ class TokenServiceTest < ActiveSupport::TestCase
     assert_equal @subscription.expires_at.to_i, decoded[0]["subscription_expires"]
   end
 
+  test "generated token should include unique jti" do
+    token = TokenService.generate_token(@user)
+    decoded = JWT.decode(token, nil, false)
+
+    assert decoded[0]["jti"].present?
+  end
+
   test "generated token should be signed with RS256 algorithm" do
     token = TokenService.generate_token(@user)
     header = JWT.decode(token, nil, false, verify_expiration: false)[1]
@@ -117,6 +124,7 @@ class TokenServiceTest < ActiveSupport::TestCase
     assert_equal @user.id, result[:user_id]
     assert result[:expires_at].is_a?(Time)
     assert result[:subscription_expires].is_a?(Time)
+    assert result[:token_id].present?
   end
 
   test "should return nil for expired token" do
@@ -182,6 +190,7 @@ class TokenServiceTest < ActiveSupport::TestCase
     assert_not_nil result
     assert_equal @user.id, result[:user_id]
     assert_nil result[:subscription_expires]
+    assert_nil result[:token_id]
   end
 
   test "should return correct expiration time from token" do
@@ -331,15 +340,17 @@ class TokenServiceTest < ActiveSupport::TestCase
     assert payload.key?("exp")  # expiration
     assert payload.key?("iat")  # issued at
     assert payload.key?("subscription_expires")
+    assert payload.key?("jti")  # unique token id
   end
 
   test "token payload should be minimal" do
     token = TokenService.generate_token(@user)
     decoded = JWT.decode(token, nil, false)
 
-    # Should only have the 4 expected fields
-    assert_equal 4, decoded[0].keys.length
-    assert_equal %w[sub exp iat subscription_expires].sort, decoded[0].keys.sort
+    # Should only have the 5 expected fields
+    expected_keys = %w[sub exp iat subscription_expires jti]
+    assert_equal expected_keys.length, decoded[0].keys.length
+    assert_equal expected_keys.sort, decoded[0].keys.sort
   end
 
   # === Concurrent Access Tests ===

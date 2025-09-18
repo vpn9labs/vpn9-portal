@@ -29,6 +29,7 @@ class Api::V1::AuthControllerTest < ActionDispatch::IntegrationTest
 
     json = JSON.parse(response.body)
     assert json["token"].present?
+    assert json["refresh_token"].present?
     assert_equal 86400, json["expires_in"]  # 24 hours
     assert_not_nil json["subscription_expires_at"]
   end
@@ -83,7 +84,10 @@ class Api::V1::AuthControllerTest < ActionDispatch::IntegrationTest
       passphrase: "#{@passphrase}:password"
     }, as: :json
 
-    token = JSON.parse(response.body)["token"]
+    token_response = JSON.parse(response.body)
+    token = token_response["token"]
+    refresh_token = token_response["refresh_token"]
+    assert refresh_token.present?
 
     # Now verify it
     get api_v1_verify_path, headers: {
@@ -95,6 +99,39 @@ class Api::V1::AuthControllerTest < ActionDispatch::IntegrationTest
     assert json["valid"]
     assert json["expires_at"].present?
     assert json["subscription_expires"].present?
+  end
+
+  test "should refresh access token with valid refresh token" do
+    post api_v1_token_path, params: {
+      passphrase: "#{@passphrase}:password"
+    }, as: :json
+
+    token_response = JSON.parse(response.body)
+    refresh_token = token_response["refresh_token"]
+
+    post api_v1_refresh_path, params: { refresh_token: refresh_token }, as: :json
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert json["token"].present?
+    assert json["refresh_token"].present?
+    assert_equal 86400, json["expires_in"]
+  end
+
+  test "should reject refresh with missing token" do
+    post api_v1_refresh_path, params: {}, as: :json
+
+    assert_response :bad_request
+    json = JSON.parse(response.body)
+    assert_equal "Missing refresh token", json["error"]
+  end
+
+  test "should reject refresh with invalid token" do
+    post api_v1_refresh_path, params: { refresh_token: "invalid" }, as: :json
+
+    assert_response :unauthorized
+    json = JSON.parse(response.body)
+    assert_equal "Invalid or expired refresh token", json["error"]
   end
 
   test "should reject invalid token on verify" do
