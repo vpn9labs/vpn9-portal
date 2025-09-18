@@ -3,13 +3,6 @@ require "test_helper"
 class Api::V1::DevicesControllerTest < ActionDispatch::IntegrationTest
   setup do
     @user = users(:one)
-    @relay = relays(:stockholm_relay)
-    @redis = FakeRedis.new
-    DeviceRegistry.redis = @redis
-  end
-
-  teardown do
-    DeviceRegistry.redis = nil
   end
 
   test "should require authentication" do
@@ -30,8 +23,7 @@ class Api::V1::DevicesControllerTest < ActionDispatch::IntegrationTest
              device: {
                public_key: public_key,
                name: "desktop-device"
-             },
-             relay_id: @relay.id
+             }
            },
            headers: { "Authorization" => "Bearer #{token}" },
            as: :json
@@ -47,42 +39,10 @@ class Api::V1::DevicesControllerTest < ActionDispatch::IntegrationTest
     assert body.dig("device", "ipv6").present?
     refute body.key?("config"), "response should not include client config"
     refute body.key?("filename"), "response should not include config filename"
+    refute body.key?("relay"), "response should not include relay metadata"
 
     created_device = @user.devices.find_by(public_key: public_key)
     assert_not_nil created_device
-  end
-
-  test "creating a device stores an encrypted preferred relay hint" do
-    create_active_subscription_for(@user)
-    token = generate_valid_token_for(@user)
-
-    post api_v1_devices_url,
-         params: {
-           device: {
-             public_key: "pref-#{SecureRandom.hex(4)}",
-             name: "hint-device"
-           },
-           relay_id: @relay.id
-         },
-         headers: { "Authorization" => "Bearer #{token}" },
-         as: :json
-
-    assert_response :created
-    device_id = json_response.dig("device", "id")
-    refute_nil device_id
-
-    key = "vpn9:device-pref:#{device_id}"
-    raw = @redis.get(key)
-    refute_nil raw
-    refute_equal @relay.id.to_s, raw
-
-    ttl = @redis.ttl(key)
-    assert_operator ttl, :>, 0
-    assert_operator ttl, :<=, DeviceRegistry::DEFAULT_PREFERRED_RELAY_TTL
-
-    assert_equal @relay.id.to_s, DeviceRegistry.consume_preferred_relay(device_id)
-    refute @redis.exists?(key)
-    assert_nil DeviceRegistry.consume_preferred_relay(device_id)
   end
 
   test "should enforce device limit" do
@@ -98,8 +58,7 @@ class Api::V1::DevicesControllerTest < ActionDispatch::IntegrationTest
 
     post api_v1_devices_url,
          params: {
-           device: { public_key: "new-pubkey-#{SecureRandom.hex(6)}" },
-           relay_id: @relay.id
+           device: { public_key: "new-pubkey-#{SecureRandom.hex(6)}" }
          },
          headers: { "Authorization" => "Bearer #{token}" },
          as: :json
@@ -119,8 +78,7 @@ class Api::V1::DevicesControllerTest < ActionDispatch::IntegrationTest
            device: {
              public_key: "pubkey-#{SecureRandom.hex(6)}",
              name: "inactive-device"
-           },
-           relay_id: @relay.id
+           }
          },
          headers: { "Authorization" => "Bearer #{token}" },
          as: :json
@@ -129,45 +87,13 @@ class Api::V1::DevicesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Invalid or expired token", json_response["error"]
   end
 
-  test "should require relay id" do
-    create_active_subscription_for(@user)
-    token = generate_valid_token_for(@user)
-
-    post api_v1_devices_url,
-         params: {
-           device: { public_key: "pubkey-#{SecureRandom.hex(6)}" }
-         },
-         headers: { "Authorization" => "Bearer #{token}" },
-         as: :json
-
-    assert_response :unprocessable_content
-    assert_equal "relay_id is required", json_response["error"]
-  end
-
-  test "should reject inactive relay" do
-    create_active_subscription_for(@user)
-    token = generate_valid_token_for(@user)
-
-    post api_v1_devices_url,
-         params: {
-           device: { public_key: "pubkey-#{SecureRandom.hex(6)}" },
-           relay_id: relays(:uk_relay_inactive).id
-         },
-         headers: { "Authorization" => "Bearer #{token}" },
-         as: :json
-
-    assert_response :not_found
-    assert_equal "Relay not found or inactive", json_response["error"]
-  end
-
   test "should return validation errors for invalid device" do
     create_active_subscription_for(@user)
     token = generate_valid_token_for(@user)
 
     post api_v1_devices_url,
          params: {
-           device: { public_key: "" },
-           relay_id: @relay.id
+           device: { public_key: "" }
          },
          headers: { "Authorization" => "Bearer #{token}" },
          as: :json
