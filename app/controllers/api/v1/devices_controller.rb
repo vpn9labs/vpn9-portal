@@ -41,7 +41,7 @@ class Api::V1::DevicesController < Api::BaseController
   end
 
   def device_params
-    params.require(:device).permit(:public_key, :name)
+    params.require(:device).permit(:public_key)
   end
 
   def handle_missing_parameter(exception)

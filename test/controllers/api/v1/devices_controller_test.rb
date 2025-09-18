@@ -20,10 +20,9 @@ class Api::V1::DevicesControllerTest < ActionDispatch::IntegrationTest
     assert_difference -> { @user.devices.count }, +1 do
       post api_v1_devices_url,
            params: {
-             device: {
-               public_key: public_key,
-               name: "desktop-device"
-             }
+           device: {
+             public_key: public_key
+           }
            },
            headers: { "Authorization" => "Bearer #{token}" },
            as: :json
@@ -33,7 +32,7 @@ class Api::V1::DevicesControllerTest < ActionDispatch::IntegrationTest
     body = json_response
 
     assert_equal public_key, body.dig("device", "public_key")
-    assert_equal "desktop-device", body.dig("device", "name")
+    assert body.dig("device", "name").present?
     assert_includes [ "active", "inactive" ], body.dig("device", "status")
     assert body.dig("device", "ipv4").present?
     assert body.dig("device", "ipv6").present?
@@ -76,8 +75,7 @@ class Api::V1::DevicesControllerTest < ActionDispatch::IntegrationTest
     post api_v1_devices_url,
          params: {
            device: {
-             public_key: "pubkey-#{SecureRandom.hex(6)}",
-             name: "inactive-device"
+             public_key: "pubkey-#{SecureRandom.hex(6)}"
            }
          },
          headers: { "Authorization" => "Bearer #{token}" },
