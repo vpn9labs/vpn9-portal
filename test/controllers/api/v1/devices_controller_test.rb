@@ -156,6 +156,73 @@ class Api::V1::DevicesControllerTest < ActionDispatch::IntegrationTest
     assert_includes json_response["errors"], "Public key can't be blank"
   end
 
+  test "verify should require authentication" do
+    post verify_api_v1_devices_url, params: { public_key: "missing" }, as: :json
+
+    assert_response :unauthorized
+    assert_equal "Missing authentication token", json_response["error"]
+  end
+
+  test "verify returns device data for matching public key" do
+    create_active_subscription_for(@user)
+    token = generate_valid_token_for(@user)
+    device = devices(:another_device)
+
+    post verify_api_v1_devices_url,
+         params: { public_key: device.public_key },
+         headers: { "Authorization" => "Bearer #{token}" },
+         as: :json
+
+    assert_response :ok
+    body = json_response
+
+    assert_equal device.public_key, body.dig("device", "public_key")
+    assert_equal device.name, body.dig("device", "name")
+    assert body.dig("device", "ipv4").present?
+    assert body.dig("device", "ipv6").present?
+    refute body.key?("relay"), "verify response should omit relay metadata"
+  end
+
+  test "verify returns not found for unknown device" do
+    create_active_subscription_for(@user)
+    token = generate_valid_token_for(@user)
+
+    post verify_api_v1_devices_url,
+         params: { public_key: "nonexistent-pubkey" },
+         headers: { "Authorization" => "Bearer #{token}" },
+         as: :json
+
+    assert_response :not_found
+    assert_equal "Device not found", json_response["error"]
+  end
+
+  test "verify does not leak devices from other users" do
+    create_active_subscription_for(@user)
+    token = generate_valid_token_for(@user)
+    other_device = devices(:two_device)
+
+    post verify_api_v1_devices_url,
+         params: { public_key: other_device.public_key },
+         headers: { "Authorization" => "Bearer #{token}" },
+         as: :json
+
+    assert_response :not_found
+    assert_equal "Device not found", json_response["error"]
+  end
+
+  test "verify requires public_key parameter" do
+    create_active_subscription_for(@user)
+    token = generate_valid_token_for(@user)
+
+    post verify_api_v1_devices_url,
+         params: {},
+         headers: { "Authorization" => "Bearer #{token}" },
+         as: :json
+
+    assert_response :bad_request
+    assert_match "public_key", json_response["error"]
+  end
+
   private
 
   def json_response

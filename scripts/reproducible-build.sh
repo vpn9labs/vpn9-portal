@@ -169,9 +169,9 @@ create_attestation() {
     },
     "materials": [
       {
-        "uri": "docker.io/library/ruby:3.4.5-slim",
+        "uri": "docker.io/library/ruby:3.4.6-slim",
         "digest": {
-          "sha256": "0d2adfa1930d67ee79e5d16c3610f4fbed43c98e98dbda14c2811b8197211c74"
+          "sha256": "7e98b0446142b30dd4bbf298d13a09735c27abc93d1eece0ca787b19cdac20b2"
         }
       }
     ]
@@ -325,4 +325,3 @@ EOF
 
 # Run main function
 main "$@"
-

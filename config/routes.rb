@@ -162,7 +162,11 @@ Rails.application.routes.draw do
         get :verify, to: "auth#verify"
       end
 
-      resources :devices, only: [ :create ]
+      resources :devices, only: [ :create ] do
+        collection do
+          post :verify
+        end
+      end
 
       # Relay list - no tracking of which relay user connects to
       resources :relays, only: [ :index ]

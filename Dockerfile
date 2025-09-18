@@ -14,7 +14,7 @@
 
 # Fixed base image with SHA256 digest for reproducibility
 ARG RUBY_VERSION=3.4.5
-FROM docker.io/library/ruby:${RUBY_VERSION}-slim@sha256:0d2adfa1930d67ee79e5d16c3610f4fbed43c98e98dbda14c2811b8197211c74 AS base
+FROM docker.io/library/ruby:${RUBY_VERSION}-slim@sha256:7e98b0446142b30dd4bbf298d13a09735c27abc93d1eece0ca787b19cdac20b2 AS base
 
 # Label for Kamal
 LABEL service="vpn9-portal"
