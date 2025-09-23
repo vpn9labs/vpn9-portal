@@ -54,12 +54,6 @@ class DeviceRegistryTest < ActiveSupport::TestCase
   def setup
     @store = FakeStore.new
     DeviceRegistry.kredis = @store
-    @redis = FakeRedis.new
-    DeviceRegistry.redis = @redis
-  end
-
-  def teardown
-    DeviceRegistry.redis = nil
   end
 
   test "activate_device! writes per-device fields" do
@@ -175,28 +169,5 @@ class DeviceRegistryTest < ActiveSupport::TestCase
     assert_empty @store.set("vpn9:user:#{u2.id}:devices:active").members
     global_members = @store.set("vpn9:devices:active").members
     assert global_members.include?(d1.id.to_s) || global_members.include?(d2.id.to_s)
-  end
-
-  test "preferred relay hints are encrypted, expire soon, and are consumed once" do
-    user = users(:john)
-    device = user.devices.create!(public_key: "pref-pub")
-    relay_id = relays(:stockholm_relay).id
-
-    assert DeviceRegistry.set_preferred_relay(device.id, relay_id, ttl: 120)
-
-    key = "vpn9:device-pref:#{device.id}"
-    raw = @redis.get(key)
-    refute_nil raw
-    refute_equal relay_id, raw, "relay id must be encrypted in Redis"
-
-    ttl = @redis.ttl(key)
-    assert_operator ttl, :>, 0
-    assert_operator ttl, :<=, 120
-
-    assert_equal relay_id, DeviceRegistry.peek_preferred_relay(device.id)
-
-    assert_equal relay_id, DeviceRegistry.consume_preferred_relay(device.id)
-    refute @redis.exists?(key)
-    assert_nil DeviceRegistry.consume_preferred_relay(device.id), "hint should only be returned once"
   end
 end

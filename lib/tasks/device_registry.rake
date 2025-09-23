@@ -47,15 +47,4 @@ namespace :device_registry do
     puts "\nTip: pass only_active=true to limit to active devices"
     puts "e.g. rails device_registry:print[true]"
   end
-
-  desc "Generate a new DEVICE_PREF_SECRET for preferred relay hints"
-  task generate_preference_secret: :environment do
-    require "securerandom"
-
-    secret = SecureRandom.hex(32)
-    puts "Generated DEVICE_PREF_SECRET (hex-encoded 32 bytes):"
-    puts secret
-    puts "\nUpdate the secret in your environment and restart application processes."
-    puts "Existing preferred relay hints will expire automatically within #{DeviceRegistry::DEFAULT_PREFERRED_RELAY_TTL} seconds."
-  end
 end
