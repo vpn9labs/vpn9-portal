@@ -187,6 +187,19 @@ class DeviceTest < ActiveSupport::TestCase
     end
   end
 
+  test "wireguard_ip skips vpn infrastructure subnet" do
+    device = @user.devices.build(public_key: @valid_public_key)
+    device.id = SecureRandom.uuid
+
+    stubbed_digest = ("0" * 63) + "8"
+
+    Digest::SHA256.stubs(:hexdigest).returns(stubbed_digest)
+    second_octet = device.ipv4_address.split(".")[1].to_i
+    assert_not_equal 9, second_octet
+  ensure
+    Digest::SHA256.unstub(:hexdigest)
+  end
+
   test "should not save device without user" do
     device = Device.new(public_key: @valid_public_key)
     assert_not device.save

@@ -191,8 +191,10 @@ class Device < ApplicationRecord
     hash = Digest::SHA256.hexdigest(hash_input).to_i(16)
 
     # Use 10.0.0.0/8 range but avoid 10.0.0.0/24 (reserved for network equipment)
-    # This gives us effectively 10.1.0.0 - 10.255.255.255
-    second_octet = (hash % 255) + 1  # 1-255, avoiding 0
+    # and 10.9.0.0/16 (reserved for VPN9 infrastructure).
+    # This gives us effectively 10.1.0.0 - 10.255.255.255 excluding 10.9.x.x.
+    second_octet = (hash % 254) + 1  # 1-254, avoiding 0
+    second_octet += 1 if second_octet >= 9  # skip 9 to reserve 10.9.0.0/16
     third_octet = (hash >> 8) % 256  # 0-255
     fourth_octet = ((hash >> 16) % 254) + 1  # 1-254, avoiding 0 and 255
 
