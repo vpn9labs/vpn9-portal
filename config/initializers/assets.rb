@@ -5,7 +5,3 @@ Rails.application.config.assets.version = "1.0"
 
 # Add additional assets to the asset load path.
 # Rails.application.config.assets.paths << Emoji.images_path
-
-# Include the CSS/JS bundler output directory (cssbundling/jsbundling)
-# so stylesheet_link_tag/javascript_include_tag can find built assets in test.
-Rails.application.config.assets.paths << Rails.root.join("app/assets/builds")
