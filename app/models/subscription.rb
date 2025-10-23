@@ -56,9 +56,9 @@ class Subscription < ApplicationRecord
   validate :expires_at_after_started_at
 
   # Subscriptions that are currently valid (status active and not expired)
-  scope :current, -> { active.where("expires_at > ?", Time.current) }
+  scope :current, -> { active.where("subscriptions.expires_at > ?", Time.current) }
   # Subscriptions that have expired or will expire within 24 hours
-  scope :expired_or_expiring, -> { where("expires_at <= ?", Time.current + 1.day) }
+  scope :expired_or_expiring, -> { where("subscriptions.expires_at <= ?", Time.current + 1.day) }
 
   # Keep device access in sync with subscription changes
   # - Always sync on create/destroy
@@ -97,7 +97,7 @@ class Subscription < ApplicationRecord
   #
   # @return [Integer] number of affected users whose devices were resynced
   def self.sync_expirations!
-    to_expire = where(status: statuses[:active]).where("expires_at <= ?", Time.current)
+    to_expire = where(status: statuses[:active]).where("subscriptions.expires_at <= ?", Time.current)
     return 0 if to_expire.none?
 
     # Collect affected users before bulk update to avoid N queries with callbacks
