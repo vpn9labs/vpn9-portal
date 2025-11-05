@@ -80,9 +80,9 @@ gem "base32", "~> 0.3.4"
 
 gem "base58", "~> 0.2.3"
 
-gem "grpc", "~> 1.74"
+gem "grpc", "~> 1.76"
 
-gem "grpc-tools", "~> 1.74"
+gem "grpc-tools", "~> 1.76"
 
 # JWT for API authentication
 gem "jwt", "~> 3.1"
