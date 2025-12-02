@@ -13,8 +13,8 @@
 # For development, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
 # Fixed base image with SHA256 digest for reproducibility
-ARG RUBY_VERSION=3.4.5
-FROM docker.io/library/ruby:${RUBY_VERSION}-slim@sha256:7e98b0446142b30dd4bbf298d13a09735c27abc93d1eece0ca787b19cdac20b2 AS base
+ARG RUBY_VERSION=3.4.7
+FROM docker.io/library/ruby:${RUBY_VERSION}-slim@sha256:c1bc8f6bc1075857b9138a600b59127f5570a494e84e80725ea276812465e24e AS base
 
 # Label for Kamal
 LABEL service="vpn9-portal"
@@ -33,7 +33,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update -qq && \
     apt-get install --no-install-recommends -y \
-        curl=8.14.1-2 \
+        curl=8.14.1-2+deb13u2 \
         libjemalloc2=5.3.0-3 \
         libvips42t64=8.16.1-1+b1 \
         sqlite3=3.46.1-7 \
