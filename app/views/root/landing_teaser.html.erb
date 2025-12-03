@@ -88,11 +88,17 @@
       </p>
 
       <%= form_with url: launch_notifications_path, local: false, html: { id: 'notification-form', class: 'flex gap-x-4 mb-4' } do |f| %>
-        <%= f.email_field :email, 
-            placeholder: "Enter your email", 
+        <%# Honeypot field - hidden from users, attracts bots %>
+        <div class="absolute -left-[9999px]" aria-hidden="true" tabindex="-1">
+          <%= f.text_field :company, tabindex: "-1", autocomplete: "off" %>
+        </div>
+        <%= f.email_field :email,
+            placeholder: "Enter your email",
             required: true,
             class: "min-w-0 flex-auto rounded-md border-0 bg-white px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6" %>
-        <%= f.submit "Notify Me", 
+        <%# Hidden field for timing validation - server-signed token %>
+        <%= f.hidden_field :form_token, value: @form_timing_token %>
+        <%= f.submit "Notify Me",
             class: "flex-none rounded-md bg-black px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black" %>
       <% end %>
 
@@ -292,11 +298,11 @@ document.addEventListener('DOMContentLoaded', function() {
   const successMessage = document.getElementById('success-message');
   const errorMessage = document.getElementById('error-message');
   const errorText = document.getElementById('error-text');
-  
+
   if (form) {
     form.addEventListener('submit', function(e) {
       e.preventDefault();
-      
+
       const formData = new FormData(form);
       
       fetch(form.action, {

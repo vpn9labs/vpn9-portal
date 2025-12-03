@@ -120,4 +120,167 @@ class LaunchNotificationsControllerTest < ActionDispatch::IntegrationTest
       assert_response :success
     end
   end
+
+  # ==========================================
+  # Anti-Bot Protection Tests
+  # ==========================================
+
+  test "should reject submission with honeypot field filled" do
+    assert_no_difference("LaunchNotification.count") do
+      post launch_notifications_url,
+           params: { email: "bot@example.com", company: "Spammy Inc" },
+           as: :json
+    end
+
+    # Returns fake success to not inform bots
+    assert_response :success
+    json_response = JSON.parse(response.body)
+    assert json_response["success"]
+    assert_equal "You're on the list!", json_response["message"]
+  end
+
+  test "should accept submission with empty honeypot field" do
+    assert_difference("LaunchNotification.count", 1) do
+      post launch_notifications_url,
+           params: { email: "legit@example.com", company: "" },
+           as: :json
+    end
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+    assert json_response["success"]
+  end
+
+  test "should accept submission without honeypot field" do
+    assert_difference("LaunchNotification.count", 1) do
+      post launch_notifications_url,
+           params: { email: "nofield@example.com" },
+           as: :json
+    end
+
+    assert_response :success
+  end
+
+  test "should reject submission that is too fast when timing validation enabled" do
+    # Generate a signed token from 0.5 seconds ago (too fast)
+    form_token = generate_signed_token(0.5.seconds.ago)
+
+    with_timing_validation do
+      assert_no_difference("LaunchNotification.count") do
+        post launch_notifications_url,
+             params: { email: "fast@example.com", form_token: form_token },
+             as: :json
+      end
+    end
+
+    # Returns fake success to not inform bots
+    assert_response :success
+    json_response = JSON.parse(response.body)
+    assert json_response["success"]
+  end
+
+  test "should accept submission with valid timing when timing validation enabled" do
+    # Generate a signed token from 5 seconds ago (legitimate)
+    form_token = generate_signed_token(5.seconds.ago)
+
+    with_timing_validation do
+      assert_difference("LaunchNotification.count", 1) do
+        post launch_notifications_url,
+             params: { email: "slow@example.com", form_token: form_token },
+             as: :json
+      end
+    end
+
+    assert_response :success
+  end
+
+  test "should accept submission without form_token (graceful degradation for JS-disabled users)" do
+    assert_difference("LaunchNotification.count", 1) do
+      post launch_notifications_url,
+           params: { email: "nojs@example.com" },
+           as: :json
+    end
+
+    assert_response :success
+  end
+
+  test "should reject malformed form_token when timing validation enabled" do
+    with_timing_validation do
+      assert_no_difference("LaunchNotification.count") do
+        post launch_notifications_url,
+             params: { email: "malformed@example.com", form_token: "invalid-token-format" },
+             as: :json
+      end
+    end
+
+    # Returns fake success to not inform bots
+    assert_response :success
+    json_response = JSON.parse(response.body)
+    assert json_response["success"]
+  end
+
+  test "should reject form_token with invalid signature when timing validation enabled" do
+    # Token with valid format but wrong signature
+    fake_token = "#{Time.current.to_f}--invalidsignature123"
+
+    with_timing_validation do
+      assert_no_difference("LaunchNotification.count") do
+        post launch_notifications_url,
+             params: { email: "tampered@example.com", form_token: fake_token },
+             as: :json
+      end
+    end
+
+    # Returns fake success to not inform bots
+    assert_response :success
+    json_response = JSON.parse(response.body)
+    assert json_response["success"]
+  end
+
+  test "should reject expired form_token when timing validation enabled" do
+    # Generate a signed token from 2 hours ago (exceeds TOKEN_MAX_AGE_SECONDS of 1 hour)
+    form_token = generate_signed_token(2.hours.ago)
+
+    with_timing_validation do
+      assert_no_difference("LaunchNotification.count") do
+        post launch_notifications_url,
+             params: { email: "expired@example.com", form_token: form_token },
+             as: :json
+      end
+    end
+
+    # Returns fake success to not inform bots
+    assert_response :success
+    json_response = JSON.parse(response.body)
+    assert json_response["success"]
+  end
+
+  test "honeypot rejection with HTML format returns success redirect" do
+    assert_no_difference("LaunchNotification.count") do
+      post launch_notifications_url,
+           params: { email: "htmlbot@example.com", company: "Spammy Inc" }
+    end
+
+    assert_redirected_to root_path(teaser: 1)
+    assert_equal "Thank you! We'll notify you as soon as we launch.", flash[:notice]
+  end
+
+  private
+
+  def with_timing_validation
+    ENV["TEST_TIMING_VALIDATION"] = "true"
+    yield
+  ensure
+    ENV.delete("TEST_TIMING_VALIDATION")
+  end
+
+  def generate_signed_token(timestamp_time)
+    timestamp = timestamp_time.to_f.to_s
+    signature = OpenSSL::HMAC.hexdigest(
+      "SHA256",
+      Rails.application.secret_key_base,
+      "form_timing:#{timestamp}"
+    )
+    "#{timestamp}--#{signature}"
+  end
 end

@@ -6,3 +6,5 @@ en:
   sessions:
     invalid_passphrase: "Invalid passphrase. Please check your passphrase and try again."
     rate_limit_exceeded: "Try again later."
+  launch_notifications:
+    rate_limit_exceeded: "Too many requests. Please try again later."

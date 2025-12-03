@@ -1,4 +1,6 @@
 class RootController < ApplicationController
+  include FormTimingToken
+
   allow_unauthenticated_access
   layout "public"
 
@@ -27,6 +29,7 @@ class RootController < ApplicationController
       else
         # Default to teaser/coming soon page
         @teaser_version = true
+        @form_timing_token = generate_form_timing_token
         render :landing_teaser
       end
     end
