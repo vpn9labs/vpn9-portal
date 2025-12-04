@@ -72,7 +72,7 @@ group :test do
   gem "mocha"
 end
 
-gem "dotenv-rails", "~> 3.1"
+gem "dotenv-rails", "~> 3.2"
 
 gem "argon2", "~> 2.3"
 
