@@ -443,7 +443,7 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    yard (0.9.37)
+    yard (0.9.38)
     zeitwerk (2.7.3)
 
 PLATFORMS
@@ -493,7 +493,7 @@ DEPENDENCIES
   turbo-rails
   tzinfo-data
   web-console
-  yard (~> 0.9.37)
+  yard (~> 0.9.38)
 
 BUNDLED WITH
    2.7.0
