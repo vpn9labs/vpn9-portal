@@ -54,7 +54,7 @@ group :development, :test do
   gem "rubocop-rails-omakase", require: false
 
   # YARD documentation for Ruby code [https://yardoc.org/]
-  gem "yard", "~> 0.9.37", require: false
+  gem "yard", "~> 0.9.38", require: false
 
   # YARD documentation for Ruby code [https://yardoc.org/]
   gem "rubocop-yard", "~> 1.0", require: false
