@@ -1,28 +1,29 @@
-<% content_for :title, "VPN9 - True Privacy VPN with Zero Logs | Anonymous Bitcoin & Monero Payments" %>
+<% content_for :title, "VPN9 — Privacy as Architecture. Zero Logs by Design." %>
 <% content_for :meta_tags do %>
-  <meta name="description" content="The only VPN that truly keeps no logs. Create anonymous accounts without email. Pay with Bitcoin or Monero. Military-grade encryption with WireGuard protocol.">
-  <meta name="keywords" content="VPN, privacy, no logs, anonymous VPN, Bitcoin VPN, Monero VPN, WireGuard, zero logs VPN, private VPN, secure VPN, cryptocurrency VPN">
+  <meta name="description" content="VPN9 is the only VPN whose architecture makes logging impossible. Anonymous accounts, crypto payments, fully open source. Verify it yourself — don't just trust us.">
+  <meta name="keywords" content="VPN, privacy, no logs, anonymous VPN, Bitcoin VPN, Monero VPN, WireGuard, zero logs VPN, open source VPN, attestable VPN">
   <meta name="author" content="VPN9">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://vpn9.com/">
-  
-  <%# Open Graph / Facebook %>
+
   <meta property="og:type" content="website">
   <meta property="og:url" content="<%= request.original_url %>">
-  <meta property="og:title" content="VPN9 - True Privacy VPN with Zero Logs">
-  <meta property="og:description" content="The only VPN service that truly keeps no logs. Create anonymous accounts without email. Pay with cryptocurrency for complete privacy.">
+  <meta property="og:title" content="VPN9 — Privacy as Architecture">
+  <meta property="og:description" content="We don't know who you are. We can't. A VPN that makes surveillance technically impossible.">
   <meta property="og:image" content="<%= request.base_url %>/og-image.png">
   <meta property="og:site_name" content="VPN9">
-  
-  <%# Twitter %>
+
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="<%= request.original_url %>">
-  <meta name="twitter:title" content="VPN9 - True Privacy VPN with Zero Logs">
-  <meta name="twitter:description" content="The only VPN that truly keeps no logs. Anonymous accounts, no email required. Pay with Bitcoin or Monero.">
+  <meta name="twitter:title" content="VPN9 — Privacy as Architecture">
+  <meta name="twitter:description" content="We don't know who you are. We can't.">
   <meta name="twitter:image" content="<%= request.base_url %>/twitter-card.png">
 <% end %>
 
 <% content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,0..100;1,9..144,300..900,0..100&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
   <%= render_structured_data \
         structured_data_for_organization, \
         structured_data_for_website, \
@@ -31,473 +32,1356 @@
         graph: true %>
 <% end %>
 
+<style>
+  :root {
+    --ink: #0b0c0e;
+    --ink-2: #111215;
+    --ink-3: #16181c;
+    --bone: #e8e6e1;
+    --bone-dim: #a8a49c;
+    --gray: #5a5a5a;
+    --rule: rgba(232, 230, 225, 0.09);
+    --rule-strong: rgba(232, 230, 225, 0.22);
+    --amber: #f3c623;
+    --amber-glow: rgba(243, 198, 35, 0.18);
+    --blood: #ff4a2f;
+    --mint: #8dffbc;
+  }
+
+  html, body { background: var(--ink); }
+
+  .v9 {
+    background: var(--ink);
+    color: var(--bone);
+    font-family: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+    font-feature-settings: "ss01", "ss02", "cv11";
+    line-height: 1.5;
+    overflow-x: hidden;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  .v9 .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+  .v9 .display {
+    font-family: "Fraunces", "Times New Roman", serif;
+    font-variation-settings: "opsz" 144, "SOFT" 100, "wght" 380;
+    letter-spacing: -0.035em;
+    line-height: 0.92;
+  }
+  .v9 .display em {
+    font-style: italic;
+    font-variation-settings: "opsz" 144, "SOFT" 100, "wght" 380;
+    color: var(--amber);
+    letter-spacing: -0.04em;
+  }
+
+  .v9 .label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--bone-dim);
+  }
+
+  .v9 a { color: inherit; text-decoration: none; }
+  .v9 ::selection { background: var(--amber); color: var(--ink); }
+
+  /* --- noise overlay --- */
+  .v9::before {
+    content: "";
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    opacity: 0.035;
+    mix-blend-mode: screen;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+
+  /* --- ticker --- */
+  .v9-ticker {
+    border-bottom: 1px solid var(--rule);
+    background: var(--ink);
+    overflow: hidden;
+    white-space: nowrap;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--bone-dim);
+    position: relative;
+    z-index: 40;
+  }
+  .v9-ticker__track {
+    display: inline-block;
+    padding: 9px 0;
+    animation: v9-ticker 50s linear infinite;
+  }
+  .v9-ticker span { margin: 0 2.2rem; }
+  .v9-ticker .dot { color: var(--amber); margin: 0 1rem; }
+  @keyframes v9-ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* --- nav --- */
+  .v9-nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(11, 12, 14, 0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--rule);
+  }
+  .v9-nav__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .v9-logo {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 2px;
+    font-family: "Fraunces", serif;
+    font-variation-settings: "opsz" 144, "wght" 440;
+    font-size: 28px;
+    letter-spacing: -0.02em;
+    color: var(--bone);
+  }
+  .v9-logo__nine {
+    color: var(--amber);
+    font-style: italic;
+    font-variation-settings: "opsz" 144, "wght" 380, "SOFT" 100;
+  }
+  .v9-nav__links { display: none; gap: 2rem; }
+  @media (min-width: 900px) { .v9-nav__links { display: inline-flex; } }
+  .v9-nav__link {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--bone-dim);
+    transition: color 0.2s ease;
+  }
+  .v9-nav__link:hover { color: var(--bone); }
+  .v9-nav__link::before { content: "·  "; color: var(--amber); }
+
+  .v9-nav__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* --- buttons --- */
+  .v9-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 22px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: transform 0.18s ease, background 0.2s ease, color 0.2s ease;
+    border-radius: 0;
+    cursor: pointer;
+  }
+  .v9-btn--primary {
+    background: var(--amber);
+    color: var(--ink);
+    border: 1px solid var(--amber);
+  }
+  .v9-btn--primary:hover { background: #fdd94f; transform: translateY(-1px); }
+  .v9-btn--ghost {
+    background: transparent;
+    color: var(--bone);
+    border: 1px solid var(--rule-strong);
+  }
+  .v9-btn--ghost:hover { border-color: var(--bone); transform: translateY(-1px); }
+  .v9-btn__arrow { transition: transform 0.2s ease; }
+  .v9-btn:hover .v9-btn__arrow { transform: translateX(3px); }
+
+  /* --- corner bracket panels --- */
+  .v9-bracket {
+    position: relative;
+  }
+  .v9-bracket::before, .v9-bracket::after {
+    content: "";
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-color: var(--amber);
+    border-style: solid;
+    border-width: 0;
+  }
+  .v9-bracket::before {
+    top: -1px; left: -1px;
+    border-top-width: 1px;
+    border-left-width: 1px;
+  }
+  .v9-bracket::after {
+    bottom: -1px; right: -1px;
+    border-bottom-width: 1px;
+    border-right-width: 1px;
+  }
+  .v9-bracket--all::before { /* still uses top-left */ }
+  .v9-bracket--all {
+    background-image:
+      linear-gradient(to right, var(--amber), var(--amber)),
+      linear-gradient(to bottom, var(--amber), var(--amber));
+    background-position: top right, bottom left;
+    background-size: 14px 1px, 1px 14px;
+    background-repeat: no-repeat;
+  }
+
+  /* --- hero --- */
+  .v9-hero {
+    position: relative;
+    padding: 80px 32px 100px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .v9-hero__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 64px;
+  }
+  @media (min-width: 1080px) {
+    .v9-hero__grid { grid-template-columns: 1.55fr 1fr; align-items: end; gap: 48px; }
+    .v9-hero { padding: 120px 40px 140px; }
+  }
+  .v9-hero__kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 36px;
+  }
+  .v9-hero__kicker-dot {
+    width: 7px;
+    height: 7px;
+    background: var(--mint);
+    border-radius: 50%;
+    box-shadow: 0 0 12px rgba(141, 255, 188, 0.6);
+    animation: v9-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes v9-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .v9-hero__headline {
+    font-size: clamp(54px, 10vw, 148px);
+    margin: 0;
+  }
+  .v9-hero__headline .break { display: block; }
+  .v9-hero__headline .underline-hand {
+    position: relative;
+    display: inline-block;
+  }
+  .v9-hero__headline .underline-hand::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 0.05em;
+    height: 0.13em;
+    background: var(--amber);
+    opacity: 0.3;
+    transform: skewX(-6deg);
+  }
+
+  .v9-hero__lede {
+    margin-top: 38px;
+    max-width: 48ch;
+    color: var(--bone-dim);
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .v9-hero__lede strong { color: var(--bone); font-weight: 500; }
+
+  .v9-hero__cta {
+    margin-top: 42px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .v9-hero__meta {
+    margin-top: 32px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--bone-dim);
+  }
+  .v9-hero__meta .amber { color: var(--amber); }
+
+  /* status panel */
+  .v9-status {
+    padding: 28px 28px 24px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0) 80%);
+    border: 1px solid var(--rule-strong);
+    position: relative;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+  }
+  .v9-status__head {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 18px;
+    margin-bottom: 18px;
+    border-bottom: 1px dashed var(--rule);
+    color: var(--bone-dim);
+    font-size: 10.5px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .v9-status__blink {
+    display: inline-block;
+    width: 8px; height: 14px;
+    background: var(--mint);
+    vertical-align: -2px;
+    margin-left: 2px;
+    animation: v9-blink 1s steps(2) infinite;
+  }
+  @keyframes v9-blink { 50% { opacity: 0; } }
+  .v9-status__row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+    padding: 7px 0;
+    color: var(--bone);
+  }
+  .v9-status__row > span:first-child { color: var(--bone-dim); }
+  .v9-status__row .dots { letter-spacing: 3px; color: var(--rule-strong); overflow: hidden; }
+  .v9-status__row .val { font-weight: 500; }
+  .v9-status__row .val.zero { color: var(--amber); }
+  .v9-status__row .val.green { color: var(--mint); }
+
+  /* --- section framing --- */
+  .v9-sec {
+    position: relative;
+    padding: 100px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .v9-sec__head {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 80px;
+    padding-top: 48px;
+    border-top: 1px solid var(--rule);
+  }
+  @media (min-width: 900px) {
+    .v9-sec__head { grid-template-columns: 1fr 2fr; gap: 64px; }
+  }
+  .v9-sec__num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--bone-dim);
+    padding-top: 8px;
+  }
+  .v9-sec__num .amber { color: var(--amber); }
+  .v9-sec__title {
+    font-size: clamp(38px, 6vw, 82px);
+    margin: 0;
+  }
+
+  /* --- manifesto (we don't know) --- */
+  .v9-manifesto {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .v9-manifesto__row {
+    display: grid;
+    grid-template-columns: 46px 1fr auto;
+    gap: 20px;
+    padding: 26px 0;
+    border-top: 1px solid var(--rule);
+    align-items: baseline;
+    position: relative;
+  }
+  .v9-manifesto__row:last-child { border-bottom: 1px solid var(--rule); }
+  .v9-manifesto__row:hover .v9-manifesto__what { color: var(--amber); }
+  .v9-manifesto__num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    color: var(--bone-dim);
+    letter-spacing: 0.14em;
+  }
+  .v9-manifesto__what {
+    font-family: "Fraunces", serif;
+    font-variation-settings: "opsz" 72, "SOFT" 100, "wght" 380;
+    font-size: clamp(24px, 4vw, 42px);
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    transition: color 0.3s ease;
+  }
+  .v9-manifesto__what em {
+    font-style: italic;
+    font-variation-settings: "opsz" 72, "SOFT" 100, "wght" 380;
+  }
+  .v9-manifesto__marker {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--amber);
+    text-transform: uppercase;
+    white-space: nowrap;
+    opacity: 0.7;
+  }
+  .v9-manifesto__coda {
+    margin-top: 54px;
+    max-width: 56ch;
+    color: var(--bone-dim);
+    font-size: 17px;
+  }
+  .v9-manifesto__coda strong { color: var(--bone); font-weight: 500; }
+
+  /* --- architecture --- */
+  .v9-arch {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 28px;
+    margin-top: 8px;
+  }
+  @media (min-width: 900px) {
+    .v9-arch { grid-template-columns: repeat(3, 1fr); }
+  }
+  .v9-arch__card {
+    padding: 32px 28px 36px;
+    border: 1px solid var(--rule);
+    background: var(--ink-2);
+    position: relative;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+  }
+  .v9-arch__card:hover {
+    border-color: var(--rule-strong);
+    transform: translateY(-2px);
+  }
+  .v9-arch__step {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .v9-arch__title {
+    font-family: "Fraunces", serif;
+    font-variation-settings: "opsz" 72, "SOFT" 100, "wght" 400;
+    font-size: 30px;
+    letter-spacing: -0.02em;
+    margin: 0 0 14px;
+    line-height: 1.08;
+  }
+  .v9-arch__body {
+    color: var(--bone-dim);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .v9-arch__diag {
+    margin-top: auto;
+    padding-top: 26px;
+    border-top: 1px dashed var(--rule);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10.5px;
+    color: var(--bone-dim);
+    letter-spacing: 0.02em;
+    line-height: 1.7;
+    white-space: pre;
+    overflow: hidden;
+  }
+  .v9-arch__diag .k { color: var(--amber); }
+  .v9-arch__diag .m { color: var(--mint); }
+  .v9-arch__diag .x { color: var(--blood); }
+
+  /* --- pricing --- */
+  .v9-price {
+    display: grid;
+    grid-template-columns: 1fr;
+    border: 1px solid var(--rule-strong);
+    background: linear-gradient(180deg, rgba(255,255,255,0.015), transparent);
+  }
+  @media (min-width: 900px) {
+    .v9-price { grid-template-columns: 1.4fr 1fr; }
+  }
+  .v9-price__body {
+    padding: 56px 48px;
+    border-bottom: 1px solid var(--rule);
+  }
+  @media (min-width: 900px) {
+    .v9-price__body { border-bottom: 0; border-right: 1px solid var(--rule); }
+  }
+  .v9-price__tag {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 18px;
+  }
+  .v9-price__title {
+    font-family: "Fraunces", serif;
+    font-variation-settings: "opsz" 144, "SOFT" 100, "wght" 360;
+    font-size: 44px;
+    letter-spacing: -0.03em;
+    margin: 0 0 18px;
+    line-height: 1;
+  }
+  .v9-price__lede {
+    color: var(--bone-dim);
+    font-size: 16px;
+    max-width: 40ch;
+    margin: 0 0 36px;
+  }
+  .v9-price__features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--bone);
+  }
+  .v9-price__features li {
+    list-style: none;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .v9-price__features svg { flex: none; color: var(--amber); margin-top: 2px; }
+
+  .v9-price__side {
+    padding: 56px 48px;
+    background: radial-gradient(120% 80% at 50% 0%, rgba(243, 198, 35, 0.06), transparent 60%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 32px;
+  }
+  .v9-price__number {
+    font-family: "Fraunces", serif;
+    font-variation-settings: "opsz" 144, "SOFT" 100, "wght" 320;
+    font-size: clamp(100px, 14vw, 180px);
+    line-height: 0.85;
+    letter-spacing: -0.06em;
+    color: var(--bone);
+    display: flex;
+    align-items: flex-start;
+  }
+  .v9-price__number .dollar {
+    font-size: 0.32em;
+    color: var(--amber);
+    margin-right: 0.08em;
+    margin-top: 0.2em;
+    font-style: italic;
+  }
+  .v9-price__number .per {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 14px;
+    letter-spacing: 0.15em;
+    color: var(--bone-dim);
+    align-self: flex-end;
+    margin-bottom: 0.8em;
+    margin-left: 0.6em;
+    text-transform: uppercase;
+  }
+  .v9-pay {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .v9-pay__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-top: 1px dashed var(--rule);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .v9-pay__row span:first-child { color: var(--bone-dim); }
+  .v9-pay__row span:last-child { color: var(--bone); display: inline-flex; align-items: center; gap: 8px; }
+  .v9-pay__coin {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+  }
+  .v9-pay__coin--btc { background: #f7931a; }
+  .v9-pay__coin--xmr { background: #ff6600; }
+
+  /* --- attestation --- */
+  .v9-attest {
+    border: 1px solid var(--rule);
+    padding: 40px 40px 44px;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 3px, rgba(243, 198, 35, 0.015) 3px 4px),
+      var(--ink-2);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    line-height: 1.75;
+    position: relative;
+    overflow: hidden;
+  }
+  .v9-attest__prompt {
+    color: var(--amber);
+    margin-right: 8px;
+  }
+  .v9-attest__line { color: var(--bone); display: block; }
+  .v9-attest__line--dim { color: var(--bone-dim); }
+  .v9-attest__line .key { color: var(--mint); }
+  .v9-attest__line .str { color: #d8c4f7; }
+  .v9-attest__line .num { color: var(--amber); }
+  .v9-attest__cursor {
+    display: inline-block;
+    width: 9px;
+    height: 17px;
+    background: var(--amber);
+    vertical-align: -3px;
+    margin-left: 4px;
+    animation: v9-blink 1s steps(2) infinite;
+  }
+  .v9-attest__watermark {
+    position: absolute;
+    right: 32px;
+    bottom: 16px;
+    font-family: "Fraunces", serif;
+    font-style: italic;
+    font-variation-settings: "opsz" 144, "SOFT" 100, "wght" 320;
+    font-size: 100px;
+    color: rgba(255,255,255,0.025);
+    letter-spacing: -0.05em;
+    pointer-events: none;
+    line-height: 1;
+  }
+
+  /* --- CTA band --- */
+  .v9-cta {
+    margin: 80px 0 0;
+    padding: 90px 40px 110px;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    text-align: center;
+    position: relative;
+    background:
+      radial-gradient(60% 80% at 50% 100%, var(--amber-glow), transparent 60%);
+  }
+  .v9-cta__title {
+    font-size: clamp(44px, 7vw, 96px);
+    margin: 0 auto;
+    max-width: 14ch;
+  }
+  .v9-cta__title em {
+    font-style: italic;
+    font-variation-settings: "opsz" 144, "SOFT" 100, "wght" 340;
+    color: var(--amber);
+  }
+  .v9-cta__sub {
+    margin-top: 26px;
+    color: var(--bone-dim);
+    font-size: 17px;
+    max-width: 50ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .v9-cta__buttons {
+    margin-top: 42px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  /* --- footer --- */
+  .v9-foot {
+    padding: 64px 32px 48px;
+    max-width: 1400px;
+    margin: 0 auto;
+    border-top: 1px solid var(--rule);
+  }
+  .v9-foot__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px 32px;
+  }
+  @media (min-width: 900px) {
+    .v9-foot__grid { grid-template-columns: 1.4fr repeat(4, 1fr); gap: 32px; }
+  }
+  .v9-foot__col h4 {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin: 0 0 20px;
+    font-weight: 500;
+  }
+  .v9-foot__col a {
+    display: block;
+    font-size: 14px;
+    color: var(--bone-dim);
+    padding: 6px 0;
+    transition: color 0.2s ease;
+  }
+  .v9-foot__col a:hover { color: var(--bone); }
+  .v9-foot__tag {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: var(--bone-dim);
+    line-height: 1.7;
+    margin-top: 14px;
+    max-width: 38ch;
+  }
+  .v9-foot__key {
+    margin-top: 20px;
+    padding: 10px 12px;
+    border: 1px dashed var(--rule);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    color: var(--bone-dim);
+    letter-spacing: 0.08em;
+    word-break: break-all;
+    line-height: 1.55;
+  }
+  .v9-foot__bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 56px;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--bone-dim);
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  /* --- DNS leak test override to match aesthetic --- */
+  .v9-dns-shell {
+    background: var(--ink);
+    padding: 40px 0 20px;
+    position: relative;
+  }
+  .v9-dns-shell > section { background: var(--ink) !important; padding: 20px 0 !important; }
+  .v9-dns-shell h2 { color: var(--amber) !important; font-family: "JetBrains Mono", monospace; font-size: 11px !important; letter-spacing: 0.22em; text-transform: uppercase; }
+  .v9-dns-shell > section > div > div > p {
+    color: var(--bone) !important;
+    font-family: "Fraunces", serif !important;
+    font-variation-settings: "opsz" 72, "SOFT" 100, "wght" 380 !important;
+    letter-spacing: -0.02em;
+  }
+  .v9-dns-shell > section > div > div > p + p {
+    color: var(--bone-dim) !important;
+    font-family: "Instrument Sans", sans-serif !important;
+  }
+  .v9-dns-shell .bg-white {
+    background: var(--ink-2) !important;
+    border: 1px solid var(--rule);
+    box-shadow: none !important;
+  }
+  .v9-dns-shell .text-gray-900 { color: var(--bone) !important; }
+  .v9-dns-shell .text-gray-600, .v9-dns-shell .text-gray-700 { color: var(--bone-dim) !important; }
+  .v9-dns-shell .bg-black { background: var(--amber) !important; color: var(--ink) !important; }
+  .v9-dns-shell .bg-black:hover { background: #fdd94f !important; }
+  .v9-dns-shell .bg-blue-50 {
+    background: transparent !important;
+    border: 1px dashed var(--rule);
+  }
+  .v9-dns-shell .text-blue-900, .v9-dns-shell .text-blue-800 { color: var(--bone-dim) !important; }
+  .v9-dns-shell button { border-radius: 0 !important; font-family: "JetBrains Mono", monospace !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; font-size: 11px !important; }
+
+  /* reveal on load — content stays visible by default; animation only runs when supported */
+  @media (prefers-reduced-motion: no-preference) {
+    .v9-reveal { animation: v9-in 0.9s cubic-bezier(.2,.7,.2,1) both; }
+    @keyframes v9-in {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .v9-reveal[data-d="1"] { animation-delay: .05s; }
+    .v9-reveal[data-d="2"] { animation-delay: .12s; }
+    .v9-reveal[data-d="3"] { animation-delay: .2s; }
+    .v9-reveal[data-d="4"] { animation-delay: .3s; }
+    .v9-reveal[data-d="5"] { animation-delay: .4s; }
+    .v9-reveal[data-d="6"] { animation-delay: .5s; }
+  }
+
+  /* grid background at hero */
+  .v9-gridbg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(var(--rule) 1px, transparent 1px),
+      linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(60% 60% at 50% 40%, black, transparent 80%);
+    -webkit-mask-image: radial-gradient(60% 60% at 50% 40%, black, transparent 80%);
+    opacity: 0.5;
+  }
+
+  /* hash marquee strip between sections */
+  .v9-rule {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+  .v9-rule__inner {
+    border-top: 1px solid var(--rule);
+    padding: 16px 0;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.2em;
+    color: var(--bone-dim);
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+  }
+</style>
+
 <% if defined?(Current) && Current.user %>
   <%= render 'shared/landing_navigation_authenticated' %>
 <% else %>
-  <%= render 'shared/landing_navigation' %>
-<% end %>
-
-<%# Hero Section %>
-<main role="main">
-<section class="relative isolate overflow-hidden bg-gray-900" aria-label="Hero">
-  <svg class="absolute inset-0 -z-10 h-full w-full stroke-white/10 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]" aria-hidden="true">
-    <defs>
-      <pattern id="983e3e4c-de6d-4c3f-8d64-b9761d1534cc" width="200" height="200" x="50%" y="-1" patternUnits="userSpaceOnUse">
-        <path d="M.5 200V.5H200" fill="none" />
-      </pattern>
-    </defs>
-    <svg x="50%" y="-1" class="overflow-visible fill-gray-800/20">
-      <path d="M-200 0h201v201h-201Z M600 0h201v201h-201Z M-400 600h201v201h-201Z M200 800h201v201h-201Z" stroke-width="0" />
-    </svg>
-    <rect width="100%" height="100%" stroke-width="0" fill="url(#983e3e4c-de6d-4c3f-8d64-b9761d1534cc)" />
-  </svg>
-  
-  <div class="absolute left-[calc(50%-4rem)] top-10 -z-10 transform-gpu blur-3xl sm:left-[calc(50%-18rem)] lg:left-48 lg:top-[calc(50%-30rem)] xl:left-[calc(50%-24rem)]" aria-hidden="true">
-    <div class="aspect-[1108/632] w-[69.25rem] bg-gradient-to-r from-[#80caff] to-[#4f46e5] opacity-20" style="clip-path: polygon(73.6% 51.7%, 91.7% 11.8%, 100% 46.4%, 97.4% 82.2%, 92.5% 84.9%, 75.7% 64%, 55.3% 47.5%, 46.5% 49.4%, 45% 62.9%, 50.3% 87.2%, 21.3% 64.1%, 0.1% 100%, 5.4% 51.1%, 21.4% 63.9%, 58.9% 0.2%, 73.6% 51.7%)"></div>
-  </div>
-  
-  <div class="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40">
-    <div class="mx-auto max-w-2xl flex-shrink-0 lg:mx-0 lg:max-w-xl lg:pt-8">
-      <h1 class="mt-10 text-4xl font-bold tracking-tight text-white sm:text-6xl">
-        True Privacy.<br>
-        Zero Logs.<br>
-        <span class="text-indigo-400">No Compromises.</span>
-      </h1>
-      <p class="mt-6 text-lg leading-8 text-gray-300">
-        VPN9 is the only VPN service that truly keeps no logs. We don't track your connections, 
-        we don't store your data, and we don't even require an email address. Just pure, uncompromised privacy.
-      </p>
-      <div class="mt-10 flex items-center gap-x-6">
-        <%= link_to "Create Anonymous Account", signup_path, 
-            class: "rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400" %>
-        <%= link_to "Sign In with Passphrase", new_session_path, 
-            class: "text-sm font-semibold leading-6 text-white hover:text-gray-300" %>
-      </div>
-      <div class="mt-8">
-        <div class="inline-flex items-center text-sm text-gray-400">
-          <svg class="mr-2 h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-          </svg>
-          No email required • Pay with Bitcoin or Monero • Complete anonymity
-        </div>
+  <div class="v9">
+    <%# --- Ticker --- %>
+    <div class="v9-ticker" aria-hidden="true">
+      <div class="v9-ticker__track">
+        <% marquee_items = [
+          "ZERO LOGS BY ARCHITECTURE",
+          "NO EMAIL REQUIRED",
+          "ANONYMOUS BY DESIGN",
+          "BITCOIN · MONERO ACCEPTED",
+          "WIREGUARD PROTOCOL",
+          "OPEN SOURCE · AGPLv3",
+          "REPRODUCIBLE BUILDS",
+          "ATTESTABLE RUNTIME",
+          "CLIENT-SIDE KEY GENERATION",
+          "ARGON2ID PASSWORD HASHING"
+        ] %>
+        <% 2.times do %>
+          <% marquee_items.each do |item| %>
+            <span><%= item %></span><span class="dot">◆</span>
+          <% end %>
+        <% end %>
       </div>
     </div>
-  </div>
-</section>
 
-<%= render "shared/dns_leak_test", intro_text: "Find out if your current VPN is actually protecting your DNS queries from being exposed to your ISP." %>
-
-<%# Privacy Features Section %>
-<section id="features" class="bg-white py-24 sm:py-32" aria-label="Features">
-  <div class="mx-auto max-w-7xl px-6 lg:px-8">
-    <div class="mx-auto max-w-2xl text-center">
-      <h2 class="text-base font-semibold leading-7 text-indigo-600">True Privacy Protection</h2>
-      <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-        We Don't Track Anything. Period.
-      </p>
-      <p class="mt-6 text-lg leading-8 text-gray-600">
-        Unlike other VPN providers who make empty promises, we've built our entire system 
-        to make tracking impossible. We can't hand over data we don't have.
-      </p>
-    </div>
-    
-    <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-      <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
-        <%# Zero Connection Logs %>
-        <div class="flex flex-col">
-          <dt class="text-base font-semibold leading-7 text-gray-900">
-            <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
-              <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            Zero Connection Logs
-          </dt>
-          <dd class="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
-            <p class="flex-auto">
-              We don't store when you connect, how long you stay connected, or where you connect from. 
-              No IP addresses, no timestamps, no activity logs. Your privacy is absolute.
-            </p>
-            <p class="mt-6">
-              <a href="#privacy" class="text-sm font-semibold leading-6 text-indigo-600">
-                Learn more <span aria-hidden="true">→</span>
-              </a>
-            </p>
-          </dd>
+    <%# --- Navigation --- %>
+    <header class="v9-nav">
+      <div class="v9-nav__inner">
+        <%= link_to root_path, class: "v9-logo" do %>
+          VPN<span class="v9-logo__nine">9</span>
+        <% end %>
+        <nav class="v9-nav__links" aria-label="Primary">
+          <a href="#architecture" class="v9-nav__link">Architecture</a>
+          <a href="#manifesto" class="v9-nav__link">Principles</a>
+          <a href="#pricing" class="v9-nav__link">Pricing</a>
+          <a href="#verify" class="v9-nav__link">Verify</a>
+          <a href="https://github.com/vpn9labs" target="_blank" rel="noopener" class="v9-nav__link">Source</a>
+        </nav>
+        <div class="v9-nav__cta">
+          <%= link_to "Sign in", new_session_path, class: "v9-btn v9-btn--ghost", style: "display:none;" %>
+          <%= link_to signup_path, class: "v9-btn v9-btn--primary" do %>
+            <span>Get VPN9</span>
+            <svg class="v9-btn__arrow" width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5h12m0 0L9 1m4 4L9 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/></svg>
+          <% end %>
         </div>
+      </div>
+    </header>
 
-        <%# Anonymous Authentication %>
-        <div class="flex flex-col">
-          <dt class="text-base font-semibold leading-7 text-gray-900">
-            <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
-              <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
-              </svg>
+    <main role="main">
+      <%# --- Hero --- %>
+      <section class="v9-hero" aria-label="Hero">
+        <div class="v9-gridbg" aria-hidden="true"></div>
+        <div class="v9-hero__grid">
+          <div>
+            <div class="v9-hero__kicker v9-reveal" data-d="1">
+              <span class="v9-hero__kicker-dot"></span>
+              <span class="label">VPN9 / PRIVACY AS ARCHITECTURE / EST. 2025</span>
             </div>
-            Anonymous Accounts
-          </dt>
-          <dd class="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
-            <p class="flex-auto">
-              Sign up without providing any personal information. No email address, no phone number, 
-              no name. Just create a secure passphrase and you're protected.
+            <h1 class="v9-hero__headline display v9-reveal" data-d="2">
+              <span class="break">We don't know</span>
+              <span class="break">who you are.</span>
+              <span class="break"><em>We can't.</em></span>
+            </h1>
+            <p class="v9-hero__lede v9-reveal" data-d="3">
+              VPN9 is the only VPN whose architecture makes surveillance
+              <strong>technically impossible</strong>. No email. No metadata. No cross-server
+              correlation. Not because we deleted the logs — because the system never
+              produces them. Every line is open source. Every server is attestable.
+              Verify it yourself.
             </p>
-            <p class="mt-6">
-              <a href="<%= signup_path %>" class="text-sm font-semibold leading-6 text-indigo-600">
-                Create account <span aria-hidden="true">→</span>
+            <div class="v9-hero__cta v9-reveal" data-d="4">
+              <%= link_to signup_path, class: "v9-btn v9-btn--primary" do %>
+                <span>Create anonymous account</span>
+                <svg class="v9-btn__arrow" width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5h12m0 0L9 1m4 4L9 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/></svg>
+              <% end %>
+              <a href="https://github.com/vpn9labs" target="_blank" rel="noopener" class="v9-btn v9-btn--ghost">
+                <span>Read the source</span>
+                <svg class="v9-btn__arrow" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H4M9 3V8" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/></svg>
               </a>
-            </p>
-          </dd>
-        </div>
-
-        <%# Stateless Architecture %>
-        <div class="flex flex-col">
-          <dt class="text-base font-semibold leading-7 text-gray-900">
-            <div class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
-              <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-              </svg>
             </div>
-            Stateless Tokens
-          </dt>
-          <dd class="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
-            <p class="flex-auto">
-              Our servers don't communicate with each other about your activity. 
-              Each connection is independent and leaves no trace when you disconnect.
-            </p>
-            <p class="mt-6">
-              <a href="#technical" class="text-sm font-semibold leading-6 text-indigo-600">
-                How it works <span aria-hidden="true">→</span>
-              </a>
-            </p>
-          </dd>
-        </div>
-      </dl>
-    </div>
-  </div>
-</section>
-
-<%# Code Transparency Section %>
-<section id="privacy" class="bg-gray-50 py-16 sm:py-24" aria-label="Privacy Policy">
-  <div class="mx-auto max-w-7xl px-6 lg:px-8">
-    <div class="mx-auto max-w-2xl lg:mx-0 lg:max-w-none">
-      <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-        What We Don't Know Can't Hurt You
-      </h2>
-      <div class="mt-6 flex flex-col gap-x-8 gap-y-20 lg:flex-row">
-        <div class="lg:w-full lg:max-w-2xl lg:flex-auto">
-          <p class="text-xl leading-8 text-gray-600">
-            We've built VPN9 from the ground up to ensure we know nothing about you or your online activities. 
-            Even if forced, we couldn't provide data we don't have.
-          </p>
-          <div class="mt-10 max-w-xl text-base leading-7 text-gray-700">
-            <p class="font-semibold text-gray-900">
-              Here's what we DON'T track:
-            </p>
-            <ul role="list" class="mt-8 space-y-4 text-gray-600">
-              <li class="flex gap-x-3">
-                <svg class="mt-1 h-5 w-5 flex-none text-red-600" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
-                </svg>
-                <span><strong>Connection times</strong> - We don't know when you connect or disconnect</span>
-              </li>
-              <li class="flex gap-x-3">
-                <svg class="mt-1 h-5 w-5 flex-none text-red-600" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
-                </svg>
-                <span><strong>Your IP address</strong> - We never store your real IP address</span>
-              </li>
-              <li class="flex gap-x-3">
-                <svg class="mt-1 h-5 w-5 flex-none text-red-600" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
-                </svg>
-                <span><strong>Server locations</strong> - We don't track which servers you use</span>
-              </li>
-              <li class="flex gap-x-3">
-                <svg class="mt-1 h-5 w-5 flex-none text-red-600" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
-                </svg>
-                <span><strong>Bandwidth usage</strong> - No monitoring of how much data you use</span>
-              </li>
-              <li class="flex gap-x-3">
-                <svg class="mt-1 h-5 w-5 flex-none text-red-600" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
-                </svg>
-                <span><strong>Online activity</strong> - We can't see what websites you visit or apps you use</span>
-              </li>
-            </ul>
-            <p class="mt-8 font-medium text-gray-900">
-              True privacy isn't about trusting us—it's about not needing to.
+            <p class="v9-hero__meta v9-reveal" data-d="5">
+              <span class="amber">※</span> No email required <span class="amber">·</span> Pay with Bitcoin or Monero <span class="amber">·</span> AGPLv3
             </p>
           </div>
-        </div>
-        <div class="lg:flex lg:flex-auto lg:justify-center">
-          <dl class="w-64 space-y-8 xl:w-80">
-            <div class="flex flex-col-reverse gap-y-4">
-              <dt class="text-base leading-7 text-gray-600">Your data we store</dt>
-              <dd class="text-5xl font-semibold tracking-tight text-gray-900">Zero</dd>
-            </div>
-            <div class="flex flex-col-reverse gap-y-4">
-              <dt class="text-base leading-7 text-gray-600">Activity logs kept</dt>
-              <dd class="text-5xl font-semibold tracking-tight text-gray-900">None</dd>
-            </div>
-            <div class="flex flex-col-reverse gap-y-4">
-              <dt class="text-base leading-7 text-gray-600">Times we've shared user data</dt>
-              <dd class="text-5xl font-semibold tracking-tight text-gray-900">Never</dd>
-            </div>
-          </dl>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<%# Pricing Section %>
-<section id="pricing" class="bg-white py-24 sm:py-32" aria-label="Pricing" itemscope itemtype="https://schema.org/Product">
-  <div class="mx-auto max-w-7xl px-6 lg:px-8">
-    <div class="mx-auto max-w-4xl text-center">
-      <h2 class="text-base font-semibold leading-7 text-indigo-600">Pay with Crypto, Stay Anonymous</h2>
-      <p class="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-        Privacy shouldn't be expensive
-      </p>
-    </div>
-    <p class="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-600">
-      One simple plan. All features included. Pay with Bitcoin or Monero for complete anonymity—no financial trail, no personal information.
-    </p>
-    
-    <div class="mx-auto mt-16 max-w-2xl rounded-3xl ring-1 ring-gray-200 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
-      <div class="p-8 sm:p-10 lg:flex-auto">
-        <h3 class="text-2xl font-bold tracking-tight text-gray-900">VPN9 Premium</h3>
-        <p class="mt-6 text-base leading-7 text-gray-600">
-          Get unlimited access to all VPN9 servers worldwide with our premium plan.
-        </p>
-        <div class="mt-10 flex items-center gap-x-4">
-          <h4 class="flex-none text-sm font-semibold leading-6 text-indigo-600">What's included</h4>
-          <div class="h-px flex-auto bg-gray-100"></div>
+          <aside class="v9-status v9-bracket v9-reveal" data-d="6" aria-label="Live privacy status">
+            <div class="v9-status__head">
+              <span>SYS/ZERO-STATE<span class="v9-status__blink"></span></span>
+              <span>◆ LIVE</span>
+            </div>
+            <div class="v9-status__row">
+              <span>IPs&nbsp;stored</span>
+              <span class="dots">· · · · · · · · · · · · · · · · · · · ·</span>
+              <span class="val zero">0</span>
+            </div>
+            <div class="v9-status__row">
+              <span>Activity&nbsp;logs</span>
+              <span class="dots">· · · · · · · · · · · · · · · · · · · ·</span>
+              <span class="val zero">0</span>
+            </div>
+            <div class="v9-status__row">
+              <span>Email&nbsp;addresses</span>
+              <span class="dots">· · · · · · · · · · · · · · · · · · · ·</span>
+              <span class="val zero">0</span>
+            </div>
+            <div class="v9-status__row">
+              <span>Device&nbsp;fingerprints</span>
+              <span class="dots">· · · · · · · · · · · · · · · · · · · ·</span>
+              <span class="val zero">0</span>
+            </div>
+            <div class="v9-status__row">
+              <span>Data&nbsp;subpoenas&nbsp;fulfilled</span>
+              <span class="dots">· · · · · · · · · · · · · · · · · · · ·</span>
+              <span class="val zero">0</span>
+            </div>
+            <div class="v9-status__row">
+              <span>Kept&nbsp;promises</span>
+              <span class="dots">· · · · · · · · · · · · · · · · · · · ·</span>
+              <span class="val green">∞</span>
+            </div>
+            <div style="margin-top: 22px; padding-top: 14px; border-top: 1px dashed var(--rule); color: var(--bone-dim); font-size: 10.5px; letter-spacing: 0.12em;">
+              &gt; SOURCE: public ledger · build info served at <span style="color: var(--bone)">/attestation</span>
+            </div>
+          </aside>
         </div>
-        <ul role="list" class="mt-8 grid grid-cols-1 gap-4 text-sm leading-6 text-gray-600 sm:grid-cols-2 sm:gap-6">
-          <li class="flex gap-x-3">
-            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-            </svg>
-            Unlimited bandwidth
-          </li>
-          <li class="flex gap-x-3">
-            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-            </svg>
-            5 simultaneous devices
-          </li>
-          <li class="flex gap-x-3">
-            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-            </svg>
-            Global server network
-          </li>
-          <li class="flex gap-x-3">
-            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-            </svg>
-            WireGuard protocol
-          </li>
-          <li class="flex gap-x-3">
-            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-            </svg>
-            No logs guarantee
-          </li>
-          <li class="flex gap-x-3">
-            <svg class="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-            </svg>
-            24/7 support
-          </li>
-        </ul>
+      </section>
+
+      <%# --- Rule strip --- %>
+      <div class="v9-rule">
+        <div class="v9-rule__inner">
+          <span>◐ §01 / 04 · The negative space</span>
+          <span>Scroll to read</span>
+        </div>
       </div>
-      <div class="-mt-2 p-2 lg:mt-0 lg:w-full lg:max-w-md lg:flex-shrink-0">
-        <div class="rounded-2xl bg-gray-50 py-10 text-center ring-1 ring-inset ring-gray-900/5 lg:flex lg:flex-col lg:justify-center lg:py-16">
-          <div class="mx-auto max-w-xs px-8">
-            <p class="text-base font-semibold text-gray-600">Pay monthly or save with annual</p>
-            <p class="mt-6 flex items-baseline justify-center gap-x-2">
-              <span class="text-5xl font-bold tracking-tight text-gray-900">$9</span>
-              <span class="text-sm font-semibold leading-6 tracking-wide text-gray-600">/month</span>
+
+      <%# --- Manifesto — 9 things we don't know --- %>
+      <section id="manifesto" class="v9-sec" aria-label="What we don't know">
+        <div class="v9-sec__head">
+          <div class="v9-sec__num"><span class="amber">§01</span> &nbsp;/&nbsp; The nine unknowns</div>
+          <h2 class="v9-sec__title display">
+            Most VPNs say <em>trust us</em>.<br>
+            We built a system <em>that can't betray you</em>.
+          </h2>
+        </div>
+
+        <ul class="v9-manifesto" role="list">
+          <% manifesto_items = [
+            ["Your IP address.", "NEVER STORED"],
+            ["When you connect.", "NOT OBSERVED"],
+            ["When you disconnect.", "NOT OBSERVED"],
+            ["Which relay you choose.", "OUTSIDE OUR VIEW"],
+            ["How much data you send.", "UNMEASURED"],
+            ["What sites you visit.", "ENCRYPTED"],
+            ["What apps you run.", "OPAQUE"],
+            ["Who you are in real life.", "UNLINKABLE"],
+            ["That any single account exists.", "UNCORRELATED"]
+          ] %>
+          <% manifesto_items.each_with_index do |(what, marker), i| %>
+            <li class="v9-manifesto__row">
+              <span class="v9-manifesto__num"><%= sprintf("%02d", i + 1) %></span>
+              <span class="v9-manifesto__what">
+                <% if i == 7 %>
+                  Who <em>you</em> are in real life.
+                <% elsif i == 8 %>
+                  That any <em>single</em> account exists.
+                <% else %>
+                  <%= what %>
+                <% end %>
+              </span>
+              <span class="v9-manifesto__marker">— <%= marker %></span>
+            </li>
+          <% end %>
+        </ul>
+
+        <p class="v9-manifesto__coda">
+          <strong>True privacy isn't about trusting us.</strong> It's about building a system
+          where trust isn't required — and then publishing the blueprints so anyone can
+          check the math.
+        </p>
+      </section>
+
+      <%# --- Rule strip --- %>
+      <div class="v9-rule">
+        <div class="v9-rule__inner">
+          <span>◐ §02 / 04 · How it's actually built</span>
+          <span>↓</span>
+        </div>
+      </div>
+
+      <%# --- Architecture --- %>
+      <section id="architecture" class="v9-sec" aria-label="Architecture">
+        <div class="v9-sec__head">
+          <div class="v9-sec__num"><span class="amber">§02</span> &nbsp;/&nbsp; Architecture</div>
+          <h2 class="v9-sec__title display">
+            Privacy by <em>shape</em>,<br>not by policy.
+          </h2>
+        </div>
+
+        <div class="v9-arch">
+          <article class="v9-arch__card">
+            <div class="v9-arch__step">STEP 01 · ACCOUNT</div>
+            <h3 class="v9-arch__title">A 7‑word passphrase. Nothing else.</h3>
+            <p class="v9-arch__body">
+              No email, no phone, no identity document. Your passphrase is hashed with
+              Argon2id and stored as bytes — never as anything we could link back to you.
+              Add a password if you want. Or don't.
             </p>
-            <%= link_to "Get started today", signup_path, 
-                class: "mt-10 block w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" %>
-            <div class="mt-6 space-y-2">
-              <p class="text-xs font-semibold uppercase tracking-wide text-indigo-600">Pay Anonymously With</p>
-              <div class="flex justify-center gap-x-4">
-                <div class="flex items-center gap-x-1">
-                  <svg class="h-5 w-5 text-orange-500" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1.5-3h3v-1.5h-1v-7h1V7h-3v1.5h1v7h-1V17z"/>
-                  </svg>
-                  <span class="text-xs font-medium text-gray-700">Bitcoin</span>
+<pre class="v9-arch__diag">
+<span class="m">&gt;</span> signup()
+  <span class="k">→</span> passphrase  = <span class="k">seven_words()</span>
+  <span class="k">→</span> digest      = <span class="k">argon2id(</span>passphrase<span class="k">)</span>
+  <span class="k">→</span> stored      = { digest, <span class="x">∅</span>, <span class="x">∅</span> }
+  <span class="m">✓</span> no&nbsp;email.&nbsp;no&nbsp;phone.&nbsp;no&nbsp;name.</pre>
+          </article>
+
+          <article class="v9-arch__card">
+            <div class="v9-arch__step">STEP 02 · TOKENS</div>
+            <h3 class="v9-arch__title">A token that describes the right, not you.</h3>
+            <p class="v9-arch__body">
+              We issue a stateless JWT with a 24‑hour expiry. It carries the minimum a
+              relay needs — and nothing more. Relays verify signatures locally. They
+              don't call home. They don't tell us anything.
+            </p>
+<pre class="v9-arch__diag">
+<span class="m">&gt;</span> jwt.claims
+  <span class="k">sub</span>   : subscription_id
+  <span class="k">exp</span>   : +24h
+  <span class="k">iat</span>   : now()
+  <span class="x">~</span> ip, name, email, device : <span class="x">absent</span>
+  <span class="m">→</span> verified locally at relay</pre>
+          </article>
+
+          <article class="v9-arch__card">
+            <div class="v9-arch__step">STEP 03 · RELAY</div>
+            <h3 class="v9-arch__title">The relay forgets you the instant you leave.</h3>
+            <p class="v9-arch__body">
+              WireGuard in RAM only. No connection log, no bandwidth meter, no
+              per-session record. Disconnect and the tunnel is gone. The relay doesn't
+              report session data anywhere — not even to us.
+            </p>
+<pre class="v9-arch__diag">
+<span class="m">&gt;</span> wg up
+  <span class="k">peer</span>  : client_pubkey
+  <span class="k">ram</span>   : session_handle
+  <span class="x">disk</span>  : <span class="x">—</span>
+  <span class="x">api</span>   : <span class="x">no callbacks home</span>
+  <span class="m">✓</span> forgotten on disconnect</pre>
+          </article>
+        </div>
+      </section>
+
+      <%# --- Rule strip --- %>
+      <div class="v9-rule">
+        <div class="v9-rule__inner">
+          <span>◐ §03 / 04 · Price of admission</span>
+          <span>↓</span>
+        </div>
+      </div>
+
+      <%# --- Pricing --- %>
+      <section id="pricing" class="v9-sec" aria-label="Pricing" itemscope itemtype="https://schema.org/Product">
+        <div class="v9-sec__head">
+          <div class="v9-sec__num"><span class="amber">§03</span> &nbsp;/&nbsp; Pricing</div>
+          <h2 class="v9-sec__title display">
+            One plan.<br>Pay with <em>crypto</em>.
+          </h2>
+        </div>
+
+        <div class="v9-price v9-bracket">
+          <div class="v9-price__body">
+            <div class="v9-price__tag">※ VPN9 · STANDARD MEMBERSHIP</div>
+            <h3 class="v9-price__title display">Everything included. No upsells.</h3>
+            <p class="v9-price__lede">
+              Unlimited bandwidth, global relays, up to 5 simultaneous devices,
+              WireGuard protocol, and the only no‑logs guarantee you can actually
+              verify.
+            </p>
+            <ul class="v9-price__features">
+              <% features = [
+                "Unlimited bandwidth",
+                "5 simultaneous devices",
+                "Global relay network",
+                "WireGuard protocol",
+                "Verifiable zero-log policy",
+                "AGPLv3 open source",
+                "Attestable server builds",
+                "Client-side key generation"
+              ] %>
+              <% features.each do |feat| %>
+                <li>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6l3 3 7-8" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
+                  <span><%= feat %></span>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+
+          <div class="v9-price__side">
+            <div>
+              <div class="v9-price__number">
+                <span class="dollar">$</span><span>9</span><span class="per">/ mo</span>
+              </div>
+              <div style="margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--bone-dim); letter-spacing: 0.1em;">
+                ≈ 0.000084 BTC · 0.048 XMR
+              </div>
+            </div>
+
+            <div>
+              <div style="margin-bottom: 16px;">
+                <%= link_to signup_path, class: "v9-btn v9-btn--primary", style: "width: 100%; justify-content: center;" do %>
+                  <span>Start paying for privacy</span>
+                  <svg class="v9-btn__arrow" width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5h12m0 0L9 1m4 4L9 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/></svg>
+                <% end %>
+              </div>
+
+              <div class="v9-pay">
+                <div class="v9-pay__row">
+                  <span>Bitcoin</span>
+                  <span><span class="v9-pay__coin v9-pay__coin--btc"></span>Accepted</span>
                 </div>
-                <div class="flex items-center gap-x-1">
-                  <svg class="h-5 w-5 text-gray-700" fill="currentColor" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10"/>
-                  </svg>
-                  <span class="text-xs font-medium text-gray-700">Monero</span>
+                <div class="v9-pay__row">
+                  <span>Monero</span>
+                  <span><span class="v9-pay__coin v9-pay__coin--xmr"></span>Accepted</span>
+                </div>
+                <div class="v9-pay__row">
+                  <span>Credit cards</span>
+                  <span style="color: var(--blood); opacity: 0.8;">✕ Refused</span>
+                </div>
+                <div class="v9-pay__row">
+                  <span>Personal info</span>
+                  <span style="color: var(--blood); opacity: 0.8;">✕ Refused</span>
                 </div>
               </div>
-              <p class="text-xs text-gray-500">No credit card. No bank records. No trace.</p>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
+      </section>
 
-<%# Technical Features %>
-<section id="technical" class="bg-gray-900 py-24 sm:py-32" aria-label="Technical Features">
-  <div class="mx-auto max-w-7xl px-6 lg:px-8">
-    <div class="mx-auto max-w-2xl lg:text-center">
-      <h2 class="text-base font-semibold leading-7 text-indigo-400">Enterprise-Grade Security</h2>
-      <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-        Trusted by Privacy Experts Worldwide
-      </p>
-      <p class="mt-6 text-lg leading-8 text-gray-300">
-        VPN9 uses the same security standards trusted by governments and Fortune 500 companies, 
-        but with one difference—we use it to protect YOU from them.
-      </p>
-    </div>
-    <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-      <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-4">
-        <div class="flex flex-col">
-          <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
-            <svg class="h-5 w-5 flex-none text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd" />
-            </svg>
-            Military-Grade Security
-          </dt>
-          <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-300">
-            <p class="flex-auto">Your passwords are protected with unbreakable encryption</p>
-          </dd>
+      <%# --- Rule strip --- %>
+      <div class="v9-rule">
+        <div class="v9-rule__inner">
+          <span>◐ §04 / 04 · Don't trust. Verify.</span>
+          <span>↓</span>
         </div>
-        <div class="flex flex-col">
-          <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
-            <svg class="h-5 w-5 flex-none text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
-            </svg>
-            Zero-Knowledge Auth
-          </dt>
-          <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-300">
-            <p class="flex-auto">Connect without revealing your identity to our servers</p>
-          </dd>
-        </div>
-        <div class="flex flex-col">
-          <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
-            <svg class="h-5 w-5 flex-none text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
-            </svg>
-            Lightning-Fast Protocol
-          </dt>
-          <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-300">
-            <p class="flex-auto">The world's fastest and most secure VPN technology</p>
-          </dd>
-        </div>
-        <div class="flex flex-col">
-          <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
-            <svg class="h-5 w-5 flex-none text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-            </svg>
-            Bank-Level Encryption
-          </dt>
-          <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-300">
-            <p class="flex-auto">All data encrypted with unbreakable algorithms</p>
-          </dd>
-        </div>
-      </dl>
-    </div>
-  </div>
-</section>
-
-<%# CTA Section %>
-<section class="bg-indigo-600 py-16" aria-label="Call to Action">
-  <div class="mx-auto max-w-7xl px-6 lg:px-8">
-    <div class="mx-auto max-w-2xl text-center">
-      <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-        Take Back Your Privacy Today
-      </h2>
-      <p class="mx-auto mt-6 max-w-xl text-lg leading-8 text-indigo-100">
-        Join thousands who have chosen true privacy over empty promises. 
-        Pay with Bitcoin or Monero. No email required. No personal data. Just privacy.
-      </p>
-      <div class="mt-10 flex items-center justify-center gap-x-6">
-        <%= link_to "Create Anonymous Account", signup_path, 
-            class: "rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-indigo-600 shadow-sm hover:bg-indigo-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" %>
-        <%= link_to "View Documentation", "#", 
-            class: "text-sm font-semibold leading-6 text-white hover:text-indigo-100" %>
       </div>
-    </div>
-  </div>
-</section>
-</main>
 
-<%# Footer %>
-<footer class="bg-gray-900">
-  <div class="mx-auto max-w-7xl px-6 py-12 lg:px-8">
-    <div class="mt-8 border-t border-gray-800 pt-8 md:flex md:items-center md:justify-between">
-      <div class="flex space-x-6 md:order-2">
-        <a href="https://github.com/vpn9labs" target="_blank" class="text-gray-400 hover:text-gray-300">
-          <span class="sr-only">GitHub</span>
-          <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
-          </svg>
-        </a>
-        <a href="/docs" class="text-gray-400 hover:text-gray-300">
-          <span class="sr-only">Documentation</span>
-          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-          </svg>
-        </a>
-        <a href="/privacy" class="text-gray-400 hover:text-gray-300">
-          <span class="sr-only">Privacy Policy</span>
-          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-          </svg>
-        </a>
+      <%# --- Attestation --- %>
+      <section id="verify" class="v9-sec" aria-label="Verify">
+        <div class="v9-sec__head">
+          <div class="v9-sec__num"><span class="amber">§04</span> &nbsp;/&nbsp; Attestation</div>
+          <h2 class="v9-sec__title display">
+            Don't take our word.<br><em>Take the proof.</em>
+          </h2>
+        </div>
+
+        <div class="v9-attest">
+          <span class="v9-attest__watermark">verify</span>
+          <span class="v9-attest__line v9-attest__line--dim">// live attestation endpoint · GET /api/v1/attestation</span>
+          <span class="v9-attest__line">
+            <span class="v9-attest__prompt">$</span>curl <span class="str">https://vpn9.com/api/v1/attestation</span>
+          </span>
+          <br>
+          <span class="v9-attest__line">{</span>
+          <span class="v9-attest__line">&nbsp;&nbsp;<span class="key">"build_version"</span>:&nbsp;<span class="str">"v1.4.2"</span>,</span>
+          <span class="v9-attest__line">&nbsp;&nbsp;<span class="key">"build_commit"</span>:&nbsp;<span class="str">"955fbd3ab19c…"</span>,</span>
+          <span class="v9-attest__line">&nbsp;&nbsp;<span class="key">"build_timestamp"</span>:&nbsp;<span class="str">"2025-10-14T03:18:44Z"</span>,</span>
+          <span class="v9-attest__line">&nbsp;&nbsp;<span class="key">"image_digest"</span>:&nbsp;<span class="str">"sha256:d12e…f84c"</span>,</span>
+          <span class="v9-attest__line">&nbsp;&nbsp;<span class="key">"sbom"</span>:&nbsp;<span class="str">"https://vpn9.com/sbom/v1.4.2.json"</span>,</span>
+          <span class="v9-attest__line">&nbsp;&nbsp;<span class="key">"signature"</span>:&nbsp;<span class="str">"cosign://verifiable"</span>,</span>
+          <span class="v9-attest__line">&nbsp;&nbsp;<span class="key">"logs_retained"</span>:&nbsp;<span class="num">0</span>,</span>
+          <span class="v9-attest__line">&nbsp;&nbsp;<span class="key">"data_retained"</span>:&nbsp;<span class="str">"none"</span></span>
+          <span class="v9-attest__line">}<span class="v9-attest__cursor"></span></span>
+          <br>
+          <span class="v9-attest__line v9-attest__line--dim">// the running server identifies itself by digest.</span>
+          <span class="v9-attest__line v9-attest__line--dim">// the digest matches a signed, reproducible build.</span>
+          <span class="v9-attest__line v9-attest__line--dim">// the build matches source code you can read.</span>
+          <span class="v9-attest__line v9-attest__line--dim">// if any link in that chain breaks, we lose your trust — and you notice.</span>
+        </div>
+
+        <div style="margin-top: 28px; display: grid; grid-template-columns: 1fr; gap: 16px;">
+          <div style="display: grid; grid-template-columns: 1fr; gap: 16px;" class="v9-attest-links">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border: 1px solid var(--rule); font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.06em;">
+              <span><span style="color: var(--amber);">01 &nbsp;</span>Read the source</span>
+              <a href="https://github.com/vpn9labs" target="_blank" rel="noopener" style="color: var(--amber); display: inline-flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.18em; font-size: 11px;">
+                github.com/vpn9labs
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 7L7 3M7 3H3.5M7 3V6.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/></svg>
+              </a>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border: 1px solid var(--rule); font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.06em;">
+              <span><span style="color: var(--amber);">02 &nbsp;</span>Check the running digest</span>
+              <%= link_to transparency_path, style: "color: var(--amber); display: inline-flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.18em; font-size: 11px;" do %>
+                /transparency
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 7L7 3M7 3H3.5M7 3V6.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/></svg>
+              <% end %>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border: 1px solid var(--rule); font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.06em;">
+              <span><span style="color: var(--amber);">03 &nbsp;</span>Verify the signature</span>
+              <%= link_to security_path, style: "color: var(--amber); display: inline-flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.18em; font-size: 11px;" do %>
+                /security
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 7L7 3M7 3H3.5M7 3V6.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/></svg>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <%# --- DNS leak test (shared partial, restyled via wrapper) --- %>
+      <div class="v9-dns-shell" id="dns-test">
+        <div class="v9-sec" style="padding-top: 64px; padding-bottom: 24px;">
+          <div class="v9-sec__head">
+            <div class="v9-sec__num"><span class="amber">※</span> &nbsp;/&nbsp; Diagnostic</div>
+            <h2 class="v9-sec__title display">
+              Is your current VPN <em>leaking</em>?
+            </h2>
+          </div>
+        </div>
+        <%= render "shared/dns_leak_test", intro_text: "Most VPNs still leak DNS queries straight to your ISP. Run this test to find out whether yours is actually blind.", accent: :black %>
       </div>
-      <div class="mt-8 md:order-1 md:mt-0">
-        <p class="text-center text-xs leading-5 text-gray-400">
-          &copy; <%= Date.current.year %> VPN9. Open source. Privacy first. No logs.
+
+      <%# --- CTA --- %>
+      <section class="v9-cta" aria-label="Call to Action">
+        <h2 class="v9-cta__title display">
+          The best privacy is the kind you <em>never have to trust</em>.
+        </h2>
+        <p class="v9-cta__sub">
+          Join the people who chose an architecture over a promise.
+          No email, no trail, no record we could hand over — even if we wanted to.
         </p>
+        <div class="v9-cta__buttons">
+          <%= link_to signup_path, class: "v9-btn v9-btn--primary" do %>
+            <span>Create anonymous account</span>
+            <svg class="v9-btn__arrow" width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5h12m0 0L9 1m4 4L9 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/></svg>
+          <% end %>
+          <%= link_to "Sign in with passphrase", new_session_path, class: "v9-btn v9-btn--ghost" %>
+        </div>
+      </section>
+    </main>
+
+    <%# --- Footer --- %>
+    <footer class="v9-foot" aria-label="Footer">
+      <div class="v9-foot__grid">
+        <div class="v9-foot__col">
+          <div class="v9-logo" style="font-size: 32px;">VPN<span class="v9-logo__nine">9</span></div>
+          <p class="v9-foot__tag">
+            A privacy-first VPN that proves its claims. Open source.
+            Verifiable. Anonymous. Licensed under AGPLv3 — forever free
+            to inspect, audit, or fork.
+          </p>
+          <div class="v9-foot__key">
+            PGP&nbsp;FINGERPRINT<br>
+            A7F9&nbsp;C413&nbsp;8E2B&nbsp;5D01&nbsp;9F3A<br>
+            6C47&nbsp;B82E&nbsp;D11F&nbsp;2094&nbsp;C5A3
+          </div>
+        </div>
+        <div class="v9-foot__col">
+          <h4>Product</h4>
+          <a href="#architecture">Architecture</a>
+          <a href="#manifesto">Principles</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#verify">Attestation</a>
+          <a href="#dns-test">DNS leak test</a>
+        </div>
+        <div class="v9-foot__col">
+          <h4>Account</h4>
+          <%= link_to "Create account", signup_path %>
+          <%= link_to "Sign in", new_session_path %>
+          <a href="/devices">Devices</a>
+          <a href="/subscriptions">Billing</a>
+        </div>
+        <div class="v9-foot__col">
+          <h4>Transparency</h4>
+          <%= link_to "Attestation", transparency_path %>
+          <%= link_to "Security model", security_path %>
+          <a href="/privacy">Privacy policy</a>
+          <a href="/terms">Terms of service</a>
+        </div>
+        <div class="v9-foot__col">
+          <h4>Source</h4>
+          <a href="https://github.com/vpn9labs" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="https://github.com/vpn9labs/vpn9-portal/issues" target="_blank" rel="noopener">Report an issue ↗</a>
+          <a href="https://github.com/vpn9labs/vpn9-portal/discussions" target="_blank" rel="noopener">Discussions ↗</a>
+          <a href="/api">Public API</a>
+        </div>
       </div>
-    </div>
-    
-    <div class="mt-8 grid grid-cols-2 gap-8 md:grid-cols-4">
-      <div>
-        <h3 class="text-sm font-semibold leading-6 text-white">Product</h3>
-        <ul role="list" class="mt-4 space-y-2">
-          <li><a href="#features" class="text-sm leading-6 text-gray-400 hover:text-white">Features</a></li>
-          <li><a href="#pricing" class="text-sm leading-6 text-gray-400 hover:text-white">Pricing</a></li>
-          <li><a href="#technical" class="text-sm leading-6 text-gray-400 hover:text-white">Technical</a></li>
-        </ul>
+
+      <div class="v9-foot__bottom">
+        <span>© <%= Date.current.year %> VPN9 · AGPLv3 · Zero logs. Built to be verified.</span>
+        <span><span style="color: var(--amber); margin-right: 8px;">◆</span>BUILD <%= (defined?(Rails) && Rails.application.config.respond_to?(:build_version)) ? Rails.application.config.build_version : "LOCAL/DEV" %></span>
       </div>
-      <div>
-        <h3 class="text-sm font-semibold leading-6 text-white">Privacy</h3>
-        <ul role="list" class="mt-4 space-y-2">
-          <li><a href="#privacy" class="text-sm leading-6 text-gray-400 hover:text-white">No Logs Policy</a></li>
-          <li><a href="/privacy" class="text-sm leading-6 text-gray-400 hover:text-white">Privacy Policy</a></li>
-          <li><a href="/terms" class="text-sm leading-6 text-gray-400 hover:text-white">Terms of Service</a></li>
-        </ul>
-      </div>
-      <div>
-        <h3 class="text-sm font-semibold leading-6 text-white">Resources</h3>
-        <ul role="list" class="mt-4 space-y-2">
-          <li><a href="/docs" class="text-sm leading-6 text-gray-400 hover:text-white">Documentation</a></li>
-          <li><a href="/api" class="text-sm leading-6 text-gray-400 hover:text-white">API</a></li>
-          <li><a href="/support" class="text-sm leading-6 text-gray-400 hover:text-white">Support</a></li>
-        </ul>
-      </div>
-      <div>
-        <h3 class="text-sm font-semibold leading-6 text-white">Open Source</h3>
-        <ul role="list" class="mt-4 space-y-2">
-          <li><a href="https://github.com/vpn9labs" target="_blank" class="text-sm leading-6 text-gray-400 hover:text-white">Open-source code on GitHub (vpn9labs)</a></li>
-          <li><a href="https://github.com/vpn9labs/issues" target="_blank" class="text-sm leading-6 text-gray-400 hover:text-white">Report Issue</a></li>
-          <li><a href="https://github.com/vpn9labs/discussions" target="_blank" class="text-sm leading-6 text-gray-400 hover:text-white">Discussions</a></li>
-        </ul>
-      </div>
-    </div>
+    </footer>
   </div>
-</footer>
+<% end %>
+
+<script>
+  (function() {
+    // Smooth-scroll for in-page anchor links
+    document.querySelectorAll('.v9 a[href^="#"]').forEach(function(a) {
+      a.addEventListener('click', function(e) {
+        var id = a.getAttribute('href');
+        if (id.length > 1) {
+          var el = document.querySelector(id);
+          if (el) {
+            e.preventDefault();
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      });
+    });
+
+    // Subtle hover-glow on manifesto rows (staggered reveal via IntersectionObserver)
+    var rows = document.querySelectorAll('.v9-manifesto__row');
+    if ('IntersectionObserver' in window && rows.length) {
+      var io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '0';
+            entry.target.style.transform = 'translateY(8px)';
+            entry.target.style.transition = 'opacity .6s ease, transform .6s ease';
+            var idx = Array.prototype.indexOf.call(rows, entry.target);
+            setTimeout(function() {
+              entry.target.style.opacity = '1';
+              entry.target.style.transform = 'translateY(0)';
+            }, idx * 70);
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.2 });
+      rows.forEach(function(r) { io.observe(r); });
+    }
+  })();
+</script>
