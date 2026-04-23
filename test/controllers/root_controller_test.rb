@@ -21,15 +21,17 @@ class RootControllerTest < ActionDispatch::IntegrationTest
     get root_url
     assert_response :success
     # Now shows teaser page by default
-    assert_match "True Privacy.", response.body
-    assert_match "Coming Soon", response.body
+    assert_select "section[aria-label='Coming Soon']"
+    assert_select "h1", text: /When we launch,.*we won't know.*who you are\./m
+    assert_match "Put me on the list", response.body
   end
 
   test "should show full landing page with live parameter" do
     get root_url, params: { live: "1" }
     assert_response :success
-    assert_select "h1", text: /True Privacy/
-    assert_match "Zero Logs", response.body
+    assert_select "section[aria-label='Hero']"
+    assert_select "h1", text: /We don't know.*who you are\..*We can't\./m
+    assert_match "Privacy as Architecture", response.body
   end
 
   test "should show CRO landing page when cro parameter is present" do
@@ -46,7 +48,8 @@ class RootControllerTest < ActionDispatch::IntegrationTest
   test "should show normal landing page when cro parameter is empty" do
     get root_url, params: { cro: "" }
     assert_response :success
-    assert_select "h1", text: /True Privacy/
+    assert_select "section[aria-label='Coming Soon']"
+    assert_select "h1", text: /When we launch,.*we won't know.*who you are\./m
     # Should show normal page, not CRO
     assert_select "#offer-countdown", false
     assert_select "#visitor-counter", false
@@ -291,8 +294,8 @@ class RootControllerTest < ActionDispatch::IntegrationTest
     get root_url
     assert_response :success
     # Should show teaser page for unauthenticated users
-    assert_match "True Privacy.", response.body
-    assert_match "Coming Soon", response.body
+    assert_select "section[aria-label='Coming Soon']"
+    assert_match "Put me on the list", response.body
   end
 
   # === Multiple Request Tests ===

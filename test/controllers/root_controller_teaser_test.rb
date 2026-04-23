@@ -7,27 +7,29 @@ class RootControllerTeaserTest < ActionDispatch::IntegrationTest
     get root_url
     assert_response :success
     # Should have teaser elements by default
-    assert_match "True Privacy.", response.body
-    assert_match "Coming Soon", response.body
-    assert_match "Get Early Access", response.body
+    assert_select "section[aria-label='Coming Soon']"
+    assert_select "h1", text: /When we launch,.*we won't know.*who you are\./m
+    assert_match "Put me on the list", response.body
   end
 
   test "should show full landing page with live parameter" do
     get root_url, params: { live: "1" }
     assert_response :success
-    assert_select "h1", text: /True Privacy/
+    assert_select "section[aria-label='Hero']"
+    assert_select "h1", text: /We don't know.*who you are\..*We can't\./m
     # Should not have teaser elements
-    assert_no_match "Coming Soon", response.body
-    assert_no_match "Get Early Access", response.body
+    assert_select "section[aria-label='Coming Soon']", false
+    assert_no_match "Put me on the list", response.body
   end
 
   test "should show full landing page with full parameter" do
     get root_url, params: { full: "1" }
     assert_response :success
-    assert_select "h1", text: /True Privacy/
+    assert_select "section[aria-label='Hero']"
+    assert_select "h1", text: /We don't know.*who you are\..*We can't\./m
     # Should not have teaser elements
-    assert_no_match "Coming Soon", response.body
-    assert_no_match "Get Early Access", response.body
+    assert_select "section[aria-label='Coming Soon']", false
+    assert_no_match "Put me on the list", response.body
   end
 
   test "default page should have email signup form" do
@@ -35,36 +37,39 @@ class RootControllerTeaserTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "form#notification-form"
     assert_select "input[type='email'][required]"
-    assert_select "input[type='submit'][value='Notify Me']"
+    assert_select "button[type='submit']", text: /Notify me at launch/
   end
 
-  test "default page should have countdown element" do
+  test "default page should show launch status" do
     get root_url
     assert_response :success
-    assert_select "#countdown"
-    assert_match "Q4 2025", response.body
+    assert_match "EARLY ACCESS", response.body
+    assert_match "Target", response.body
+    assert_match "launch", response.body
   end
 
   test "default page should have feature preview" do
     get root_url
     assert_response :success
-    assert_match "Zero Connection Logs", response.body
-    assert_match "Anonymous Accounts", response.body
-    assert_match "Cryptocurrency Payments", response.body
+    assert_match "Privacy by", response.body
+    assert_match "Anonymous accounts", response.body
+    assert_match "Bitcoin payments", response.body
+    assert_match "Monero payments", response.body
   end
 
   test "default page should have social proof counter" do
     get root_url
     assert_response :success
     assert_select "#signup-count"
-    assert_match "people waiting", response.body
+    assert_match "Currently", response.body
+    assert_match "waiting", response.body
   end
 
   test "full landing page should not have teaser elements" do
     get root_url, params: { live: "1" }
     assert_response :success
     assert_select "form#notification-form", false
-    assert_select "#countdown", false
+    assert_select "section[aria-label='Coming Soon']", false
     assert_select "#signup-count", false
   end
 
@@ -72,8 +77,8 @@ class RootControllerTeaserTest < ActionDispatch::IntegrationTest
     get root_url, params: { cro: "1" }
     assert_response :success
     assert_select "form#notification-form", false
-    assert_no_match "Coming Soon", response.body
-    assert_no_match "Get Early Access", response.body
+    assert_select "section[aria-label='Coming Soon']", false
+    assert_no_match "Put me on the list", response.body
   end
 
   test "authenticated users should see dashboard regardless of teaser parameter" do
@@ -104,7 +109,8 @@ class RootControllerTeaserTest < ActionDispatch::IntegrationTest
       ref: "producthunt"
     }
     assert_response :success
-    assert_match "True Privacy.", response.body
+    assert_select "section[aria-label='Coming Soon']"
+    assert_select "h1", text: /When we launch,.*we won't know.*who you are\./m
     assert_select "form#notification-form"
   end
 
@@ -112,13 +118,13 @@ class RootControllerTeaserTest < ActionDispatch::IntegrationTest
     get root_url
     assert_response :success
     assert_select "script[type='application/ld+json']"
-    assert_match "Revolutionary privacy-focused VPN service launching soon", response.body
+    assert_match "VPN9 is the only VPN whose architecture makes logging impossible", response.body
   end
 
   test "default page should have footer links" do
     get root_url
     assert_response :success
     assert_select "a[href='https://github.com/vpn9labs']"
-    assert_match "View on GitHub", response.body
+    assert_match "GitHub", response.body
   end
 end

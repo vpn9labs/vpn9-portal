@@ -169,9 +169,9 @@ create_attestation() {
     },
     "materials": [
       {
-        "uri": "docker.io/library/ruby:3.4.6-slim",
+        "uri": "docker.io/library/ruby:3.4.7-slim",
         "digest": {
-          "sha256": "7e98b0446142b30dd4bbf298d13a09735c27abc93d1eece0ca787b19cdac20b2"
+          "sha256": "c1bc8f6bc1075857b9138a600b59127f5570a494e84e80725ea276812465e24e"
         }
       }
     ]

@@ -36,8 +36,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         curl=8.14.1-2+deb13u2 \
         libjemalloc2=5.3.0-3 \
         libvips42t64=8.16.1-1+b1 \
-        sqlite3=3.46.1-7 \
-        busybox=1:1.37.0-6+b3 && \
+        sqlite3=3.46.1-7+deb13u1 \
+        busybox=1:1.37.0-6+b7 && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 # Set production environment with reproducible settings

@@ -6,7 +6,8 @@ class RootControllerCroTest < ActionDispatch::IntegrationTest
   test "should show normal landing page by default" do
     get root_url
     assert_response :success
-    assert_select "h1", text: /True Privacy/
+    assert_select "section[aria-label='Coming Soon']"
+    assert_select "h1", text: /When we launch,.*we won't know.*who you are\./m
     # Should not have CRO elements
     assert_select "#offer-countdown", false
     assert_select "#visitor-counter", false
